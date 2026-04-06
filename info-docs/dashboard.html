@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dream Paris Wedding — AI Assistant Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #B8960C;
+    --gold-light: #D4AF37;
+    --gold-pale: #FDF6E3;
+    --gold-muted: #e8d5a3;
+    --dark: #1a1612;
+    --dark-mid: #2e2820;
+    --mid: #5c4a1e;
+    --text: #3a3020;
+    --text-muted: #8a7a5a;
+    --bg: #faf8f3;
+    --white: #ffffff;
+    --border: #e8dfc8;
+    --green: #3d7a5a;
+    --green-bg: #edf7f2;
+    --red: #8b3a3a;
+    --red-bg: #fdf0f0;
+    --blue: #2e5c8a;
+    --blue-bg: #eef4fb;
+    --sidebar-w: 260px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    font-size: 13px;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--dark);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border-right: 1px solid #2e2820;
+  }
+
+  .logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid #2e2820;
+  }
+
+  .logo-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(184,150,12,0.15);
+    border: 1px solid rgba(184,150,12,0.3);
+    border-radius: 20px;
+    padding: 3px 8px;
+    margin-top: 10px;
+  }
+
+  .ai-dot {
+    width: 6px; height: 6px;
+    background: var(--gold-light);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .ai-badge span {
+    font-size: 10px;
+    color: var(--gold-light);
+    letter-spacing: 0.5px;
+  }
+
+  .nav {
+    padding: 16px 12px;
+    flex: 1;
+  }
+
+  .nav-section-label {
+    font-size: 9px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #4a3e2a;
+    padding: 0 8px;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #8a7a5a;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+    font-size: 12.5px;
+    font-weight: 400;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: #c8b88a; }
+
+  .nav-item.active {
+    background: rgba(184,150,12,0.15);
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--gold);
+    color: var(--dark);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 10px;
+  }
+
+  .nav-badge.green { background: var(--green); color: white; }
+
+  .sidebar-footer {
+    padding: 14px 16px;
+    border-top: 1px solid #2e2820;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--gold), #8a6a00);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px; color: white; font-weight: 600;
+  }
+
+  .user-info { flex: 1; }
+  .user-name { font-size: 12px; color: #c8b88a; font-weight: 500; }
+  .user-role { font-size: 10px; color: #5a4a2a; }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .topbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  .pending-count {
+    background: var(--gold-pale);
+    border: 1px solid var(--gold-muted);
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .btn-ghost:hover { background: var(--bg); }
+
+  .btn-gold {
+    background: var(--gold);
+    color: white;
+  }
+
+  .btn-gold:hover { background: var(--gold-light); }
+
+  /* ── CONTENT AREA ── */
+  .content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ── INBOX LIST ── */
+  .inbox-panel {
+    width: 320px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    overflow: hidden;
+  }
+
+  .inbox-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 3px;
+  }
+
+  .filter-tab {
+    flex: 1;
+    text-align: center;
+    padding: 5px 6px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+
+  .filter-tab.active {
+    background: var(--white);
+    color: var(--gold);
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .inbox-list { flex: 1; overflow-y: auto; }
+
+  .inbox-list::-webkit-scrollbar { width: 4px; }
+  .inbox-list::-webkit-scrollbar-track { background: transparent; }
+  .inbox-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .message-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0ebe0;
+    cursor: pointer;
+    transition: background 0.12s;
+    position: relative;
+  }
+
+  .message-item:hover { background: var(--gold-pale); }
+  .message-item.active { background: var(--gold-pale); border-left: 3px solid var(--gold); }
+
+  .message-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .sender-name { font-weight: 500; font-size: 12.5px; color: var(--dark); }
+  .message-time { font-size: 10px; color: var(--text-muted); }
+
+  .message-subject {
+    font-size: 12px;
+    color: var(--text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .message-preview {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .message-tags {
+    display: flex;
+    gap: 4px;
+    margin-top: 7px;
+    align-items: center;
+  }
+
+  .tag {
+    font-size: 9.5px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  .tag-inquiry { background: #fef3cd; color: #8a6200; border: 1px solid #f0d980; }
+  .tag-client { background: var(--blue-bg); color: var(--blue); border: 1px solid #c0d8f0; }
+  .tag-vendor { background: var(--green-bg); color: var(--green); border: 1px solid #b0dcc8; }
+  .tag-collab { background: #f3eeff; color: #5c3a8a; border: 1px solid #d8c8f0; }
+  .tag-general { background: #f0f0f0; color: #666; border: 1px solid #ddd; }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .status-dot.pending { background: var(--gold); }
+  .status-dot.auto { background: var(--green); }
+
+  /* ── REVIEW PANEL ── */
+  .review-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .review-header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .review-header-left { flex: 1; }
+
+  .review-sender {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 3px;
+  }
+
+  .review-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .review-meta span { display: flex; align-items: center; gap: 4px; }
+
+  .review-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .btn-reject {
+    background: var(--red-bg);
+    color: var(--red);
+    border: 1px solid #e8c0c0;
+  }
+
+  .btn-reject:hover { background: #fde8e8; }
+
+  .btn-approve {
+    background: var(--green);
+    color: white;
+    padding: 8px 18px;
+    font-size: 13px;
+  }
+
+  .btn-approve:hover { background: #2d6048; }
+
+  /* ── TWO COLUMN REVIEW ── */
+  .review-body {
+    flex: 1;
+    display: flex;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .message-col {
+    flex: 1;
+    padding: 20px 24px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+
+  .draft-col {
+    flex: 1;
+    padding: 20px 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .col-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .col-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .message-bubble {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .message-bubble p { margin-bottom: 10px; }
+  .message-bubble p:last-child { margin-bottom: 0; }
+
+  .ai-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .ai-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(184,150,12,0.1);
+    border: 1px solid rgba(184,150,12,0.25);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 10px;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .confidence {
+    font-size: 10px;
+    color: var(--green);
+    background: var(--green-bg);
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid #b0dcc8;
+  }
+
+  .draft-textarea {
+    flex: 1;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    resize: none;
+    outline: none;
+    min-height: 280px;
+    transition: border 0.15s;
+  }
+
+  .draft-textarea:focus {
+    border-color: var(--gold-muted);
+    box-shadow: 0 0 0 3px rgba(184,150,12,0.08);
+  }
+
+  .draft-footer {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .draft-hint { font-size: 11px; color: var(--text-muted); font-style: italic; }
+
+  .char-count { font-size: 11px; color: var(--text-muted); }
+
+  /* ── RIGHT META PANEL ── */
+  .meta-panel {
+    width: 220px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border);
+    background: var(--white);
+    overflow-y: auto;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .meta-section-title {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+
+  .meta-key { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+  .meta-val { font-size: 11px; color: var(--text); font-weight: 500; text-align: right; }
+
+  .priority-high {
+    color: var(--red);
+    background: var(--red-bg);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .priority-med {
+    color: var(--gold);
+    background: var(--gold-pale);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .send-mode-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mode-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.12s;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .mode-option.selected {
+    border-color: var(--gold-muted);
+    background: var(--gold-pale);
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .mode-radio {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .mode-radio.filled::after {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 10px 8px;
+  }
+
+  .stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--dark);
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+
+  .stat-label { font-size: 9.5px; color: var(--text-muted); }
+  .stat-val.gold { color: var(--gold); }
+  .stat-val.green { color: var(--green); }
+
+  /* ── BOTTOM STATS BAR ── */
+  .stats-bar {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .stat-item strong { color: var(--text); font-weight: 600; }
+  .stat-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  .channel-icon {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .ch-gmail { background: #fde8e8; color: #c23b22; }
+  .ch-wa { background: #e8f7ee; color: #25a244; }
+  .ch-ig { background: #f3eeff; color: #833ab4; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-name">Dream Paris Wedding</div>
+    <div class="logo-sub">AI Command Centre</div>
+    <div class="ai-badge">
+      <div class="ai-dot"></div>
+      <span>AI Assistant Active</span>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section-label">Inbox</div>
+    <div class="nav-item active">
+      <span class="nav-icon">📋</span> Approval Queue
+      <span class="nav-badge">12</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚡</span> Auto-Sent
+      <span class="nav-badge green">34</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📨</span> All Messages
+    </div>
+
+    <div class="nav-section-label">Channels</div>
+    <div class="nav-item">
+      <span class="nav-icon">✉️</span> Gmail
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">💬</span> WhatsApp
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📸</span> Instagram
+    </div>
+
+    <div class="nav-section-label">Settings</div>
+    <div class="nav-item">
+      <span class="nav-icon">🧠</span> Knowledge Base
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚙️</span> Approval Rules
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📊</span> Analytics
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="avatar">S</div>
+    <div class="user-info">
+      <div class="user-name">Sophie Laurent</div>
+      <div class="user-role">Lead Planner</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="page-title">Approval Queue</div>
+      <div class="pending-count">12 Pending Review</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost">⟳ Refresh</button>
+      <button class="btn btn-gold">✓ Approve All Safe</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- INBOX LIST -->
+    <div class="inbox-panel">
+      <div class="inbox-header">
+        <div class="filter-tabs">
+          <div class="filter-tab active">All (12)</div>
+          <div class="filter-tab">Inquiry</div>
+          <div class="filter-tab">Client</div>
+          <div class="filter-tab">Vendor</div>
+        </div>
+      </div>
+
+      <div class="inbox-list">
+
+        <!-- Active item -->
+        <div class="message-item active">
+          <div class="message-item-top">
+            <div class="sender-name">Emma & James Holloway</div>
+            <div class="message-time">9:42 am</div>
+          </div>
+          <div class="message-subject">Eiffel Tower ceremony — June 2026</div>
+          <div class="message-preview">We've been dreaming of a Paris wedding for years and found your...</div>
+          <div class="message-tags">
+            <div class="status-dot pending"></div>
+            <div class="tag tag-inquiry">New Inquiry</div>
+            <div class="tag" style="background:#fde8e8;color:#8b3a3a;border:1px solid #e8c0c0;font-size:9.5px;padding:2px 7px;border-radius:10px;">High Value</div>
+          </div>
+        </div>
+
+        <div class="message-item">
+          <div class="message-item-top">
+            <div class="sender-name">Château Vaux-le-Vicomte</div>
+            <div class="message-time">9:15 am</div>
+          </div>
+          <div class="message-subject">Re: Availability — September dates</div>
+          <div class="message-preview">Good morning, following up on your venue inquiry for the...</div>
+          <div class="message-tags">
+            <div class="status-dot pending"></div>
+            <div class="tag tag-vendor">Vendor</div>
+          </div>
+        </div>
+
+        <div class="message-item">
+          <div class="message-item-top">
+            <div class="sender-name">Priya & Rohan Mehta</div>
+            <div class="message-time">8:58 am</div>
+          </div>
+          <div class="message-subject">Catering menu final confirmation</div>
+          <div class="message-preview">Hi, we wanted to confirm the vegetarian options we discussed...</div>
+          <div class="message-tags">
+            <div class="status-dot pending"></div>
+            <div class="tag tag-client">Existing Client</div>
+          </div>
+        </div>
+
+        <div class="message-item">
+          <div class="message-item-top">
+            <div class="sender-name">Lumière Photography</div>
+            <div class="message-time">8:30 am</div>
+          </div>
+          <div class="message-subject">Partnership proposal — 2026 season</div>
+          <div class="message-preview">We've admired your work for some time and would love to...</div>
+          <div class="message-tags">
+            <div class="status-dot pending"></div>
+            <div class="tag tag-collab">Collaboration</div>
+          </div>
+        </div>
+
+        <div class="message-item">
+          <div class="message-item-top">
+            <div class="sender-name">Clara Dubois</div>
+            <div class="message-time">7:55 am</div>
+          </div>
+          <div class="message-subject">Quick question about your pricing</div>
+          <div class="message-preview">Hello! I was wondering if you could share your general pricing...</div>
+          <div class="message-tags">
+            <div class="status-dot auto"></div>
+            <div class="tag tag-general">General</div>
+          </div>
+        </div>
+
+        <div class="message-item">
+          <div class="message-item-top">
+            <div class="sender-name">Fleurs de Paris</div>
+            <div class="message-time">Yesterday</div>
+          </div>
+          <div class="message-subject">Floral quote for the Beaumont wedding</div>
+          <div class="message-preview">Please find attached our revised quote for the ceremony...</div>
+          <div class="message-tags">
+            <div class="status-dot pending"></div>
+            <div class="tag tag-vendor">Vendor</div>
+          </div>
+        </div>
+
+        <div class="message-item">
+          <div class="message-item-top">
+            <div class="sender-name">Isabella & Marco Rossi</div>
+            <div class="message-time">Yesterday</div>
+          </div>
+          <div class="message-subject">Timeline update — 3 weeks out</div>
+          <div class="message-preview">We just wanted to check in on the final schedule for...</div>
+          <div class="message-tags">
+            <div class="status-dot pending"></div>
+            <div class="tag tag-client">Existing Client</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- REVIEW PANEL -->
+    <div class="review-panel">
+
+      <div class="review-header">
+        <div class="review-header-left">
+          <div class="review-sender">Emma & James Holloway</div>
+          <div class="review-meta">
+            <span>✉️ emma.holloway@gmail.com</span>
+            <span>🕐 Today, 9:42 am</span>
+            <span>📍 Via Gmail</span>
+          </div>
+        </div>
+        <div class="review-actions">
+          <button class="btn btn-ghost">↩ Skip</button>
+          <button class="btn btn-reject">✕ Discard</button>
+          <button class="btn btn-approve btn-gold">✓ Approve & Send</button>
+        </div>
+      </div>
+
+      <div class="review-body">
+
+        <!-- Original message -->
+        <div class="message-col">
+          <div class="col-label">Original Message</div>
+          <div class="message-bubble">
+            <p>Dear Dream Paris Wedding team,</p>
+            <p>My name is Emma, and I'm writing on behalf of myself and my fiancé James. We've been dreaming of a Paris wedding for as long as we can remember, and after discovering your work through Instagram, we feel your style perfectly captures what we've always envisioned.</p>
+            <p>We're considering a ceremony near the Eiffel Tower in June 2026, ideally for around 40 guests. We'd love a full planning service that covers the venue, catering, flowers, and photography coordination.</p>
+            <p>Could you please let us know your availability and whether you offer an initial consultation? We're based in London but are happy to travel to Paris at your convenience.</p>
+            <p>Warm regards,<br>Emma & James Holloway</p>
+          </div>
+        </div>
+
+        <!-- AI Draft -->
+        <div class="draft-col">
+          <div class="col-label">
+            <div class="ai-label">
+              <div class="ai-chip">✦ AI Draft</div>
+              <div class="confidence">96% tone match</div>
+            </div>
+          </div>
+
+          <textarea class="draft-textarea">Dear Emma and James,
+
+What a beautiful vision — a ceremony near the Eiffel Tower in June surrounded by your closest 40 guests sounds absolutely magical, and we would be truly honoured to help bring it to life.
+
+June 2026 is one of our most cherished seasons in Paris, and we do have availability during that month. We offer a full planning service that covers everything you've mentioned — venue selection and negotiation, bespoke catering coordination, floral design, and photography curation — so you can arrive in Paris knowing every detail has been lovingly arranged.
+
+We would love to invite you to a complimentary initial consultation, either in person during a Paris visit or via video call at a time that suits you. This gives us the chance to truly understand your vision and share some of our favourite Eiffel Tower ceremony locations with you.
+
+Could you let us know a few dates that work for you over the next two weeks? We're very much looking forward to beginning this journey together.
+
+Warmly,
+Sophie Laurent
+Dream Paris Wedding</textarea>
+
+          <div class="draft-footer">
+            <div class="draft-hint">✎ Click to edit before sending</div>
+            <div class="char-count">487 characters</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- META PANEL -->
+    <div class="meta-panel">
+
+      <div>
+        <div class="meta-section-title">Classification</div>
+        <div class="meta-row">
+          <div class="meta-key">Category</div>
+          <div class="meta-val"><span class="tag tag-inquiry">New Inquiry</span></div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-key">Priority</div>
+          <div class="meta-val"><span class="priority-high">High</span></div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-key">Source</div>
+          <div class="meta-val">Gmail</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-key">Est. Value</div>
+          <div class="meta-val" style="color:var(--green);">€12,000+</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-key">Guests</div>
+          <div class="meta-val">~40</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-key">Date</div>
+          <div class="meta-val">June 2026</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="meta-section-title">Sending Mode</div>
+        <div class="send-mode-toggle">
+          <div class="mode-option">
+            <div class="mode-radio"></div>
+            Auto-Send
+          </div>
+          <div class="mode-option selected">
+            <div class="mode-radio filled"></div>
+            Approve First
+          </div>
+          <div class="mode-option">
+            <div class="mode-radio"></div>
+            Draft Only
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="meta-section-title">Today's Stats</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-val gold">12</div>
+            <div class="stat-label">Pending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val green">34</div>
+            <div class="stat-label">Auto-sent</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">8</div>
+            <div class="stat-label">Approved</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" style="color:var(--mid);">96%</div>
+            <div class="stat-label">Tone Score</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="meta-section-title">Channel Activity</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="channel-icon ch-gmail">✉</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;color:var(--text);margin-bottom:3px;">Gmail <span style="color:var(--text-muted);">· 28 msgs</span></div>
+              <div style="height:4px;background:var(--border);border-radius:4px;">
+                <div style="height:4px;background:var(--gold);border-radius:4px;width:65%;"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="channel-icon ch-wa">💬</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;color:var(--text);margin-bottom:3px;">WhatsApp <span style="color:var(--text-muted);">· 11 msgs</span></div>
+              <div style="height:4px;background:var(--border);border-radius:4px;">
+                <div style="height:4px;background:var(--green);border-radius:4px;width:28%;"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="channel-icon ch-ig">📸</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;color:var(--text);margin-bottom:3px;">Instagram <span style="color:var(--text-muted);">· 7 msgs</span></div>
+              <div style="height:4px;background:var(--border);border-radius:4px;">
+                <div style="height:4px;background:#833ab4;border-radius:4px;width:18%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-dot" style="background:var(--gold);"></div>
+      <strong>12</strong> awaiting approval
+    </div>
+    <div class="stat-item">
+      <div class="stat-dot" style="background:var(--green);"></div>
+      <strong>34</strong> auto-sent today
+    </div>
+    <div class="stat-item">
+      <div class="stat-dot" style="background:var(--blue);"></div>
+      <strong>8</strong> manually approved
+    </div>
+    <div class="stat-item" style="margin-left:auto;">
+      <span>Avg. response time:</span> <strong>4 min</strong>
+    </div>
+    <div class="stat-item">
+      <span>AI tone accuracy:</span> <strong style="color:var(--green);">96%</strong>
+    </div>
+    <div class="stat-item">
+      <div class="ai-dot" style="width:7px;height:7px;background:var(--green);animation:pulse 2s infinite;border-radius:50%;"></div>
+      System online
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

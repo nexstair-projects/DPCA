@@ -1,0 +1,53 @@
+{
+  "name": "WF3 — KB Embedding",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "embed-kb" },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "typeVersion": 1,
+      "notes": "Manual trigger or Supabase webhook on knowledge_base insert/update."
+    },
+    {
+      "parameters": {},
+      "name": "Fetch KB Entry",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300],
+      "typeVersion": 4,
+      "notes": "Read knowledge_base entry from Supabase by ID."
+    },
+    {
+      "parameters": { "model": "text-embedding-3-small" },
+      "name": "Generate Embedding",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [650, 300],
+      "typeVersion": 1,
+      "notes": "OpenAI text-embedding-3-small, 1536 dimensions. Input = title + content concatenated."
+    },
+    {
+      "parameters": {},
+      "name": "Upsert to Pinecone",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300],
+      "typeVersion": 4,
+      "notes": "Upsert vector to Pinecone index with metadata: { kb_id, category, subcategory, title, inlet_id }."
+    },
+    {
+      "parameters": {},
+      "name": "Update KB Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1050, 300],
+      "typeVersion": 4,
+      "notes": "Update knowledge_base.embedding_status = 'completed' in Supabase."
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{ "node": "Fetch KB Entry", "type": "main", "index": 0 }]] },
+    "Fetch KB Entry": { "main": [[{ "node": "Generate Embedding", "type": "main", "index": 0 }]] },
+    "Generate Embedding": { "main": [[{ "node": "Upsert to Pinecone", "type": "main", "index": 0 }]] },
+    "Upsert to Pinecone": { "main": [[{ "node": "Update KB Record", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "DPCA" }, { "name": "Knowledge Base" }]
+}

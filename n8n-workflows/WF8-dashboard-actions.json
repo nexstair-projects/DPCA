@@ -1,0 +1,92 @@
+{
+  "name": "WF8 — Dashboard Actions",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "draft-action" },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "typeVersion": 1,
+      "notes": "Called by backend API with { action, draft_id, message_id, user_id, ... }. Actions: approve, edit_and_send, reject, regenerate, reassign."
+    },
+    {
+      "parameters": {},
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "position": [450, 300],
+      "typeVersion": 2,
+      "notes": "Branch on action field to appropriate handler."
+    },
+    {
+      "parameters": {},
+      "name": "Approve & Send",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [700, 100],
+      "typeVersion": 4,
+      "notes": "Trigger WF6 send-message webhook. Update draft status → approved."
+    },
+    {
+      "parameters": {},
+      "name": "Edit & Send",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [700, 250],
+      "typeVersion": 4,
+      "notes": "Save edited_text to draft, then trigger WF6 send-message."
+    },
+    {
+      "parameters": {},
+      "name": "Reject",
+      "type": "n8n-nodes-base.function",
+      "position": [700, 400],
+      "typeVersion": 1,
+      "notes": "Update draft status → rejected. Log rejection reason to audit_log."
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "temperature": 0.5,
+        "maxTokens": 800
+      },
+      "name": "Regenerate Draft",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [700, 550],
+      "typeVersion": 1,
+      "notes": "Uses P5 regeneration prompt. Previous draft + feedback + original message + KB context → new draft. Stores as new draft row."
+    },
+    {
+      "parameters": {},
+      "name": "Reassign",
+      "type": "n8n-nodes-base.function",
+      "position": [700, 700],
+      "typeVersion": 1,
+      "notes": "Update draft.assigned_to. Optionally send notification to assigned team member."
+    },
+    {
+      "parameters": {},
+      "name": "Audit Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [950, 400],
+      "typeVersion": 4,
+      "notes": "All actions log to audit_log: { action_type, user_id, draft_id, message_id, metadata }."
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{ "node": "Route by Action", "type": "main", "index": 0 }]] },
+    "Route by Action": {
+      "main": [
+        [{ "node": "Approve & Send", "type": "main", "index": 0 }],
+        [{ "node": "Edit & Send", "type": "main", "index": 0 }],
+        [{ "node": "Reject", "type": "main", "index": 0 }],
+        [{ "node": "Regenerate Draft", "type": "main", "index": 0 }],
+        [{ "node": "Reassign", "type": "main", "index": 0 }]
+      ]
+    },
+    "Approve & Send": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] },
+    "Edit & Send": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] },
+    "Reject": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] },
+    "Regenerate Draft": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] },
+    "Reassign": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "DPCA" }, { "name": "Dashboard Actions" }]
+}

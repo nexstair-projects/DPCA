@@ -1,0 +1,242 @@
+{
+  "name": "WF1 - Gmail to Supabase (Production)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "1",
+      "name": "Poll Gmail",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [160, 300]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 10,
+        "simple": false,
+        "filters": {
+          "q": "is:unread -label:AI-Processing in:inbox"
+        }
+      },
+      "id": "2",
+      "name": "Fetch New Emails",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [380, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getHeader(headers, name) {\n  const h = headers?.find(h => (h.name || '').toLowerCase() === name.toLowerCase());\n  return h ? h.value : '';\n}\n\nfunction decodeBase64Url(data) {\n  if (!data) return '';\n  const normalized = data.replace(/-/g, '+').replace(/_/g, '/');\n  return Buffer.from(normalized, 'base64').toString('utf8');\n}\n\nfunction extractPart(payload, mimeType) {\n  if (!payload) return '';\n\n  if (payload.mimeType === mimeType && payload.body?.data) {\n    return decodeBase64Url(payload.body.data);\n  }\n\n  if (payload.parts && Array.isArray(payload.parts)) {\n    for (const part of payload.parts) {\n      if (part.mimeType === mimeType && part.body?.data) {\n        return decodeBase64Url(part.body.data);\n      }\n    }\n    for (const part of payload.parts) {\n      if (part.parts) {\n        const nested = extractPart(part, mimeType);\n        if (nested) return nested;\n      }\n    }\n  }\n\n  return '';\n}\n\nfunction stripHtml(html) {\n  return (html || '')\n    .replace(/<style[\\s\\S]*?<\\/style>/gi, ' ')\n    .replace(/<script[\\s\\S]*?<\\/script>/gi, ' ')\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    .replace(/<\\/p>/gi, '\\n')\n    .replace(/<[^>]+>/g, ' ')\n    .replace(/&nbsp;/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/\\s+\\n/g, '\\n')\n    .replace(/\\n\\s+/g, '\\n')\n    .replace(/[ \\t]+/g, ' ')\n    .trim();\n}\n\nreturn items.map(item => {\n  const j = item.json;\n  const payload = j.payload || {};\n  const headers = payload.headers || [];\n\n  const from = getHeader(headers, 'From');\n  const to = getHeader(headers, 'To');\n  const subject = getHeader(headers, 'Subject');\n  const date = getHeader(headers, 'Date');\n  const messageIdHeader = getHeader(headers, 'Message-ID');\n\n  let bodyText = extractPart(payload, 'text/plain');\n  if (!bodyText) {\n    const html = extractPart(payload, 'text/html');\n    bodyText = stripHtml(html);\n  }\n  if (!bodyText) bodyText = j.snippet || '';\n\n  return {\n    json: {\n      gmail_message_id: j.id,\n      gmail_thread_id: j.threadId,\n      message_id_header: messageIdHeader,\n      from_email: from,\n      to_email: to,\n      subject: subject,\n      received_at: date,\n      snippet: j.snippet || '',\n      body_text: bodyText.trim(),\n      status: 'new'\n    }\n  };\n});"
+      },
+      "id": "3",
+      "name": "Clean Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [620, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hefkqlkiuiqhgssdmvad.supabase.co/rest/v1/messages?on_conflict=message_external_id",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=ignore-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "otherBody",
+        "body": "={{ JSON.stringify({\n  message_external_id: $json.gmail_message_id,\n  thread_external_id: $json.gmail_thread_id,\n  message_id_header: $json.message_id_header,\n  from_email: $json.from_email,\n  to_email: $json.to_email,\n  subject: $json.subject,\n  body_text: $json.body_text,\n  snippet: $json.snippet,\n  received_at: $json.received_at,\n  status: 'new',\n  inbox_id: '70eb1a2a-d50c-4586-96a2-f12a9ed57118',\n  channel: 'gmail',\n  classification_status: 'pending'\n}) }}"
+      },
+      "id": "4",
+      "name": "Insert into Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{Array.isArray($json) ? $json.length > 0 : !!$json.id}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "5",
+      "name": "Inserted?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "modify",
+        "messageId": "={{$item(0).$node[\"Clean Email\"].json[\"gmail_message_id\"]}}",
+        "addLabelNames": [
+          "AI-Processing"
+        ],
+        "removeLabelNames": [
+          "UNREAD"
+        ]
+      },
+      "id": "6",
+      "name": "Label as AI-Processing",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1360, 220],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "{{$env.WF2_WEBHOOK_URL || 'http://host.docker.internal:5678/webhook/wf2-trigger'}}",
+        "sendBody": true,
+        "specifyBody": "otherBody",
+        "body": "={{ JSON.stringify({\n  message_external_id: $item(0).$node['Clean Email'].json.gmail_message_id,\n  thread_external_id: $item(0).$node['Clean Email'].json.gmail_thread_id,\n  status: 'new'\n}) }}"
+      },
+      "id": "7",
+      "name": "Trigger WF2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 220]
+    },
+    {
+      "parameters": {},
+      "id": "8",
+      "name": "Skip Duplicate",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1360, 400]
+    }
+  ],
+  "connections": {
+    "Poll Gmail": {
+      "main": [
+        [
+          {
+            "node": "Fetch New Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch New Emails": {
+      "main": [
+        [
+          {
+            "node": "Clean Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Email": {
+      "main": [
+        [
+          {
+            "node": "Insert into Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert into Supabase": {
+      "main": [
+        [
+          {
+            "node": "Inserted?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inserted?": {
+      "main": [
+        [
+          {
+            "node": "Label as AI-Processing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label as AI-Processing": {
+      "main": [
+        [
+          {
+            "node": "Trigger WF2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

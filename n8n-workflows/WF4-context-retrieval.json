@@ -1,0 +1,44 @@
+{
+  "name": "WF4 — Context Retrieval",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "retrieve-context" },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "typeVersion": 1,
+      "notes": "Called by WF5 with { message_id, category, body_clean }."
+    },
+    {
+      "parameters": { "model": "text-embedding-3-small" },
+      "name": "Embed Query",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [450, 300],
+      "typeVersion": 1,
+      "notes": "Generate embedding from message body_clean for similarity search."
+    },
+    {
+      "parameters": {},
+      "name": "Query Pinecone",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 300],
+      "typeVersion": 4,
+      "notes": "Top-5 results. Metadata filter based on category: new_inquiry → template,email_example,faq,brand_voice; existing_client → email_example,template,process."
+    },
+    {
+      "parameters": {},
+      "name": "Build Context Block",
+      "type": "n8n-nodes-base.function",
+      "position": [850, 300],
+      "typeVersion": 1,
+      "notes": "Assemble top-5 KB entries into a 3000-token context block. Return { context_text, source_ids[] }."
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{ "node": "Embed Query", "type": "main", "index": 0 }]] },
+    "Embed Query": { "main": [[{ "node": "Query Pinecone", "type": "main", "index": 0 }]] },
+    "Query Pinecone": { "main": [[{ "node": "Build Context Block", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "DPCA" }, { "name": "Retrieval" }]
+}

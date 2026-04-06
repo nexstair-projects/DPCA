@@ -1,0 +1,77 @@
+{
+  "name": "WF6 — Auto-Send",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "send-message" },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "typeVersion": 1,
+      "notes": "Called by WF5 (Tier 1 auto) or WF8 (dashboard approve & send) with { draft_id, message_id, channel }."
+    },
+    {
+      "parameters": {},
+      "name": "Fetch Draft + Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300],
+      "typeVersion": 4,
+      "notes": "GET /api/messages/:id with drafts. Use edited_text if present, else draft_text."
+    },
+    {
+      "parameters": {},
+      "name": "Route by Channel",
+      "type": "n8n-nodes-base.switch",
+      "position": [650, 300],
+      "typeVersion": 2,
+      "notes": "Branch on message.channel: gmail → Gmail API, whatsapp → Meta Cloud API, instagram → Meta Graph API."
+    },
+    {
+      "parameters": {},
+      "name": "Send via Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "position": [850, 200],
+      "typeVersion": 2,
+      "notes": "Reply in thread (thread_id), apply 'AI-Sent' label. 3 retries with exponential backoff."
+    },
+    {
+      "parameters": {},
+      "name": "Send via WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 350],
+      "typeVersion": 4,
+      "notes": "Meta Cloud API: POST /{phone-number-id}/messages with reply text."
+    },
+    {
+      "parameters": {},
+      "name": "Send via Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 500],
+      "typeVersion": 4,
+      "notes": "Meta Graph API: POST /me/messages with reply text."
+    },
+    {
+      "parameters": {},
+      "name": "Report Result",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1050, 300],
+      "typeVersion": 4,
+      "notes": "POST /api/webhooks/n8n/send-result with { draft_id, message_id, success, sent_at }."
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{ "node": "Fetch Draft + Message", "type": "main", "index": 0 }]] },
+    "Fetch Draft + Message": { "main": [[{ "node": "Route by Channel", "type": "main", "index": 0 }]] },
+    "Route by Channel": {
+      "main": [
+        [{ "node": "Send via Gmail", "type": "main", "index": 0 }],
+        [{ "node": "Send via WhatsApp", "type": "main", "index": 0 }],
+        [{ "node": "Send via Instagram", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send via Gmail": { "main": [[{ "node": "Report Result", "type": "main", "index": 0 }]] },
+    "Send via WhatsApp": { "main": [[{ "node": "Report Result", "type": "main", "index": 0 }]] },
+    "Send via Instagram": { "main": [[{ "node": "Report Result", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "DPCA" }, { "name": "Send" }]
+}

@@ -1,0 +1,57 @@
+{
+  "name": "WF7 — Lead Extraction",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "extract-lead" },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "typeVersion": 1,
+      "notes": "Called by WF2 after classification when category=new_inquiry with { message_id }."
+    },
+    {
+      "parameters": {},
+      "name": "Fetch Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300],
+      "typeVersion": 4,
+      "notes": "GET /api/messages/:id for full message body and sender info."
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "temperature": 0.1,
+        "maxTokens": 500
+      },
+      "name": "GPT-4o Extract Lead",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [650, 300],
+      "typeVersion": 1,
+      "notes": "Uses P4 lead extraction prompt. Returns JSON: { client_names, email, phone, wedding_date, guest_count, budget_range, venue_preference, services_requested, ai_summary }."
+    },
+    {
+      "parameters": {},
+      "name": "Check Existing Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300],
+      "typeVersion": 4,
+      "notes": "Query Supabase leads table by email. If exists, update; else create new lead."
+    },
+    {
+      "parameters": {},
+      "name": "Store Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1050, 300],
+      "typeVersion": 4,
+      "notes": "POST /api/webhooks/n8n/lead-extracted with structured lead data."
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{ "node": "Fetch Message", "type": "main", "index": 0 }]] },
+    "Fetch Message": { "main": [[{ "node": "GPT-4o Extract Lead", "type": "main", "index": 0 }]] },
+    "GPT-4o Extract Lead": { "main": [[{ "node": "Check Existing Lead", "type": "main", "index": 0 }]] },
+    "Check Existing Lead": { "main": [[{ "node": "Store Lead", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "DPCA" }, { "name": "Leads" }]
+}

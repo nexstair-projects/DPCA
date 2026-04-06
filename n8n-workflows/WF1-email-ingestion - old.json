@@ -1,0 +1,62 @@
+
+{
+  "name": "WF1 — Email Ingestion",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [{ "field": "minutes", "minutesInterval": 2 }] } },
+      "name": "Poll Gmail",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "name": "Fetch New Emails",
+      "type": "n8n-nodes-base.gmail",
+      "position": [450, 300],
+      "typeVersion": 2,
+      "notes": "Query: is:unread -label:AI-Processing. Fetch last 10 emails."
+    },
+    {
+      "parameters": {},
+      "name": "Check Duplicates",
+      "type": "n8n-nodes-base.function",
+      "position": [650, 300],
+      "typeVersion": 1,
+      "notes": "Check message_external_id against Supabase messages table to skip already-ingested emails."
+    },
+    {
+      "parameters": {},
+      "name": "Clean & Store",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300],
+      "typeVersion": 4,
+      "notes": "POST to /api/webhooks/n8n/message-ingested with cleaned email data."
+    },
+    {
+      "parameters": {},
+      "name": "Label as AI-Processing",
+      "type": "n8n-nodes-base.gmail",
+      "position": [1050, 300],
+      "typeVersion": 2,
+      "notes": "Apply 'AI-Processing' label & mark as read."
+    },
+    {
+      "parameters": {},
+      "name": "Trigger WF2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1250, 300],
+      "typeVersion": 4,
+      "notes": "Call WF2 classification webhook with message_id."
+    }
+  ],
+  "connections": {
+    "Poll Gmail": { "main": [[{ "node": "Fetch New Emails", "type": "main", "index": 0 }]] },
+    "Fetch New Emails": { "main": [[{ "node": "Check Duplicates", "type": "main", "index": 0 }]] },
+    "Check Duplicates": { "main": [[{ "node": "Clean & Store", "type": "main", "index": 0 }]] },
+    "Clean & Store": { "main": [[{ "node": "Label as AI-Processing", "type": "main", "index": 0 }]] },
+    "Label as AI-Processing": { "main": [[{ "node": "Trigger WF2", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "DPCA" }, { "name": "Ingestion" }]
+}

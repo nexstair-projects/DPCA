@@ -1,0 +1,75 @@
+{
+  "name": "WF5 — Draft Generation",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "generate-draft" },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "typeVersion": 1,
+      "notes": "Called after WF2 classification with { message_id, tier, category }."
+    },
+    {
+      "parameters": {},
+      "name": "Fetch Message + Classification",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300],
+      "typeVersion": 4,
+      "notes": "GET /api/messages/:id for full message and classification data."
+    },
+    {
+      "parameters": {},
+      "name": "Call WF4 Context",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 300],
+      "typeVersion": 4,
+      "notes": "Call WF4 retrieve-context webhook to get KB context block."
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "temperature": 0.4,
+        "maxTokens": 800
+      },
+      "name": "GPT-4o Draft",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [850, 300],
+      "typeVersion": 1,
+      "notes": "System: P1 brand voice. User: P3 draft generation prompt with classification, message, KB context, channel rules."
+    },
+    {
+      "parameters": {},
+      "name": "Post-Process",
+      "type": "n8n-nodes-base.function",
+      "position": [1050, 300],
+      "typeVersion": 1,
+      "notes": "Validate: no placeholder text, check word count, calculate tone_confidence. Optionally run P6 tone validation."
+    },
+    {
+      "parameters": {},
+      "name": "Store Draft",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1250, 300],
+      "typeVersion": 4,
+      "notes": "POST /api/webhooks/n8n/draft-generated. auto_approve=true for Tier 1."
+    },
+    {
+      "parameters": {},
+      "name": "Route Tier 1 → WF6",
+      "type": "n8n-nodes-base.switch",
+      "position": [1450, 300],
+      "typeVersion": 2,
+      "notes": "If Tier 1 and auto_approve, trigger WF6 auto-send. Otherwise, draft awaits human review."
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{ "node": "Fetch Message + Classification", "type": "main", "index": 0 }]] },
+    "Fetch Message + Classification": { "main": [[{ "node": "Call WF4 Context", "type": "main", "index": 0 }]] },
+    "Call WF4 Context": { "main": [[{ "node": "GPT-4o Draft", "type": "main", "index": 0 }]] },
+    "GPT-4o Draft": { "main": [[{ "node": "Post-Process", "type": "main", "index": 0 }]] },
+    "Post-Process": { "main": [[{ "node": "Store Draft", "type": "main", "index": 0 }]] },
+    "Store Draft": { "main": [[{ "node": "Route Tier 1 → WF6", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "DPCA" }, { "name": "Draft" }]
+}

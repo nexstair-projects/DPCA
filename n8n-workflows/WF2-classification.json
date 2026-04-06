@@ -1,0 +1,75 @@
+{
+  "name": "WF2 — Message Classification",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "classify-message" },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "typeVersion": 1,
+      "notes": "Triggered by WF1 with { message_id }."
+    },
+    {
+      "parameters": {},
+      "name": "Fetch Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300],
+      "typeVersion": 4,
+      "notes": "GET /api/messages/:id to retrieve full message body."
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "temperature": 0.1,
+        "maxTokens": 300
+      },
+      "name": "GPT-4o Classify",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [650, 300],
+      "typeVersion": 1,
+      "notes": "Uses P2 classification prompt. Returns JSON: { category, priority, tier, confidence, estimated_value, guest_count, reasoning }."
+    },
+    {
+      "parameters": {},
+      "name": "Safety Overrides",
+      "type": "n8n-nodes-base.function",
+      "position": [850, 300],
+      "typeVersion": 1,
+      "notes": "Apply safety rules: confidence <0.70 escalates tier; value >€5K or guests >20 → Tier 3; cancel/complaint/legal keywords → Tier 3; unknown sender with Tier 1 → Tier 2."
+    },
+    {
+      "parameters": {},
+      "name": "Store Classification",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1050, 300],
+      "typeVersion": 4,
+      "notes": "POST /api/webhooks/n8n/message-classified with final classification result."
+    },
+    {
+      "parameters": {},
+      "name": "Route by Tier",
+      "type": "n8n-nodes-base.switch",
+      "position": [1250, 300],
+      "typeVersion": 2,
+      "notes": "Tier 1 → WF5 (auto-draft). Tier 2 → WF5 (draft for review). Tier 3 → flag only, notify team."
+    },
+    {
+      "parameters": {},
+      "name": "Trigger WF5 + WF7",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1450, 300],
+      "typeVersion": 4,
+      "notes": "Call WF4→WF5 for draft generation and WF7 for lead extraction (if new_inquiry)."
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{ "node": "Fetch Message", "type": "main", "index": 0 }]] },
+    "Fetch Message": { "main": [[{ "node": "GPT-4o Classify", "type": "main", "index": 0 }]] },
+    "GPT-4o Classify": { "main": [[{ "node": "Safety Overrides", "type": "main", "index": 0 }]] },
+    "Safety Overrides": { "main": [[{ "node": "Store Classification", "type": "main", "index": 0 }]] },
+    "Store Classification": { "main": [[{ "node": "Route by Tier", "type": "main", "index": 0 }]] },
+    "Route by Tier": { "main": [[{ "node": "Trigger WF5 + WF7", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "DPCA" }, { "name": "Classification" }]
+}
