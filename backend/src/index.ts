@@ -23,6 +23,19 @@ app.use('/api/messages', messagesRouter)
 app.use('/api/drafts', draftsRouter)
 app.use('/api/webhooks', webhooksRouter)
 
+//root route
+app.get('/', (_req, res) => {
+  res.json({
+    status: 'DPCA API running',
+    endpoints: [
+      '/api/health',
+      '/api/messages',
+      '/api/drafts',
+      '/api/webhooks'
+    ]
+  })
+})
+
 // ── Start ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`DPCA API running on :${PORT}`)
