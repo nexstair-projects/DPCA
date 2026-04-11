@@ -18,10 +18,10 @@ app.use(express.json({ limit: '1mb' }))
 app.use(morgan('short'))
 
 // ── Routes ───────────────────────────────────────────────────────────────────
-app.use('/api/health', healthRouter)
-app.use('/api/messages', messagesRouter)
-app.use('/api/drafts', draftsRouter)
-app.use('/api/webhooks', webhooksRouter)
+// app.use('/api/health', healthRouter)
+// app.use('/api/messages', messagesRouter)
+// app.use('/api/drafts', draftsRouter)
+// app.use('/api/webhooks', webhooksRouter)
 
 // ── Start ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
