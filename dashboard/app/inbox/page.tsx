@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
 import useSWR from 'swr'
 import { createClient } from '@/lib/supabase'
 import Sidebar from '@/components/Sidebar'
@@ -113,6 +113,14 @@ const CHANNEL_TABS = [
 // ── Page ────────────────────────────────────────────────────────────────────────
 
 export default function InboxPage() {
+  return (
+    <Suspense>
+      <InboxContent />
+    </Suspense>
+  )
+}
+
+function InboxContent() {
   const searchParams = useSearchParams()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [filter, setFilter]         = useState('all')

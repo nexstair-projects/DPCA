@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 
 const S = {
@@ -41,10 +41,50 @@ const NAV = [
   },
 ]
 
-export default function Sidebar() {
+function SidebarNav() {
   const pathname = usePathname()
-  const router   = useRouter()
   const searchParams = useSearchParams()
+
+  return (
+    <nav style={{ flex: 1, padding: '14px 10px', overflowY: 'auto' }}>
+      {NAV.map(group => (
+        <div key={group.section} style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 9, fontWeight: 600, color: S.muted, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 10px', marginBottom: 4 }}>
+            {group.section}
+          </div>
+          {group.items.map(item => {
+            const [itemPath, itemQuery] = item.href.split('?')
+            const itemChannel = itemQuery ? new URLSearchParams(itemQuery).get('channel') : null
+            const currentChannel = searchParams.get('channel')
+            const active = itemChannel
+              ? pathname.startsWith(itemPath) && currentChannel === itemChannel
+              : pathname.startsWith(itemPath) && !currentChannel
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '8px 10px', borderRadius: 8, marginBottom: 1,
+                  fontSize: 12, fontWeight: active ? 600 : 400,
+                  color: active ? S.gold : S.text,
+                  background: active ? 'rgba(184,150,12,0.12)' : 'transparent',
+                  textDecoration: 'none', transition: 'all 0.12s',
+                }}
+              >
+                <span style={{ fontSize: 14 }}>{item.icon}</span>
+                {item.label}
+              </Link>
+            )
+          })}
+        </div>
+      ))}
+    </nav>
+  )
+}
+
+export default function Sidebar() {
+  const router   = useRouter()
   const [email,   setEmail]   = useState('')
   const [initial, setInitial] = useState('U')
 
@@ -81,40 +121,9 @@ export default function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '14px 10px', overflowY: 'auto' }}>
-        {NAV.map(group => (
-          <div key={group.section} style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 9, fontWeight: 600, color: S.muted, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 10px', marginBottom: 4 }}>
-              {group.section}
-            </div>
-            {group.items.map(item => {
-              const [itemPath, itemQuery] = item.href.split('?')
-              const itemChannel = itemQuery ? new URLSearchParams(itemQuery).get('channel') : null
-              const currentChannel = searchParams.get('channel')
-              const active = itemChannel
-                ? pathname.startsWith(itemPath) && currentChannel === itemChannel
-                : pathname.startsWith(itemPath) && !currentChannel
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '8px 10px', borderRadius: 8, marginBottom: 1,
-                    fontSize: 12, fontWeight: active ? 600 : 400,
-                    color: active ? S.gold : S.text,
-                    background: active ? 'rgba(184,150,12,0.12)' : 'transparent',
-                    textDecoration: 'none', transition: 'all 0.12s',
-                  }}
-                >
-                  <span style={{ fontSize: 14 }}>{item.icon}</span>
-                  {item.label}
-                </Link>
-              )
-            })}
-          </div>
-        ))}
-      </nav>
+      <Suspense fallback={<nav style={{ flex: 1, padding: '14px 10px' }} />}>
+        <SidebarNav />
+      </Suspense>
 
       {/* Footer */}
       <div style={{ padding: '14px 16px', borderTop: `1px solid ${S.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
