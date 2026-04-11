@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 
@@ -20,8 +20,10 @@ const NAV = [
   {
     section: 'Inbox',
     items: [
-      { href: '/inbox',      icon: '📋', label: 'Approval Queue' },
-      { href: '/auto-sent',  icon: '⚡', label: 'Auto-Sent' },
+      { href: '/inbox',                    icon: '📋', label: 'All Messages' },
+      { href: '/inbox?channel=gmail',      icon: '✉️',  label: 'Gmail' },
+      { href: '/inbox?channel=whatsapp',   icon: '💬', label: 'WhatsApp' },
+      { href: '/inbox?channel=instagram',  icon: '📸', label: 'Instagram' },
     ],
   },
   {
@@ -42,6 +44,7 @@ const NAV = [
 export default function Sidebar() {
   const pathname = usePathname()
   const router   = useRouter()
+  const searchParams = useSearchParams()
   const [email,   setEmail]   = useState('')
   const [initial, setInitial] = useState('U')
 
@@ -85,7 +88,12 @@ export default function Sidebar() {
               {group.section}
             </div>
             {group.items.map(item => {
-              const active = pathname.startsWith(item.href)
+              const [itemPath, itemQuery] = item.href.split('?')
+              const itemChannel = itemQuery ? new URLSearchParams(itemQuery).get('channel') : null
+              const currentChannel = searchParams.get('channel')
+              const active = itemChannel
+                ? pathname.startsWith(itemPath) && currentChannel === itemChannel
+                : pathname.startsWith(itemPath) && !currentChannel
               return (
                 <Link
                   key={item.href}

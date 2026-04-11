@@ -3,14 +3,20 @@ import { supabase } from '../lib/supabase'
 
 export const messagesRouter = Router()
 
-// GET /api/messages — list messages with drafts
-messagesRouter.get('/', async (_req: Request, res: Response) => {
-  const { data, error } = await supabase
+// GET /api/messages — list messages with drafts (optional ?channel=gmail|whatsapp|instagram)
+messagesRouter.get('/', async (req: Request, res: Response) => {
+  let query = supabase
     .from('messages')
     .select('*, drafts(id, draft_text, tone_confidence, status)')
     .order('created_at', { ascending: false })
     .limit(100)
 
+  const channel = req.query.channel as string | undefined
+  if (channel && ['gmail', 'whatsapp', 'instagram'].includes(channel)) {
+    query = query.eq('channel', channel)
+  }
+
+  const { data, error } = await query
   if (error) return res.status(500).json({ error: error.message })
   res.json(data)
 })

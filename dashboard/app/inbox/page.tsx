@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import useSWR from 'swr'
 import { createClient } from '@/lib/supabase'
 import Sidebar from '@/components/Sidebar'
+import { useSearchParams } from 'next/navigation'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -97,11 +98,25 @@ function MetaRow({ label, children }: { label: string; children: React.ReactNode
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3001'
 
+// Status groupings
+const PENDING_STATUSES  = ['received', 'new', 'processing', 'classified', 'draft_ready', 'pending_review', 'needs_human_reply']
+const APPROVED_STATUSES = ['approved', 'edited_approved']
+const SENT_STATUSES     = ['auto_sent', 'auto_approved', 'sent', 'replied']
+
+const CHANNEL_TABS = [
+  { key: 'all',       label: 'All',       icon: '' },
+  { key: 'gmail',     label: 'Gmail',     icon: '✉️' },
+  { key: 'whatsapp',  label: 'WhatsApp',  icon: '💬' },
+  { key: 'instagram', label: 'Instagram', icon: '📸' },
+]
+
 // ── Page ────────────────────────────────────────────────────────────────────────
 
 export default function InboxPage() {
+  const searchParams = useSearchParams()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [filter, setFilter]         = useState('all')
+  const [channelFilter, setChannelFilter] = useState(searchParams.get('channel') ?? 'all')
   const [draftText, setDraftText]   = useState('')
   const [userId, setUserId]         = useState<string | null>(null)
 
@@ -112,13 +127,9 @@ export default function InboxPage() {
   }, [])
 
   const { data: messages = [], isLoading, mutate } = useSWR<Message[]>('inbox-messages', async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*, drafts(id, draft_text, tone_confidence)')
-      .order('created_at', { ascending: false })
-    if (error) throw error
-    return (data ?? []) as Message[]
+    const res = await fetch(`${BACKEND_URL}/api/messages`)
+    if (!res.ok) throw new Error('Failed to fetch messages')
+    return res.json()
   })
 
   const selected = messages.find(m => m.id === selectedId) ?? null
@@ -127,7 +138,12 @@ export default function InboxPage() {
     if (selected) setDraftText(selected.drafts?.[0]?.draft_text ?? '')
   }, [selectedId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filtered = filter === 'all' ? messages : messages.filter(m => m.category === filter)
+  const filtered = useMemo(() => {
+    let result = messages
+    if (channelFilter !== 'all') result = result.filter(m => m.channel === channelFilter)
+    if (filter !== 'all') result = result.filter(m => m.category === filter)
+    return result
+  }, [messages, channelFilter, filter])
 
   const handleSelect = useCallback((msg: Message) => {
     setSelectedId(msg.id)
@@ -177,9 +193,9 @@ export default function InboxPage() {
     advanceSelection()
   }
 
-  const pendingCount  = messages.filter(m => m.status === 'pending_review').length
-  const approvedCount = messages.filter(m => m.status === 'approved').length
-  const autoSentCount = messages.filter(m => m.status === 'auto_sent').length
+  const pendingCount  = messages.filter(m => PENDING_STATUSES.includes(m.status ?? '')).length
+  const approvedCount = messages.filter(m => APPROVED_STATUSES.includes(m.status ?? '')).length
+  const autoSentCount = messages.filter(m => SENT_STATUSES.includes(m.status ?? '')).length
   const activeDraft   = selected?.drafts?.[0]
   const [sendingMode, setSendingMode] = useState<'auto' | 'approve' | 'draft'>('approve')
 
@@ -265,8 +281,26 @@ export default function InboxPage() {
           {/* ── INBOX LIST PANEL ──────────────────────────────────────────── */}
           <div style={{ width: 310, flexShrink: 0, borderRight: `1px solid ${S.border}`, display: 'flex', flexDirection: 'column', background: S.white }}>
 
-            {/* Filter tabs */}
-            <div style={{ padding: '10px 12px 0', borderBottom: `1px solid ${S.border}` }}>
+            {/* Channel tabs */}
+            <div style={{ padding: '8px 12px 0', borderBottom: `1px solid ${S.border}` }}>
+              <div style={{ display: 'flex', gap: 2, marginBottom: 4 }}>
+                {CHANNEL_TABS.map(ch => (
+                  <button
+                    key={ch.key}
+                    onClick={() => setChannelFilter(ch.key)}
+                    style={{
+                      padding: '4px 9px', borderRadius: 6, border: 'none',
+                      background: channelFilter === ch.key ? S.dark : 'transparent',
+                      color: channelFilter === ch.key ? '#fff' : S.muted,
+                      fontSize: 10, fontWeight: channelFilter === ch.key ? 600 : 400,
+                      cursor: 'pointer', fontFamily: S.sans, transition: 'all 0.12s',
+                    }}
+                  >
+                    {ch.icon} {ch.label}
+                  </button>
+                ))}
+              </div>
+              {/* Category filter tabs */}
               <div style={{ display: 'flex', gap: 2 }}>
                 {FILTERS.map(f => (
                   <button
@@ -280,7 +314,7 @@ export default function InboxPage() {
                       cursor: 'pointer', fontFamily: S.sans, transition: 'all 0.12s',
                     }}
                   >
-                    {f.label}{f.key === 'all' ? ` (${messages.length})` : ''}
+                    {f.label}{f.key === 'all' ? ` (${filtered.length})` : ''}
                   </button>
                 ))}
               </div>

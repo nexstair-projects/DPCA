@@ -7,6 +7,8 @@ import { messagesRouter } from './routes/messages'
 import { draftsRouter } from './routes/drafts'
 import { webhooksRouter } from './routes/webhooks'
 import { healthRouter } from './routes/health'
+import { inboxesRouter } from './routes/inboxes'
+import { leadsRouter } from './routes/leads'
 
 const app = express()
 const PORT = process.env.PORT ?? 3001
@@ -22,6 +24,8 @@ app.use('/api/health', healthRouter)
 app.use('/api/messages', messagesRouter)
 app.use('/api/drafts', draftsRouter)
 app.use('/api/webhooks', webhooksRouter)
+app.use('/api/inboxes', inboxesRouter)
+app.use('/api/leads', leadsRouter)
 
 //root route
 app.get('/', (_req, res) => {
