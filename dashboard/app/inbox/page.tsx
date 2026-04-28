@@ -7,6 +7,9 @@ import Sidebar from '@/components/Sidebar'
 import { useSearchParams } from 'next/navigation'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 
+import {S} from '@/lib/theme';
+import { CategoryBadge } from '@/components/ui/CategoryBadge'
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type Draft = {
@@ -34,27 +37,7 @@ type Message = {
   drafts: Draft[]
 }
 
-// ── Design tokens ──────────────────────────────────────────────────────────────
 
-const S = {
-  gold:   '#B8960C',
-  goldLight: '#D4AF37',
-  dark:   '#1a1612',
-  bg:     '#faf8f3',
-  white:  '#ffffff',
-  border: '#e8dfc8',
-  text:   '#2c2416',
-  muted:  '#9c8f6f',
-  mid:    '#6b5d3f',
-  green:  '#2d7a4e',
-  red:    '#8b3a3a',
-  redBg:  '#fde8e8',
-  blue:   '#2e5c8a',
-  purple: '#833ab4',
-  pale:   '#FDF6E3',
-  serif:  "'Cormorant Garamond', Georgia, serif",
-  sans:   "'DM Sans', system-ui, sans-serif",
-}
 
 // ── Category look-up ────────────────────────────────────────────────────────────
 
@@ -78,14 +61,6 @@ const FILTERS = [
 
 // ── Small reusable pieces ──────────────────────────────────────────────────────
 
-function CategoryBadge({ category }: { category: string | null }) {
-  const m = catMeta(category)
-  return (
-    <span style={{ padding: '1px 8px', borderRadius: 12, fontSize: 10, background: m.bg, color: m.color, border: `1px solid ${m.border}`, whiteSpace: 'nowrap' }}>
-      {m.label}
-    </span>
-  )
-}
 
 function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
