@@ -12,6 +12,7 @@ const categoryLabels = {
   new_inquiry: { label: 'New Inquiry', variant: 'newInquiry' },
   existing_client: { label: 'Client', variant: 'existingClient' },
   collaboration: { label: 'Collab', variant: 'collaboration' },
+  high_value: { label: 'High Value', variant: 'highValue' },
   general: { label: 'General', variant: 'general' },
 } as const
 

@@ -11,6 +11,7 @@ const badgeVariants = {
   existingClient: 'bg-blue-50 text-blue-900 border-blue-200',
   collaboration: 'bg-purple-50 text-purple-900 border-purple-200',
   general: 'bg-gray-50 text-gray-900 border-gray-200',
+  highValue: 'bg-red-50 text-red-800 border-red-200',
   default: 'bg-gray-50 text-gray-600 border-gray-200',
 } as const
 
@@ -27,7 +28,7 @@ export function Badge({ variant = 'default', children, className = '' }: BadgePr
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${variantClasses} ${className}`}
+      className={`inline-flex items-center px-3 py-0.5 rounded-full text-[10px] font-medium border ${variantClasses} ${className}`}
     >
       {children}
     </span>

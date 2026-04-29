@@ -7,35 +7,16 @@ import Sidebar from '@/components/Sidebar'
 import { useSearchParams } from 'next/navigation'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 
+/*Importing Types*/
+import { Message } from "@/app/types/message";
+
+/*End*/ 
+
 import {S} from '@/lib/theme';
-import { CategoryBadge } from '@/components/ui/CategoryBadge'
+import { CategoryBadge } from '@/components/ui/CategoryBadge';
+import { MessageItem } from '@/components/ui/MessageItem';
 
-// ── Types ──────────────────────────────────────────────────────────────────────
 
-type Draft = {
-  id: string
-  draft_text: string | null
-  tone_confidence: number | null
-}
-
-type Message = {
-  id: string
-  sender_name: string | null
-  sender_email: string | null
-  subject: string | null
-  body_raw: string | null
-  category: string | null
-  priority: string | null
-  tier: number | null
-  channel: string | null
-  estimated_value: number | null
-  guest_count: number | null
-  confidence_score: number | null
-  status: string | null
-  created_at: string
-  classified_at: string | null
-  drafts: Draft[]
-}
 
 
 
@@ -225,10 +206,7 @@ function InboxContent() {
     return () => window.removeEventListener('keydown', handler)
   }) // intentionally no deps — always uses latest state
 
-  const relativeTime = (iso: string) => {
-    try { return formatDistanceToNow(parseISO(iso), { addSuffix: false }) }
-    catch { return '' }
-  }
+ 
 
   return (
     <div style={{ display: 'flex', height: '100vh', background: S.bg, fontFamily: S.sans }}>
@@ -314,38 +292,7 @@ function InboxContent() {
               {filtered.map(msg => {
                 const isActive = msg.id === selectedId
                 return (
-                  <div
-                    key={msg.id}
-                    onClick={() => handleSelect(msg)}
-                    style={{
-                      padding: '14px 16px', borderBottom: `1px solid #f0e8d4`,
-                      cursor: 'pointer', transition: 'all 0.12s',
-                      background: isActive ? S.pale : 'transparent',
-                      borderLeft: `2px solid ${isActive ? S.gold : 'transparent'}`,
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <div style={{ fontFamily: S.serif, fontSize: 14, fontWeight: 600, color: S.dark }}>
-                        {msg.sender_name ?? 'Unknown'}
-                      </div>
-                      <div style={{ fontSize: 10, color: S.muted, flexShrink: 0, marginLeft: 8 }}>
-                        {relativeTime(msg.created_at)}
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 12, color: S.text, fontWeight: 500, marginBottom: 3 }}>
-                      {msg.subject ?? '(no subject)'}
-                    </div>
-                    <div style={{ fontSize: 11, color: S.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {(msg.body_raw ?? '').substring(0, 80)}
-                    </div>
-                    <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ width: 6, height: 6, borderRadius: '50%', flexShrink: 0, background: msg.status === 'approved' ? S.green : msg.status === 'auto_sent' ? '#2d5a8a' : S.gold }} />
-                      <CategoryBadge category={msg.category} />
-                      {(msg.tier === 3 || (msg.estimated_value != null && msg.estimated_value >= 5000)) && (
-                        <span style={{ padding: '1px 7px', borderRadius: 10, fontSize: 9.5, background: S.redBg, color: S.red, border: '1px solid #e8c0c0', whiteSpace: 'nowrap' }}>High Value</span>
-                      )}
-                    </div>
-                  </div>
+                  <MessageItem key={msg.id} msg={msg} isActive={isActive} onClick={handleSelect} />
                 )
               })}
             </div>
