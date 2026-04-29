@@ -4,7 +4,7 @@
 > **Client**: Dream Paris Wedding
 > **Tech Lead**: Abdur Rehman (n8n / Backend / Integrations)
 > **Frontend**: Usama (React Dashboard)
-> **Stack**: n8n · Supabase · Pinecone · OpenAI GPT-4o · React · Node.js
+> **Stack**: n8n · Supabase · Pinecone · claude ai · React · Node.js
 
 ---
 

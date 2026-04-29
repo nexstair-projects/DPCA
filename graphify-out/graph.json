@@ -1,0 +1,5809 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "n8n_ai_pipeline",
+        "label": "n8n AI Message Processing Pipeline (WF1\u2192WF2\u2192WF4\u2192WF5\u2192WF6)",
+        "nodes": [
+          "wf1_email_ingestion",
+          "wf2_classification",
+          "wf4_context_retrieval",
+          "wf5_draft_generation",
+          "wf6_auto_send"
+        ],
+        "relation": "implement",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "docs/WORKFLOWS.md"
+      },
+      {
+        "id": "core_tech_stack",
+        "label": "DPCA Core Technology Stack",
+        "nodes": [
+          "n8n_engine",
+          "supabase_db",
+          "pinecone_vectorstore",
+          "openai_gpt4o",
+          "backend_api",
+          "dashboard_frontend"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "docs/ARCHITECTURE.md"
+      },
+      {
+        "id": "external_channels",
+        "label": "External Message Channels",
+        "nodes": [
+          "gmail_api",
+          "meta_whatsapp_api",
+          "meta_instagram_api"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "docs/ARCHITECTURE.md"
+      },
+      {
+        "id": "dpca_team",
+        "label": "DPCA Development Team",
+        "nodes": [
+          "team_abdur",
+          "team_usama",
+          "team_sophie"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md"
+      },
+      {
+        "id": "supabase_db_tables",
+        "label": "Supabase Database Tables (10 tables)",
+        "nodes": [
+          "db_table_users",
+          "db_table_messages",
+          "db_table_drafts",
+          "db_table_leads",
+          "db_table_knowledge_base",
+          "db_table_inboxes",
+          "db_table_audit_log",
+          "db_table_system_config",
+          "db_table_errors_log",
+          "db_table_ignored_messages"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "docs/DATABASE_SCHEMA.md"
+      },
+      {
+        "id": "ai_prompts_suite",
+        "label": "DPCA AI Prompt Suite (P1-P6)",
+        "nodes": [
+          "p1_brand_voice_prompt",
+          "p2_classification_prompt",
+          "p3_draft_generation_prompt",
+          "p4_lead_extraction_prompt",
+          "p5_regeneration_prompt",
+          "p6_tone_validation_prompt"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "docs/PROMPTS.md"
+      },
+      {
+        "id": "dpw_real_weddings",
+        "label": "Dream Paris Wedding Real Event Timelines",
+        "nodes": [
+          "wedding_helena_andy",
+          "wedding_sabine_arbi"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "graphify-out/converted/WEDDING TIMELINE - HELENA & ANDY_6651eb75.md"
+      },
+      {
+        "id": "dpw_brand_intelligence",
+        "label": "DPW Brand Intelligence & AI Behavior Rules",
+        "nodes": [
+          "dpw_planning_philosophy",
+          "dpw_communication_tone",
+          "dpw_vendor_management",
+          "dpw_masterfile",
+          "p1_brand_voice_prompt"
+        ],
+        "relation": "form",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md"
+      },
+      {
+        "id": "dpca_tech_stack",
+        "label": "DPCA Core Technology Stack",
+        "type": "TechnologyStack",
+        "participants": [
+          "dpca_project",
+          "n8n",
+          "openai_gpt4o",
+          "supabase",
+          "railway",
+          "vercel",
+          "nextjs",
+          "expressjs",
+          "pinecone"
+        ],
+        "relation": "CONSTITUTES_TECH_STACK_OF",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "dream_paris_team",
+        "label": "Dream Paris Wedding Internal Team",
+        "type": "Team",
+        "participants": [
+          "dream_paris_wedding",
+          "vanessa",
+          "patricia",
+          "kimberlee"
+        ],
+        "relation": "TEAM_MEMBERS_OF",
+        "confidence_score": 0.9
+      },
+      {
+        "id": "dpca_dev_team",
+        "label": "DPCA Development Team",
+        "type": "Team",
+        "participants": [
+          "nexstair_technologies",
+          "abdur_rehman",
+          "usama"
+        ],
+        "relation": "DEVELOPMENT_TEAM_OF",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "week2_deliverables",
+        "label": "Week 2 Key Deliverables",
+        "type": "SprintDeliverable",
+        "participants": [
+          "week2_report",
+          "api_inboxes",
+          "api_leads",
+          "api_messages",
+          "db_migration_sql",
+          "rls_policy"
+        ],
+        "relation": "DELIVERED_IN_WEEK_2",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "week3_deliverables",
+        "label": "Week 3 Key Deliverables",
+        "type": "SprintDeliverable",
+        "participants": [
+          "week3_report",
+          "developer_guide",
+          "codeowners_file",
+          "repo_org"
+        ],
+        "relation": "DELIVERED_IN_WEEK_3",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "colin_veronica_wedding_team",
+        "label": "Colin & Veronica Wedding Vendor Team",
+        "type": "EventTeam",
+        "participants": [
+          "couple_colin_veronica",
+          "vanessa",
+          "patricia",
+          "catalin",
+          "minh",
+          "entremets_fragrances"
+        ],
+        "relation": "SERVED_EVENT",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "zach_toni_wedding_team",
+        "label": "Zach & Toni Wedding Vendor Team",
+        "type": "EventTeam",
+        "participants": [
+          "couple_zach_toni",
+          "laura",
+          "tuan",
+          "minh",
+          "raphael",
+          "naim",
+          "revart_dancers",
+          "santiago"
+        ],
+        "relation": "SERVED_EVENT",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "tomiko_adam_wedding_team",
+        "label": "Tomiko & Adam Wedding Vendor Team",
+        "type": "EventTeam",
+        "participants": [
+          "couple_tomiko_adam",
+          "laura",
+          "chris_ohana",
+          "kimberly",
+          "naim",
+          "loic"
+        ],
+        "relation": "SERVED_EVENT",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "holly_james_wedding_team",
+        "label": "Holly & James Wedding Vendor Team",
+        "type": "EventTeam",
+        "participants": [
+          "couple_holly_james",
+          "vanessa",
+          "patricia",
+          "aude_lucas",
+          "minh",
+          "entremets_fragrances",
+          "anthony_dj"
+        ],
+        "relation": "SERVED_EVENT",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "message_channels",
+        "label": "DPCA Supported Message Channels",
+        "type": "ChannelSet",
+        "participants": [
+          "dpca_project",
+          "channel_gmail",
+          "channel_whatsapp",
+          "channel_instagram"
+        ],
+        "relation": "MANAGES_CHANNELS",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "code_review_governance",
+        "label": "DPCA Code Review Governance",
+        "type": "Governance",
+        "participants": [
+          "codeowners_file",
+          "abdur_rehman",
+          "usama",
+          "repo_org"
+        ],
+        "relation": "GOVERNS_REVIEW_PROCESS_FOR",
+        "confidence_score": 1.0
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "create_tasks_doc.py",
+      "file_type": "code",
+      "source_file": "create_tasks_doc.py",
+      "source_location": "L1",
+      "id": "create_tasks_doc_py",
+      "community": 9,
+      "norm_label": "create_tasks_doc.py"
+    },
+    {
+      "label": "add_styled_heading()",
+      "file_type": "code",
+      "source_file": "create_tasks_doc.py",
+      "source_location": "L12",
+      "id": "create_tasks_doc_add_styled_heading",
+      "community": 9,
+      "norm_label": "add_styled_heading()"
+    },
+    {
+      "label": "add_table_row()",
+      "file_type": "code",
+      "source_file": "create_tasks_doc.py",
+      "source_location": "L23",
+      "id": "create_tasks_doc_add_table_row",
+      "community": 9,
+      "norm_label": "add_table_row()"
+    },
+    {
+      "label": "create_document()",
+      "file_type": "code",
+      "source_file": "create_tasks_doc.py",
+      "source_location": "L33",
+      "id": "create_tasks_doc_create_document",
+      "community": 9,
+      "norm_label": "create_document()"
+    },
+    {
+      "label": "generate_week2_report.py",
+      "file_type": "code",
+      "source_file": "generate_week2_report.py",
+      "source_location": "L1",
+      "id": "generate_week2_report_py",
+      "community": 10,
+      "norm_label": "generate_week2_report.py"
+    },
+    {
+      "label": "create_report()",
+      "file_type": "code",
+      "source_file": "generate_week2_report.py",
+      "source_location": "L9",
+      "id": "generate_week2_report_create_report",
+      "community": 10,
+      "norm_label": "create_report()"
+    },
+    {
+      "label": "generate_week3_report.py",
+      "file_type": "code",
+      "source_file": "generate_week3_report.py",
+      "source_location": "L1",
+      "id": "generate_week3_report_py",
+      "community": 11,
+      "norm_label": "generate_week3_report.py"
+    },
+    {
+      "label": "create_report()",
+      "file_type": "code",
+      "source_file": "generate_week3_report.py",
+      "source_location": "L9",
+      "id": "generate_week3_report_create_report",
+      "community": 11,
+      "norm_label": "create_report()"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "backend\\src\\index.ts",
+      "source_location": "L1",
+      "id": "backend_src_index_ts",
+      "community": 16,
+      "norm_label": "index.ts"
+    },
+    {
+      "label": "supabase.ts",
+      "file_type": "code",
+      "source_file": "backend\\src\\lib\\supabase.ts",
+      "source_location": "L1",
+      "id": "backend_src_lib_supabase_ts",
+      "community": 17,
+      "norm_label": "supabase.ts"
+    },
+    {
+      "label": "drafts.ts",
+      "file_type": "code",
+      "source_file": "backend\\src\\routes\\drafts.ts",
+      "source_location": "L1",
+      "id": "backend_src_routes_drafts_ts",
+      "community": 18,
+      "norm_label": "drafts.ts"
+    },
+    {
+      "label": "health.ts",
+      "file_type": "code",
+      "source_file": "backend\\src\\routes\\health.ts",
+      "source_location": "L1",
+      "id": "backend_src_routes_health_ts",
+      "community": 19,
+      "norm_label": "health.ts"
+    },
+    {
+      "label": "inboxes.ts",
+      "file_type": "code",
+      "source_file": "backend\\src\\routes\\inboxes.ts",
+      "source_location": "L1",
+      "id": "backend_src_routes_inboxes_ts",
+      "community": 20,
+      "norm_label": "inboxes.ts"
+    },
+    {
+      "label": "leads.ts",
+      "file_type": "code",
+      "source_file": "backend\\src\\routes\\leads.ts",
+      "source_location": "L1",
+      "id": "backend_src_routes_leads_ts",
+      "community": 21,
+      "norm_label": "leads.ts"
+    },
+    {
+      "label": "messages.ts",
+      "file_type": "code",
+      "source_file": "backend\\src\\routes\\messages.ts",
+      "source_location": "L1",
+      "id": "backend_src_routes_messages_ts",
+      "community": 22,
+      "norm_label": "messages.ts"
+    },
+    {
+      "label": "webhooks.ts",
+      "file_type": "code",
+      "source_file": "backend\\src\\routes\\webhooks.ts",
+      "source_location": "L1",
+      "id": "backend_src_routes_webhooks_ts",
+      "community": 23,
+      "norm_label": "webhooks.ts"
+    },
+    {
+      "label": "middleware.ts",
+      "file_type": "code",
+      "source_file": "dashboard\\middleware.ts",
+      "source_location": "L1",
+      "id": "dashboard_middleware_ts",
+      "community": 12,
+      "norm_label": "middleware.ts"
+    },
+    {
+      "label": "middleware()",
+      "file_type": "code",
+      "source_file": "dashboard\\middleware.ts",
+      "source_location": "L5",
+      "id": "middleware_middleware",
+      "community": 12,
+      "norm_label": "middleware()"
+    },
+    {
+      "label": "next-env.d.ts",
+      "file_type": "code",
+      "source_file": "dashboard\\next-env.d.ts",
+      "source_location": "L1",
+      "id": "dashboard_next_env_d_ts",
+      "community": 24,
+      "norm_label": "next-env.d.ts"
+    },
+    {
+      "label": "next.config.js",
+      "file_type": "code",
+      "source_file": "dashboard\\next.config.js",
+      "source_location": "L1",
+      "id": "dashboard_next_config_js",
+      "community": 25,
+      "norm_label": "next.config.js"
+    },
+    {
+      "label": "postcss.config.js",
+      "file_type": "code",
+      "source_file": "dashboard\\postcss.config.js",
+      "source_location": "L1",
+      "id": "dashboard_postcss_config_js",
+      "community": 26,
+      "norm_label": "postcss.config.js"
+    },
+    {
+      "label": "tailwind.config.ts",
+      "file_type": "code",
+      "source_file": "dashboard\\tailwind.config.ts",
+      "source_location": "L1",
+      "id": "dashboard_tailwind_config_ts",
+      "community": 27,
+      "norm_label": "tailwind.config.ts"
+    },
+    {
+      "label": "layout.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\layout.tsx",
+      "source_location": "L1",
+      "id": "dashboard_app_layout_tsx",
+      "community": 28,
+      "norm_label": "layout.tsx"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\page.tsx",
+      "source_location": "L1",
+      "id": "dashboard_app_page_tsx",
+      "community": 13,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "Home()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\page.tsx",
+      "source_location": "L6",
+      "id": "page_home",
+      "community": 13,
+      "norm_label": "home()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\dashboard\\page.tsx",
+      "source_location": "L1",
+      "id": "dashboard_app_dashboard_page_tsx",
+      "community": 1,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "relTime()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\dashboard\\page.tsx",
+      "source_location": "L133",
+      "id": "page_reltime",
+      "community": 1,
+      "norm_label": "reltime()"
+    },
+    {
+      "label": "statusDot()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\dashboard\\page.tsx",
+      "source_location": "L138",
+      "id": "page_statusdot",
+      "community": 1,
+      "norm_label": "statusdot()"
+    },
+    {
+      "label": "channelIcon()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L69",
+      "id": "page_channelicon",
+      "community": 1,
+      "norm_label": "channelicon()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L1",
+      "id": "dashboard_app_inbox_page_tsx",
+      "community": 1,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "catMeta()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L69",
+      "id": "page_catmeta",
+      "community": 1,
+      "norm_label": "catmeta()"
+    },
+    {
+      "label": "CategoryBadge()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L81",
+      "id": "page_categorybadge",
+      "community": 1,
+      "norm_label": "categorybadge()"
+    },
+    {
+      "label": "handleApprove()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L169",
+      "id": "page_handleapprove",
+      "community": 1,
+      "norm_label": "handleapprove()"
+    },
+    {
+      "label": "handleDiscard()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L187",
+      "id": "page_handlediscard",
+      "community": 1,
+      "norm_label": "handlediscard()"
+    },
+    {
+      "label": "handler()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L232",
+      "id": "page_handler",
+      "community": 1,
+      "norm_label": "handler()"
+    },
+    {
+      "label": "relativeTime()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L253",
+      "id": "page_relativetime",
+      "community": 1,
+      "norm_label": "relativetime()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L1",
+      "id": "dashboard_app_knowledge_base_page_tsx",
+      "community": 1,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "CatBadge()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L52",
+      "id": "page_catbadge",
+      "community": 1,
+      "norm_label": "catbadge()"
+    },
+    {
+      "label": "handleEdit()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L109",
+      "id": "page_handleedit",
+      "community": 1,
+      "norm_label": "handleedit()"
+    },
+    {
+      "label": "handleSave()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L116",
+      "id": "page_handlesave",
+      "community": 1,
+      "norm_label": "handlesave()"
+    },
+    {
+      "label": "handleDelete()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L128",
+      "id": "page_handledelete",
+      "community": 1,
+      "norm_label": "handledelete()"
+    },
+    {
+      "label": "fmtDate()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L133",
+      "id": "page_fmtdate",
+      "community": 1,
+      "norm_label": "fmtdate()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\leads\\page.tsx",
+      "source_location": "L1",
+      "id": "dashboard_app_leads_page_tsx",
+      "community": 1,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "StatusBadge()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\leads\\page.tsx",
+      "source_location": "L61",
+      "id": "page_statusbadge",
+      "community": 1,
+      "norm_label": "statusbadge()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\login\\page.tsx",
+      "source_location": "L1",
+      "id": "dashboard_app_login_page_tsx",
+      "community": 1,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "handleSubmit()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\login\\page.tsx",
+      "source_location": "L14",
+      "id": "page_handlesubmit",
+      "community": 1,
+      "norm_label": "handlesubmit()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L1",
+      "id": "dashboard_app_settings_page_tsx",
+      "community": 1,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "handleEditConfig()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L113",
+      "id": "page_handleeditconfig",
+      "community": 1,
+      "norm_label": "handleeditconfig()"
+    },
+    {
+      "label": "handleSaveConfig()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L118",
+      "id": "page_handlesaveconfig",
+      "community": 1,
+      "norm_label": "handlesaveconfig()"
+    },
+    {
+      "label": "handleToggleInbox()",
+      "file_type": "code",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L127",
+      "id": "page_handletoggleinbox",
+      "community": 1,
+      "norm_label": "handletoggleinbox()"
+    },
+    {
+      "label": "Layout.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\components\\Layout.tsx",
+      "source_location": "L1",
+      "id": "dashboard_components_layout_tsx",
+      "community": 29,
+      "norm_label": "layout.tsx"
+    },
+    {
+      "label": "Sidebar.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\components\\Sidebar.tsx",
+      "source_location": "L1",
+      "id": "dashboard_components_sidebar_tsx",
+      "community": 1,
+      "norm_label": "sidebar.tsx"
+    },
+    {
+      "label": "handleLogout()",
+      "file_type": "code",
+      "source_file": "dashboard\\components\\Sidebar.tsx",
+      "source_location": "L102",
+      "id": "sidebar_handlelogout",
+      "community": 1,
+      "norm_label": "handlelogout()"
+    },
+    {
+      "label": "TopBar.tsx",
+      "file_type": "code",
+      "source_file": "dashboard\\components\\TopBar.tsx",
+      "source_location": "L1",
+      "id": "dashboard_components_topbar_tsx",
+      "community": 14,
+      "norm_label": "topbar.tsx"
+    },
+    {
+      "label": "TopBar()",
+      "file_type": "code",
+      "source_file": "dashboard\\components\\TopBar.tsx",
+      "source_location": "L5",
+      "id": "topbar_topbar",
+      "community": 14,
+      "norm_label": "topbar()"
+    },
+    {
+      "label": "hooks.ts",
+      "file_type": "code",
+      "source_file": "dashboard\\lib\\hooks.ts",
+      "source_location": "L1",
+      "id": "dashboard_lib_hooks_ts",
+      "community": 15,
+      "norm_label": "hooks.ts"
+    },
+    {
+      "label": "useAsync()",
+      "file_type": "code",
+      "source_file": "dashboard\\lib\\hooks.ts",
+      "source_location": "L3",
+      "id": "hooks_useasync",
+      "community": 15,
+      "norm_label": "useasync()"
+    },
+    {
+      "label": "supabase.ts",
+      "file_type": "code",
+      "source_file": "dashboard\\lib\\supabase.ts",
+      "source_location": "L1",
+      "id": "dashboard_lib_supabase_ts",
+      "community": 1,
+      "norm_label": "supabase.ts"
+    },
+    {
+      "label": "createClient()",
+      "file_type": "code",
+      "source_file": "dashboard\\lib\\supabase.ts",
+      "source_location": "L4",
+      "id": "supabase_createclient",
+      "community": 1,
+      "norm_label": "createclient()"
+    },
+    {
+      "label": "DPCA \u2014 Dream Paris Communication Assistant",
+      "file_type": "document",
+      "source_file": "docs/claude.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "Abdur Rehman",
+      "contributor": null,
+      "id": "dpca_system",
+      "community": 4,
+      "norm_label": "dpca \u2014 dream paris communication assistant"
+    },
+    {
+      "label": "DPCA System Architecture",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "dpca_architecture",
+      "community": 4,
+      "norm_label": "dpca system architecture"
+    },
+    {
+      "label": "DPCA Database Schema (Supabase PostgreSQL)",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "dpca_database_schema",
+      "community": 4,
+      "norm_label": "dpca database schema (supabase postgresql)"
+    },
+    {
+      "label": "DPCA n8n Workflow Specifications",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "dpca_workflows",
+      "community": 4,
+      "norm_label": "dpca n8n workflow specifications"
+    },
+    {
+      "label": "DPCA AI Prompt Templates",
+      "file_type": "document",
+      "source_file": "docs/PROMPTS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "dpca_prompts",
+      "community": 4,
+      "norm_label": "dpca ai prompt templates"
+    },
+    {
+      "label": "DPCA Backend Express API",
+      "file_type": "code",
+      "source_file": "backend/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "backend_api",
+      "community": 5,
+      "norm_label": "dpca backend express api"
+    },
+    {
+      "label": "DPCA Next.js Dashboard Frontend",
+      "file_type": "code",
+      "source_file": "dashboard/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "Usama Khan",
+      "contributor": null,
+      "id": "dashboard_frontend",
+      "community": 5,
+      "norm_label": "dpca next.js dashboard frontend"
+    },
+    {
+      "label": "n8n Workflow Engine (Self-hosted Docker)",
+      "file_type": "document",
+      "source_file": "n8n-workflows/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "n8n_engine",
+      "community": 5,
+      "norm_label": "n8n workflow engine (self-hosted docker)"
+    },
+    {
+      "label": "Supabase (PostgreSQL + Auth + RLS)",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a72.1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "supabase_db",
+      "community": 5,
+      "norm_label": "supabase (postgresql + auth + rls)"
+    },
+    {
+      "label": "Pinecone Vector Store",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a72.1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "pinecone_vectorstore",
+      "community": 2,
+      "norm_label": "pinecone vector store"
+    },
+    {
+      "label": "OpenAI GPT-4o",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a72.1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "openai_gpt4o",
+      "community": 2,
+      "norm_label": "openai gpt-4o"
+    },
+    {
+      "label": "Gmail REST API (OAuth 2.0)",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a72.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gmail_api",
+      "community": 5,
+      "norm_label": "gmail rest api (oauth 2.0)"
+    },
+    {
+      "label": "Meta Cloud API (WhatsApp Business)",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a72.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "meta_whatsapp_api",
+      "community": 5,
+      "norm_label": "meta cloud api (whatsapp business)"
+    },
+    {
+      "label": "Meta Graph API (Instagram DMs)",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a72.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "meta_instagram_api",
+      "community": 5,
+      "norm_label": "meta graph api (instagram dms)"
+    },
+    {
+      "label": "WF1: Email Ingestion Workflow",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "wf1_email_ingestion",
+      "community": 2,
+      "norm_label": "wf1: email ingestion workflow"
+    },
+    {
+      "label": "WF2: Message Classification Workflow",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "wf2_classification",
+      "community": 2,
+      "norm_label": "wf2: message classification workflow"
+    },
+    {
+      "label": "WF3: Knowledge Base Embedding Workflow",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "wf3_kb_embedding",
+      "community": 2,
+      "norm_label": "wf3: knowledge base embedding workflow"
+    },
+    {
+      "label": "WF4: Context Retrieval Workflow",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF4",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "wf4_context_retrieval",
+      "community": 2,
+      "norm_label": "wf4: context retrieval workflow"
+    },
+    {
+      "label": "WF5: Draft Response Generation Workflow",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF5",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "wf5_draft_generation",
+      "community": 2,
+      "norm_label": "wf5: draft response generation workflow"
+    },
+    {
+      "label": "WF6: Auto-Send Workflow",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF6",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "wf6_auto_send",
+      "community": 5,
+      "norm_label": "wf6: auto-send workflow"
+    },
+    {
+      "label": "WF7: Lead Extraction Workflow",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF7",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "wf7_lead_extraction",
+      "community": 2,
+      "norm_label": "wf7: lead extraction workflow"
+    },
+    {
+      "label": "WF8: Dashboard Actions Workflow",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF8",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "wf8_dashboard_actions",
+      "community": 2,
+      "norm_label": "wf8: dashboard actions workflow"
+    },
+    {
+      "label": "P1: Brand Voice System Prompt",
+      "file_type": "document",
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P1",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Sophie Laurent",
+      "contributor": null,
+      "id": "p1_brand_voice_prompt",
+      "community": 2,
+      "norm_label": "p1: brand voice system prompt"
+    },
+    {
+      "label": "P2: Classification Prompt",
+      "file_type": "document",
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "p2_classification_prompt",
+      "community": 2,
+      "norm_label": "p2: classification prompt"
+    },
+    {
+      "label": "P3: Draft Generation Prompt",
+      "file_type": "document",
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "p3_draft_generation_prompt",
+      "community": 2,
+      "norm_label": "p3: draft generation prompt"
+    },
+    {
+      "label": "P4: Lead Extraction Prompt",
+      "file_type": "document",
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P4",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "p4_lead_extraction_prompt",
+      "community": 2,
+      "norm_label": "p4: lead extraction prompt"
+    },
+    {
+      "label": "P5: Regeneration Prompt",
+      "file_type": "document",
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P5",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "p5_regeneration_prompt",
+      "community": 2,
+      "norm_label": "p5: regeneration prompt"
+    },
+    {
+      "label": "P6: Tone Validation Prompt",
+      "file_type": "document",
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P6",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "p6_tone_validation_prompt",
+      "community": 2,
+      "norm_label": "p6: tone validation prompt"
+    },
+    {
+      "label": "DB Table: users",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "users table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_users",
+      "community": 4,
+      "norm_label": "db table: users"
+    },
+    {
+      "label": "DB Table: messages",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "messages table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_messages",
+      "community": 4,
+      "norm_label": "db table: messages"
+    },
+    {
+      "label": "DB Table: drafts",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "drafts table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_drafts",
+      "community": 4,
+      "norm_label": "db table: drafts"
+    },
+    {
+      "label": "DB Table: leads",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "leads table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_leads",
+      "community": 4,
+      "norm_label": "db table: leads"
+    },
+    {
+      "label": "DB Table: knowledge_base",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "knowledge_base table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_knowledge_base",
+      "community": 2,
+      "norm_label": "db table: knowledge_base"
+    },
+    {
+      "label": "DB Table: inboxes",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "inboxes table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_inboxes",
+      "community": 4,
+      "norm_label": "db table: inboxes"
+    },
+    {
+      "label": "DB Table: audit_log",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "audit_log table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_audit_log",
+      "community": 2,
+      "norm_label": "db table: audit_log"
+    },
+    {
+      "label": "DB Table: system_config",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "system_config table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_system_config",
+      "community": 2,
+      "norm_label": "db table: system_config"
+    },
+    {
+      "label": "DB Table: errors_log",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "errors_log table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_errors_log",
+      "community": 4,
+      "norm_label": "db table: errors_log"
+    },
+    {
+      "label": "DB Table: ignored_messages",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "ignored_messages table",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "db_table_ignored_messages",
+      "community": 4,
+      "norm_label": "db table: ignored_messages"
+    },
+    {
+      "label": "Tiered Routing Logic (Tier 1/2/3)",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a74",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "tiered_routing_logic",
+      "community": 2,
+      "norm_label": "tiered routing logic (tier 1/2/3)"
+    },
+    {
+      "label": "Role-Based Access Control (admin/manager/team_member)",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a75.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rbac_roles",
+      "community": 4,
+      "norm_label": "role-based access control (admin/manager/team_member)"
+    },
+    {
+      "label": "Supabase Row-Level Security Policies (22 policies)",
+      "file_type": "document",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "RLS Policies",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rls_policies",
+      "community": 4,
+      "norm_label": "supabase row-level security policies (22 policies)"
+    },
+    {
+      "label": "Pending Tasks Sprint Roadmap (Weeks 2-4)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-04-07",
+      "author": null,
+      "contributor": null,
+      "id": "sprint_roadmap",
+      "community": 5,
+      "norm_label": "pending tasks sprint roadmap (weeks 2-4)"
+    },
+    {
+      "label": "Abdur Rehman (Infrastructure & Workflows Lead)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "team_abdur",
+      "community": 5,
+      "norm_label": "abdur rehman (infrastructure & workflows lead)"
+    },
+    {
+      "label": "Usama Khan (Frontend Lead)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "team_usama",
+      "community": 5,
+      "norm_label": "usama khan (frontend lead)"
+    },
+    {
+      "label": "Sophie Laurent (Content & Brand Voice Lead)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "team_sophie",
+      "community": 5,
+      "norm_label": "sophie laurent (content & brand voice lead)"
+    },
+    {
+      "label": "Supabase CLI Setup & Migration Files Report",
+      "file_type": "document",
+      "source_file": "Reports/Supabase_Setup_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-04-01",
+      "author": null,
+      "contributor": null,
+      "id": "supabase_setup_report",
+      "community": 4,
+      "norm_label": "supabase cli setup & migration files report"
+    },
+    {
+      "label": "Supabase SQL Migration Files (8 files)",
+      "file_type": "code",
+      "source_file": "Reports/Supabase_Setup_Report.md",
+      "source_location": "Part 3",
+      "source_url": null,
+      "captured_at": "2026-04-01",
+      "author": null,
+      "contributor": null,
+      "id": "supabase_migrations",
+      "community": 4,
+      "norm_label": "supabase sql migration files (8 files)"
+    },
+    {
+      "label": "Week 1 Development Report",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Week_1_Work_Report_36d60983.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-04-04",
+      "author": null,
+      "contributor": null,
+      "id": "week1_report",
+      "community": 5,
+      "norm_label": "week 1 development report"
+    },
+    {
+      "label": "Implementation Plan (Week 1-2 Foundation)",
+      "file_type": "document",
+      "source_file": "tasks/todo.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "todo_implementation_plan",
+      "community": 4,
+      "norm_label": "implementation plan (week 1-2 foundation)"
+    },
+    {
+      "label": "Lessons Learned (Windows/Supabase CLI)",
+      "file_type": "document",
+      "source_file": "tasks/lessons.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-04-01",
+      "author": null,
+      "contributor": null,
+      "id": "lessons_learned",
+      "community": 4,
+      "norm_label": "lessons learned (windows/supabase cli)"
+    },
+    {
+      "label": "DPCA Developer Workflow Guide",
+      "file_type": "document",
+      "source_file": "guides/DPCA_DEVELOPER_GUIDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "developer_guide",
+      "community": 3,
+      "norm_label": "dpca developer workflow guide"
+    },
+    {
+      "label": "Dream Paris Wedding (Client Brand)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": "Audrey (Founder)",
+      "id": "dream_paris_wedding_brand",
+      "community": 6,
+      "norm_label": "dream paris wedding (client brand)"
+    },
+    {
+      "label": "Audrey (Founder, Dream Paris Wedding)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Founder profile",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "audrey_founder",
+      "community": 6,
+      "norm_label": "audrey (founder, dream paris wedding)"
+    },
+    {
+      "label": "Vanessa (Planning & Coordination Support)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Team members",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "vanessa_planner",
+      "community": 6,
+      "norm_label": "vanessa (planning & coordination support)"
+    },
+    {
+      "label": "Frederic (Dream Paris Wedding Team Member)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Team members",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "frederic_team",
+      "community": 6,
+      "norm_label": "frederic (dream paris wedding team member)"
+    },
+    {
+      "label": "DPW Planning Philosophy (Venue-First, Step-by-Step)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Dream Paris Wedding planning logic",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "dpw_planning_philosophy",
+      "community": 6,
+      "norm_label": "dpw planning philosophy (venue-first, step-by-step)"
+    },
+    {
+      "label": "DPW Communication Tone (Luxury Authority)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Communication tone",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "dpw_communication_tone",
+      "community": 6,
+      "norm_label": "dpw communication tone (luxury authority)"
+    },
+    {
+      "label": "DPW Vendor Management Philosophy (Centralized)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Vendor management philosophy",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "dpw_vendor_management",
+      "community": 6,
+      "norm_label": "dpw vendor management philosophy (centralized)"
+    },
+    {
+      "label": "DPW Masterfile (Internal Planning Control Document)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Step 5: Masterfile creation",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "dpw_masterfile",
+      "community": 6,
+      "norm_label": "dpw masterfile (internal planning control document)"
+    },
+    {
+      "label": "Wedding Timeline: Helena & Andy (April 19, 2025, Peninsula Paris + Yacht de Paris)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/WEDDING TIMELINE - HELENA & ANDY_6651eb75.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2025-04-19",
+      "author": null,
+      "contributor": "Vanessa (Planner)",
+      "id": "wedding_helena_andy",
+      "community": 6,
+      "norm_label": "wedding timeline: helena & andy (april 19, 2025, peninsula paris + yacht de paris)"
+    },
+    {
+      "label": "Wedding Timeline: Sabine & Arbi (September 20, 2025, Bastide du Roy, Antibes)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/WEDDING TIMELINE - SABINE & ARBI docx (1)_8055fd0b.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2025-09-20",
+      "author": null,
+      "contributor": "Vanessa & Patricia (Planner/Coordinator)",
+      "id": "wedding_sabine_arbi",
+      "community": 6,
+      "norm_label": "wedding timeline: sabine & arbi (september 20, 2025, bastide du roy, antibes)"
+    },
+    {
+      "label": "Dashboard HTML Mockup (Design Reference)",
+      "file_type": "document",
+      "source_file": "info-docs/dashboard.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "dashboard_html_mockup",
+      "community": 5,
+      "norm_label": "dashboard html mockup (design reference)"
+    },
+    {
+      "label": "Rationale: Tiered Routing for Safety and Human Oversight",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a74",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_tiered_routing",
+      "community": 2,
+      "norm_label": "rationale: tiered routing for safety and human oversight"
+    },
+    {
+      "label": "Rationale: Venue-First Planning Logic",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Venue first logic",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_venue_first",
+      "community": 6,
+      "norm_label": "rationale: venue-first planning logic"
+    },
+    {
+      "label": "Rationale: Centralizing Vendor Communication",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Vendor management philosophy",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_vendor_centralization",
+      "community": 6,
+      "norm_label": "rationale: centralizing vendor communication"
+    },
+    {
+      "label": "Rationale: SQL Migrations Over Manual Dashboard Execution",
+      "file_type": "document",
+      "source_file": "Reports/Supabase_Setup_Report.md",
+      "source_location": "Appendix C",
+      "source_url": null,
+      "captured_at": "2026-04-01",
+      "author": null,
+      "contributor": null,
+      "id": "rationale_migrations_over_manual",
+      "community": 4,
+      "norm_label": "rationale: sql migrations over manual dashboard execution"
+    },
+    {
+      "label": "Rationale: Flat-Fee Planning Fee Model",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Planning fee philosophy",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_flat_fee_model",
+      "community": 6,
+      "norm_label": "rationale: flat-fee planning fee model"
+    },
+    {
+      "label": "Rationale: Pre-Signature vs Post-Signature Work Boundary",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Service philosophy",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_pre_post_signature",
+      "community": 6,
+      "norm_label": "rationale: pre-signature vs post-signature work boundary"
+    },
+    {
+      "label": "VPS Infrastructure (Ubuntu 22.04, Docker Compose)",
+      "file_type": "document",
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a76.1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "vps_infrastructure",
+      "community": 5,
+      "norm_label": "vps infrastructure (ubuntu 22.04, docker compose)"
+    },
+    {
+      "label": "Meta App Review Blocker (WhatsApp/Instagram)",
+      "file_type": "document",
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Blocked Items",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "meta_app_review_blocker",
+      "community": 5,
+      "norm_label": "meta app review blocker (whatsapp/instagram)"
+    },
+    {
+      "label": "OpenAI text-embedding-3-small (1536-dim)",
+      "file_type": "document",
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "text_embedding_3_small",
+      "community": 2,
+      "norm_label": "openai text-embedding-3-small (1536-dim)"
+    },
+    {
+      "label": "PostgreSQL Function: get_dashboard_stats()",
+      "file_type": "code",
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Database Functions",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "get_dashboard_stats_fn",
+      "community": 4,
+      "norm_label": "postgresql function: get_dashboard_stats()"
+    },
+    {
+      "label": "Git Feature Branch Workflow Convention",
+      "file_type": "document",
+      "source_file": "guides/DPCA_DEVELOPER_GUIDE.md",
+      "source_location": "\u00a72",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "developer_workflow_guide",
+      "community": 3,
+      "norm_label": "git feature branch workflow convention"
+    },
+    {
+      "label": "DPCA Project",
+      "type": "Project",
+      "properties": {
+        "full_name": "Dream Paris Communication Assistant",
+        "status": "active",
+        "current_week": 3
+      },
+      "id": "dpca_project",
+      "community": 3,
+      "norm_label": "dpca project"
+    },
+    {
+      "label": "Nexstair Technologies",
+      "type": "Organization",
+      "properties": {
+        "role": "developer/contractor",
+        "github_org": "nexstair-projects"
+      },
+      "id": "nexstair_technologies",
+      "community": 3,
+      "norm_label": "nexstair technologies"
+    },
+    {
+      "label": "Dream Paris Wedding",
+      "type": "Organization",
+      "properties": {
+        "role": "client",
+        "location": "Paris, France",
+        "type": "luxury_wedding_planning"
+      },
+      "id": "dream_paris_wedding",
+      "community": 0,
+      "norm_label": "dream paris wedding"
+    },
+    {
+      "label": "Vanessa",
+      "type": "Person",
+      "properties": {
+        "role": "Wedding Planner",
+        "employer": "Dream Paris Wedding"
+      },
+      "id": "vanessa",
+      "community": 0,
+      "norm_label": "vanessa"
+    },
+    {
+      "label": "Patricia",
+      "type": "Person",
+      "properties": {
+        "role": "Wedding Coordinator",
+        "employer": "Dream Paris Wedding"
+      },
+      "id": "patricia",
+      "community": 0,
+      "norm_label": "patricia"
+    },
+    {
+      "label": "Kimberlee",
+      "type": "Person",
+      "properties": {
+        "role": "Wedding Coordinator",
+        "employer": "Dream Paris Wedding"
+      },
+      "id": "kimberlee",
+      "community": 0,
+      "norm_label": "kimberlee"
+    },
+    {
+      "label": "Kimberly",
+      "type": "Person",
+      "properties": {
+        "role": "Wedding Coordinator",
+        "employer": "Dream Paris Wedding",
+        "note": "also spelled Kimberlee"
+      },
+      "id": "kimberly",
+      "community": 0,
+      "norm_label": "kimberly"
+    },
+    {
+      "label": "Abdur Rehman",
+      "type": "Person",
+      "properties": {
+        "role": "Developer",
+        "github": "Ab-dur-Rehman",
+        "responsibilities": [
+          "n8n workflows",
+          "API integrations",
+          "MongoDB",
+          "Node.js backend"
+        ]
+      },
+      "id": "abdur_rehman",
+      "community": 3,
+      "norm_label": "abdur rehman"
+    },
+    {
+      "label": "Usama",
+      "type": "Person",
+      "properties": {
+        "role": "Developer",
+        "github": "ujavaid015",
+        "responsibilities": [
+          "React dashboard frontend"
+        ]
+      },
+      "id": "usama",
+      "community": 3,
+      "norm_label": "usama"
+    },
+    {
+      "label": "Sophie",
+      "type": "Person",
+      "properties": {
+        "role": "Brand Voice Content Provider",
+        "status": "awaited",
+        "note": "blocking prompt finalization"
+      },
+      "id": "sophie",
+      "community": 3,
+      "norm_label": "sophie"
+    },
+    {
+      "label": "n8n",
+      "type": "Technology",
+      "properties": {
+        "category": "workflow_automation",
+        "role": "core_engine",
+        "deployment": "VPS (planned)"
+      },
+      "id": "n8n",
+      "community": 2,
+      "norm_label": "n8n"
+    },
+    {
+      "label": "Supabase",
+      "type": "Technology",
+      "properties": {
+        "category": "database_baas",
+        "db_type": "PostgreSQL",
+        "url": "https://hefkqlkiuiqhgssdmvad.supabase.co",
+        "features": [
+          "RLS",
+          "auth",
+          "realtime"
+        ]
+      },
+      "id": "supabase",
+      "community": 1,
+      "norm_label": "supabase"
+    },
+    {
+      "label": "Railway",
+      "type": "Technology",
+      "properties": {
+        "category": "cloud_hosting",
+        "url": "https://dpca-production.up.railway.app",
+        "hosts": "Express.js backend"
+      },
+      "id": "railway",
+      "community": 7,
+      "norm_label": "railway"
+    },
+    {
+      "label": "Vercel",
+      "type": "Technology",
+      "properties": {
+        "category": "cloud_hosting",
+        "url": "https://dpca-ten.vercel.app",
+        "hosts": "Next.js frontend"
+      },
+      "id": "vercel",
+      "community": 3,
+      "norm_label": "vercel"
+    },
+    {
+      "label": "Next.js 14",
+      "type": "Technology",
+      "properties": {
+        "category": "frontend_framework",
+        "version": "14"
+      },
+      "id": "nextjs",
+      "community": 3,
+      "norm_label": "next.js 14"
+    },
+    {
+      "label": "Express.js",
+      "type": "Technology",
+      "properties": {
+        "category": "backend_framework"
+      },
+      "id": "expressjs",
+      "community": 7,
+      "norm_label": "express.js"
+    },
+    {
+      "label": "PostgreSQL",
+      "type": "Technology",
+      "properties": {
+        "category": "database"
+      },
+      "id": "postgresql",
+      "community": 3,
+      "norm_label": "postgresql"
+    },
+    {
+      "label": "MongoDB",
+      "type": "Technology",
+      "properties": {
+        "category": "database",
+        "note": "listed in original brief but replaced by Supabase/PostgreSQL in actual implementation"
+      },
+      "id": "mongodb",
+      "community": 3,
+      "norm_label": "mongodb"
+    },
+    {
+      "label": "Pinecone",
+      "type": "Technology",
+      "properties": {
+        "category": "vector_store",
+        "use": "knowledge_base_embeddings"
+      },
+      "id": "pinecone",
+      "community": 3,
+      "norm_label": "pinecone"
+    },
+    {
+      "label": "ReactJS",
+      "type": "Technology",
+      "properties": {
+        "category": "frontend_library"
+      },
+      "id": "reactjs",
+      "community": 30,
+      "norm_label": "reactjs"
+    },
+    {
+      "label": "Meta Cloud API",
+      "type": "Technology",
+      "properties": {
+        "category": "integration",
+        "use": "WhatsApp"
+      },
+      "id": "meta_cloud_api",
+      "community": 3,
+      "norm_label": "meta cloud api"
+    },
+    {
+      "label": "Meta Graph API",
+      "type": "Technology",
+      "properties": {
+        "category": "integration",
+        "use": "Instagram"
+      },
+      "id": "meta_graph_api",
+      "community": 3,
+      "norm_label": "meta graph api"
+    },
+    {
+      "label": "Ab-dur-Rehman/DPCA",
+      "type": "Repository",
+      "properties": {
+        "url": "https://github.com/Ab-dur-Rehman/DPCA",
+        "status": "backup/retained"
+      },
+      "id": "repo_personal",
+      "community": 3,
+      "norm_label": "ab-dur-rehman/dpca"
+    },
+    {
+      "label": "nexstair-projects/DPCA",
+      "type": "Repository",
+      "properties": {
+        "url": "https://github.com/nexstair-projects/DPCA",
+        "status": "primary/active"
+      },
+      "id": "repo_org",
+      "community": 3,
+      "norm_label": "nexstair-projects/dpca"
+    },
+    {
+      "label": ".github/CODEOWNERS",
+      "type": "Document",
+      "properties": {
+        "path": ".github/CODEOWNERS",
+        "reviewers": [
+          "Ab-dur-Rehman",
+          "ujavaid015"
+        ]
+      },
+      "id": "codeowners_file",
+      "community": 3,
+      "norm_label": ".github/codeowners"
+    },
+    {
+      "label": "expand_message_status.sql",
+      "type": "Document",
+      "properties": {
+        "path": "supabase/migrations/20260411000001_expand_message_status.sql",
+        "status": "PENDING_EXECUTION",
+        "effect": "expands message.status CHECK constraint from 8 to 15 values"
+      },
+      "id": "db_migration_sql",
+      "community": 1,
+      "norm_label": "expand_message_status.sql"
+    },
+    {
+      "label": "Mood Board Requirements",
+      "type": "Document",
+      "properties": {
+        "path": "knowledge-base/Mood board guidelines/MOOD BOARD REQUIREMENTS (1).pdf",
+        "categories": [
+          "Bouquets/Boutonnieres",
+          "Ceremony Decor",
+          "Cocktail Hour",
+          "Reception",
+          "Wedding Signs",
+          "Decor & Extra Ideas"
+        ]
+      },
+      "id": "mood_board_requirements",
+      "community": 0,
+      "norm_label": "mood board requirements"
+    },
+    {
+      "label": "Dream Paris AI Communication Schedule",
+      "type": "Document",
+      "properties": {
+        "path": "info-docs/Dream Paris AI autmated communication (Schedule).pdf",
+        "total_weeks": 17
+      },
+      "id": "project_schedule",
+      "community": 3,
+      "norm_label": "dream paris ai communication schedule"
+    },
+    {
+      "label": "Dream Paris Wedding Team Brief",
+      "type": "Document",
+      "properties": {
+        "path": "info-docs/Dream_Paris_Wedding_Team_Brief.pdf",
+        "author": "Nexstair Technologies"
+      },
+      "id": "team_brief",
+      "community": 3,
+      "norm_label": "dream paris wedding team brief"
+    },
+    {
+      "label": "Week 2 Work Report",
+      "type": "Document",
+      "properties": {
+        "path": "graphify-out/converted/Week_2_Work_Report_23b88cf2.md",
+        "period": "April 5-11, 2026"
+      },
+      "id": "week2_report",
+      "community": 3,
+      "norm_label": "week 2 work report"
+    },
+    {
+      "label": "Week 3 Work Report",
+      "type": "Document",
+      "properties": {
+        "path": "graphify-out/converted/Week_3_Work_Report_e3a7e829.md",
+        "period": "April 12-18, 2026"
+      },
+      "id": "week3_report",
+      "community": 3,
+      "norm_label": "week 3 work report"
+    },
+    {
+      "label": "Boris Cherny CLAUDE.md File",
+      "type": "Document",
+      "properties": {
+        "path": "info-docs/claude-md-file.jpg",
+        "type": "image/reference_guide",
+        "author": "Boris Cherny",
+        "topics": [
+          "workflow_orchestration",
+          "task_management",
+          "core_principles"
+        ]
+      },
+      "id": "claude_md_image",
+      "community": 3,
+      "norm_label": "boris cherny claude.md file"
+    },
+    {
+      "label": "Tomiko & Adam",
+      "type": "WeddingEvent",
+      "properties": {
+        "date": "2025-07-26",
+        "venue": "Shangri-La Paris"
+      },
+      "id": "couple_tomiko_adam",
+      "community": 0,
+      "norm_label": "tomiko & adam"
+    },
+    {
+      "label": "Zach & Toni",
+      "type": "WeddingEvent",
+      "properties": {
+        "date": "2025-07-20",
+        "venue": "Shangri-La Paris"
+      },
+      "id": "couple_zach_toni",
+      "community": 0,
+      "norm_label": "zach & toni"
+    },
+    {
+      "label": "Stephanie & Joshua",
+      "type": "WeddingEvent",
+      "properties": {
+        "date": "2025-09-13",
+        "venue": "Ch\u00e2teau de Villette / H\u00f4tel de Crillon"
+      },
+      "id": "couple_stephanie_joshua",
+      "community": 8,
+      "norm_label": "stephanie & joshua"
+    },
+    {
+      "label": "Erika & Elliott",
+      "type": "WeddingEvent",
+      "properties": {
+        "date": "2025-10-04",
+        "venue": "Ch\u00e2teau d'Aveny"
+      },
+      "id": "couple_erika_elliott",
+      "community": 0,
+      "norm_label": "erika & elliott"
+    },
+    {
+      "label": "Christine & Anant",
+      "type": "WeddingEvent",
+      "properties": {
+        "date": "2025-11-29",
+        "venue": "Pavillon Dauphine / \u00c9glise La Madeleine"
+      },
+      "id": "couple_christine_anant",
+      "community": 0,
+      "norm_label": "christine & anant"
+    },
+    {
+      "label": "Colin & Veronica",
+      "type": "WeddingEvent",
+      "properties": {
+        "date": "2026-05-01/02",
+        "venue": "Ch\u00e2teau d'Aveny"
+      },
+      "id": "couple_colin_veronica",
+      "community": 0,
+      "norm_label": "colin & veronica"
+    },
+    {
+      "label": "Kathy & Alexandre",
+      "type": "WeddingEvent",
+      "properties": {
+        "date": "2026-05-09",
+        "venue": "Cercle de l'Union Interalli\u00e9e"
+      },
+      "id": "couple_kathy_alexandre",
+      "community": 0,
+      "norm_label": "kathy & alexandre"
+    },
+    {
+      "label": "Holly & James",
+      "type": "WeddingEvent",
+      "properties": {
+        "date": "2026-05-16",
+        "venue": "Ch\u00e2teau de Nainville"
+      },
+      "id": "couple_holly_james",
+      "community": 0,
+      "norm_label": "holly & james"
+    },
+    {
+      "label": "Steve & Chloe",
+      "type": "WeddingEvent",
+      "properties": {
+        "date": "2026-05-18",
+        "venue": "Ch\u00e2teau de Nainville",
+        "note": "Steve Chang & Chloe Huang"
+      },
+      "id": "couple_steve_chloe",
+      "community": 0,
+      "norm_label": "steve & chloe"
+    },
+    {
+      "label": "Shangri-La Paris",
+      "type": "Venue",
+      "properties": {
+        "address": "10 Av. d'I\u00e9na, 75116 Paris"
+      },
+      "id": "venue_shangri_la",
+      "community": 0,
+      "norm_label": "shangri-la paris"
+    },
+    {
+      "label": "Ch\u00e2teau d'Aveny",
+      "type": "Venue",
+      "properties": {
+        "address": "1 Rue Pav\u00e9e, 27630 Vexin-sur-Epte"
+      },
+      "id": "venue_chateau_aveny",
+      "community": 0,
+      "norm_label": "chateau d'aveny"
+    },
+    {
+      "label": "Ch\u00e2teau de Nainville",
+      "type": "Venue",
+      "properties": {
+        "address": "1 Pl. de la Mairie, 91750 Nainville-les-Roches"
+      },
+      "id": "venue_chateau_nainville",
+      "community": 0,
+      "norm_label": "chateau de nainville"
+    },
+    {
+      "label": "Pavillon Dauphine",
+      "type": "Venue",
+      "properties": {},
+      "id": "venue_pavillon_dauphine",
+      "community": 0,
+      "norm_label": "pavillon dauphine"
+    },
+    {
+      "label": "H\u00f4tel de Crillon",
+      "type": "Venue",
+      "properties": {
+        "address": "10 Pl. de la Concorde, 75008",
+        "room": "Salon Marie Antoinette"
+      },
+      "id": "venue_hotel_crillon",
+      "community": 8,
+      "norm_label": "hotel de crillon"
+    },
+    {
+      "label": "Cercle de l'Union Interalli\u00e9e",
+      "type": "Venue",
+      "properties": {
+        "address": "33 rue du Faubourg Saint Honor\u00e9, 75008"
+      },
+      "id": "venue_cercle_union",
+      "community": 0,
+      "norm_label": "cercle de l'union interalliee"
+    },
+    {
+      "label": "Ch\u00e2teau de Villette",
+      "type": "Venue",
+      "properties": {
+        "address": "1 Rue de la Maison Blanche, 95450 Cond\u00e9court"
+      },
+      "id": "venue_chateau_villette",
+      "community": 8,
+      "norm_label": "chateau de villette"
+    },
+    {
+      "label": "\u00c9glise La Madeleine",
+      "type": "Venue",
+      "properties": {
+        "address": "Pl. de la Madeleine, 75008"
+      },
+      "id": "venue_eglise_madeleine",
+      "community": 0,
+      "norm_label": "eglise la madeleine"
+    },
+    {
+      "label": "Saint Germain Church",
+      "type": "Venue",
+      "properties": {
+        "address": "3 Pl. Saint-Germain des Pr\u00e9s, 75006"
+      },
+      "id": "venue_saint_germain_church",
+      "community": 0,
+      "norm_label": "saint germain church"
+    },
+    {
+      "label": "Catalin",
+      "type": "Person",
+      "properties": {
+        "role": "Photographer",
+        "vendor_type": "photography"
+      },
+      "id": "catalin",
+      "community": 0,
+      "norm_label": "catalin"
+    },
+    {
+      "label": "Laura",
+      "type": "Person",
+      "properties": {
+        "role": "Photographer",
+        "vendor_type": "photography"
+      },
+      "id": "laura",
+      "community": 0,
+      "norm_label": "laura"
+    },
+    {
+      "label": "Aude Lucas",
+      "type": "Person",
+      "properties": {
+        "role": "Photographer",
+        "vendor_type": "photography"
+      },
+      "id": "aude_lucas",
+      "community": 0,
+      "norm_label": "aude lucas"
+    },
+    {
+      "label": "Olivier Neuville",
+      "type": "Person",
+      "properties": {
+        "role": "Photographer",
+        "vendor_type": "photography"
+      },
+      "id": "olivier_neuville",
+      "community": 0,
+      "norm_label": "olivier neuville"
+    },
+    {
+      "label": "Claire Morris",
+      "type": "Person",
+      "properties": {
+        "role": "Photographer",
+        "vendor_type": "photography"
+      },
+      "id": "claire_morris",
+      "community": 8,
+      "norm_label": "claire morris"
+    },
+    {
+      "label": "Minh",
+      "type": "Person",
+      "properties": {
+        "role": "Content Creator",
+        "vendor_type": "videography/content"
+      },
+      "id": "minh",
+      "community": 0,
+      "norm_label": "minh"
+    },
+    {
+      "label": "Melissa",
+      "type": "Person",
+      "properties": {
+        "role": "Content Creator",
+        "vendor_type": "content"
+      },
+      "id": "melissa",
+      "community": 8,
+      "norm_label": "melissa"
+    },
+    {
+      "label": "Chris (Ohana)",
+      "type": "Person",
+      "properties": {
+        "role": "Videographer",
+        "company": "Ohana"
+      },
+      "id": "chris_ohana",
+      "community": 0,
+      "norm_label": "chris (ohana)"
+    },
+    {
+      "label": "Tuan",
+      "type": "Person",
+      "properties": {
+        "role": "Videographer"
+      },
+      "id": "tuan",
+      "community": 0,
+      "norm_label": "tuan"
+    },
+    {
+      "label": "Rapha\u00ebl",
+      "type": "Person",
+      "properties": {
+        "role": "Second Shooter (photography)"
+      },
+      "id": "raphael",
+      "community": 0,
+      "norm_label": "raphael"
+    },
+    {
+      "label": "Entremets & Fragrances",
+      "type": "Organization",
+      "properties": {
+        "role": "Caterer",
+        "vendor_type": "catering"
+      },
+      "id": "entremets_fragrances",
+      "community": 0,
+      "norm_label": "entremets & fragrances"
+    },
+    {
+      "label": "Grand Chemin",
+      "type": "Organization",
+      "properties": {
+        "role": "Caterer",
+        "vendor_type": "catering"
+      },
+      "id": "grand_chemin",
+      "community": 0,
+      "norm_label": "grand chemin"
+    },
+    {
+      "label": "JL Events",
+      "type": "Organization",
+      "properties": {
+        "role": "DJ/AV Setup",
+        "vendor_type": "music_av"
+      },
+      "id": "jl_events",
+      "community": 0,
+      "norm_label": "jl events"
+    },
+    {
+      "label": "Loic",
+      "type": "Person",
+      "properties": {
+        "role": "DJ"
+      },
+      "id": "loic",
+      "community": 0,
+      "norm_label": "loic"
+    },
+    {
+      "label": "Anthony",
+      "type": "Person",
+      "properties": {
+        "role": "DJ"
+      },
+      "id": "anthony_dj",
+      "community": 0,
+      "norm_label": "anthony"
+    },
+    {
+      "label": "Santiago",
+      "type": "Person",
+      "properties": {
+        "role": "Violinist/Live Musician"
+      },
+      "id": "santiago",
+      "community": 0,
+      "norm_label": "santiago"
+    },
+    {
+      "label": "Na\u00efm",
+      "type": "Person",
+      "properties": {
+        "role": "MC & Officiant"
+      },
+      "id": "naim",
+      "community": 0,
+      "norm_label": "naim"
+    },
+    {
+      "label": "DJ Dahood",
+      "type": "Person",
+      "properties": {
+        "role": "DJ"
+      },
+      "id": "dahood_dj",
+      "community": 0,
+      "norm_label": "dj dahood"
+    },
+    {
+      "label": "Inna",
+      "type": "Person",
+      "properties": {
+        "role": "MC & Live Illustrator"
+      },
+      "id": "inna",
+      "community": 0,
+      "norm_label": "inna"
+    },
+    {
+      "label": "R\u00eavart Dancers",
+      "type": "Organization",
+      "properties": {
+        "role": "Entertainment",
+        "count": 4,
+        "performance": "Hora Loca"
+      },
+      "id": "revart_dancers",
+      "community": 0,
+      "norm_label": "revart dancers"
+    },
+    {
+      "label": "Plan\u00e8te Sucr\u00e9e",
+      "type": "Organization",
+      "properties": {
+        "role": "Wedding Cake"
+      },
+      "id": "planete_sucree",
+      "community": 0,
+      "norm_label": "planete sucree"
+    },
+    {
+      "label": "Blackstone",
+      "type": "Organization",
+      "properties": {
+        "role": "Fireworks"
+      },
+      "id": "blackstone_fireworks",
+      "community": 0,
+      "norm_label": "blackstone"
+    },
+    {
+      "label": "GET /api/inboxes",
+      "type": "APIEndpoint",
+      "properties": {
+        "method": "GET",
+        "path": "/api/inboxes",
+        "description": "List connected inboxes with channel metadata"
+      },
+      "id": "api_inboxes",
+      "community": 7,
+      "norm_label": "get /api/inboxes"
+    },
+    {
+      "label": "GET /api/leads",
+      "type": "APIEndpoint",
+      "properties": {
+        "method": "GET",
+        "path": "/api/leads",
+        "description": "List leads for dashboard display"
+      },
+      "id": "api_leads",
+      "community": 7,
+      "norm_label": "get /api/leads"
+    },
+    {
+      "label": "GET /api/messages",
+      "type": "APIEndpoint",
+      "properties": {
+        "method": "GET",
+        "path": "/api/messages",
+        "description": "Messages with optional ?channel= filter"
+      },
+      "id": "api_messages",
+      "community": 7,
+      "norm_label": "get /api/messages"
+    },
+    {
+      "label": "GET /api/health",
+      "type": "APIEndpoint",
+      "properties": {
+        "method": "GET",
+        "path": "/api/health"
+      },
+      "id": "api_health",
+      "community": 31,
+      "norm_label": "get /api/health"
+    },
+    {
+      "label": "Gmail Channel",
+      "type": "MessageChannel",
+      "properties": {
+        "type": "gmail"
+      },
+      "id": "channel_gmail",
+      "community": 7,
+      "norm_label": "gmail channel"
+    },
+    {
+      "label": "WhatsApp Channel",
+      "type": "MessageChannel",
+      "properties": {
+        "type": "whatsapp"
+      },
+      "id": "channel_whatsapp",
+      "community": 7,
+      "norm_label": "whatsapp channel"
+    },
+    {
+      "label": "Instagram Channel",
+      "type": "MessageChannel",
+      "properties": {
+        "type": "instagram"
+      },
+      "id": "channel_instagram",
+      "community": 7,
+      "norm_label": "instagram channel"
+    },
+    {
+      "label": "Row Level Security (RLS)",
+      "type": "Concept",
+      "properties": {
+        "technology": "Supabase/PostgreSQL",
+        "issue": "blocked data reads with anon key",
+        "fix": "switched to service_role key in backend"
+      },
+      "id": "rls_policy",
+      "community": 7,
+      "norm_label": "row level security (rls)"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "create_tasks_doc.py",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "create_tasks_doc_py",
+      "_tgt": "create_tasks_doc_add_styled_heading",
+      "source": "create_tasks_doc_py",
+      "target": "create_tasks_doc_add_styled_heading",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "create_tasks_doc.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "create_tasks_doc_py",
+      "_tgt": "create_tasks_doc_add_table_row",
+      "source": "create_tasks_doc_py",
+      "target": "create_tasks_doc_add_table_row",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "create_tasks_doc.py",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "create_tasks_doc_py",
+      "_tgt": "create_tasks_doc_create_document",
+      "source": "create_tasks_doc_py",
+      "target": "create_tasks_doc_create_document",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "create_tasks_doc.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_src": "create_tasks_doc_create_document",
+      "_tgt": "create_tasks_doc_add_styled_heading",
+      "source": "create_tasks_doc_add_styled_heading",
+      "target": "create_tasks_doc_create_document",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "create_tasks_doc.py",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_src": "create_tasks_doc_create_document",
+      "_tgt": "create_tasks_doc_add_table_row",
+      "source": "create_tasks_doc_add_table_row",
+      "target": "create_tasks_doc_create_document",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "generate_week2_report.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "generate_week2_report_py",
+      "_tgt": "generate_week2_report_create_report",
+      "source": "generate_week2_report_py",
+      "target": "generate_week2_report_create_report",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "generate_week3_report.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "generate_week3_report_py",
+      "_tgt": "generate_week3_report_create_report",
+      "source": "generate_week3_report_py",
+      "target": "generate_week3_report_create_report",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\middleware.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "dashboard_middleware_ts",
+      "_tgt": "middleware_middleware",
+      "source": "dashboard_middleware_ts",
+      "target": "middleware_middleware",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "dashboard_app_page_tsx",
+      "_tgt": "page_home",
+      "source": "dashboard_app_page_tsx",
+      "target": "page_home",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\dashboard\\page.tsx",
+      "source_location": "L133",
+      "weight": 1.0,
+      "_src": "dashboard_app_dashboard_page_tsx",
+      "_tgt": "page_reltime",
+      "source": "dashboard_app_dashboard_page_tsx",
+      "target": "page_reltime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\dashboard\\page.tsx",
+      "source_location": "L138",
+      "weight": 1.0,
+      "_src": "dashboard_app_dashboard_page_tsx",
+      "_tgt": "page_statusdot",
+      "source": "dashboard_app_dashboard_page_tsx",
+      "target": "page_statusdot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\dashboard\\page.tsx",
+      "source_location": "L144",
+      "weight": 1.0,
+      "_src": "dashboard_app_dashboard_page_tsx",
+      "_tgt": "page_channelicon",
+      "source": "dashboard_app_dashboard_page_tsx",
+      "target": "page_channelicon",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L69",
+      "weight": 1.0,
+      "_src": "dashboard_app_settings_page_tsx",
+      "_tgt": "page_channelicon",
+      "source": "page_channelicon",
+      "target": "dashboard_app_settings_page_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "dashboard_app_inbox_page_tsx",
+      "_tgt": "supabase",
+      "source": "dashboard_app_inbox_page_tsx",
+      "target": "supabase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L69",
+      "weight": 1.0,
+      "_src": "dashboard_app_inbox_page_tsx",
+      "_tgt": "page_catmeta",
+      "source": "dashboard_app_inbox_page_tsx",
+      "target": "page_catmeta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_src": "dashboard_app_inbox_page_tsx",
+      "_tgt": "page_categorybadge",
+      "source": "dashboard_app_inbox_page_tsx",
+      "target": "page_categorybadge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L169",
+      "weight": 1.0,
+      "_src": "dashboard_app_inbox_page_tsx",
+      "_tgt": "page_handleapprove",
+      "source": "dashboard_app_inbox_page_tsx",
+      "target": "page_handleapprove",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L187",
+      "weight": 1.0,
+      "_src": "dashboard_app_inbox_page_tsx",
+      "_tgt": "page_handlediscard",
+      "source": "dashboard_app_inbox_page_tsx",
+      "target": "page_handlediscard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L232",
+      "weight": 1.0,
+      "_src": "dashboard_app_inbox_page_tsx",
+      "_tgt": "page_handler",
+      "source": "dashboard_app_inbox_page_tsx",
+      "target": "page_handler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L253",
+      "weight": 1.0,
+      "_src": "dashboard_app_inbox_page_tsx",
+      "_tgt": "page_relativetime",
+      "source": "dashboard_app_inbox_page_tsx",
+      "target": "page_relativetime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_src": "page_categorybadge",
+      "_tgt": "page_catmeta",
+      "source": "page_catmeta",
+      "target": "page_categorybadge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L234",
+      "weight": 1.0,
+      "_src": "page_handler",
+      "_tgt": "page_handleapprove",
+      "source": "page_handleapprove",
+      "target": "page_handler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L180",
+      "weight": 1.0,
+      "_src": "page_handleapprove",
+      "_tgt": "supabase_createclient",
+      "source": "page_handleapprove",
+      "target": "supabase_createclient"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L235",
+      "weight": 1.0,
+      "_src": "page_handler",
+      "_tgt": "page_handlediscard",
+      "source": "page_handlediscard",
+      "target": "page_handler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard\\app\\inbox\\page.tsx",
+      "source_location": "L197",
+      "weight": 1.0,
+      "_src": "page_handlediscard",
+      "_tgt": "supabase_createclient",
+      "source": "page_handlediscard",
+      "target": "supabase_createclient"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "dashboard_app_knowledge_base_page_tsx",
+      "_tgt": "supabase",
+      "source": "dashboard_app_knowledge_base_page_tsx",
+      "target": "supabase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_src": "dashboard_app_knowledge_base_page_tsx",
+      "_tgt": "page_catbadge",
+      "source": "dashboard_app_knowledge_base_page_tsx",
+      "target": "page_catbadge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L109",
+      "weight": 1.0,
+      "_src": "dashboard_app_knowledge_base_page_tsx",
+      "_tgt": "page_handleedit",
+      "source": "dashboard_app_knowledge_base_page_tsx",
+      "target": "page_handleedit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L116",
+      "weight": 1.0,
+      "_src": "dashboard_app_knowledge_base_page_tsx",
+      "_tgt": "page_handlesave",
+      "source": "dashboard_app_knowledge_base_page_tsx",
+      "target": "page_handlesave",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L128",
+      "weight": 1.0,
+      "_src": "dashboard_app_knowledge_base_page_tsx",
+      "_tgt": "page_handledelete",
+      "source": "dashboard_app_knowledge_base_page_tsx",
+      "target": "page_handledelete",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L136",
+      "weight": 1.0,
+      "_src": "dashboard_app_knowledge_base_page_tsx",
+      "_tgt": "page_fmtdate",
+      "source": "dashboard_app_knowledge_base_page_tsx",
+      "target": "page_fmtdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L118",
+      "weight": 1.0,
+      "_src": "page_handlesave",
+      "_tgt": "supabase_createclient",
+      "source": "page_handlesave",
+      "target": "supabase_createclient"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard\\app\\knowledge-base\\page.tsx",
+      "source_location": "L130",
+      "weight": 1.0,
+      "_src": "page_handledelete",
+      "_tgt": "supabase_createclient",
+      "source": "page_handledelete",
+      "target": "supabase_createclient"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L133",
+      "weight": 1.0,
+      "_src": "dashboard_app_settings_page_tsx",
+      "_tgt": "page_fmtdate",
+      "source": "page_fmtdate",
+      "target": "dashboard_app_settings_page_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\leads\\page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "dashboard_app_leads_page_tsx",
+      "_tgt": "supabase",
+      "source": "dashboard_app_leads_page_tsx",
+      "target": "supabase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\leads\\page.tsx",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_src": "dashboard_app_leads_page_tsx",
+      "_tgt": "page_statusbadge",
+      "source": "dashboard_app_leads_page_tsx",
+      "target": "page_statusbadge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\login\\page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "dashboard_app_login_page_tsx",
+      "_tgt": "supabase",
+      "source": "dashboard_app_login_page_tsx",
+      "target": "supabase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\login\\page.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "dashboard_app_login_page_tsx",
+      "_tgt": "page_handlesubmit",
+      "source": "dashboard_app_login_page_tsx",
+      "target": "page_handlesubmit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard\\app\\login\\page.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_src": "page_handlesubmit",
+      "_tgt": "supabase_createclient",
+      "source": "page_handlesubmit",
+      "target": "supabase_createclient"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "dashboard_app_settings_page_tsx",
+      "_tgt": "supabase",
+      "source": "dashboard_app_settings_page_tsx",
+      "target": "supabase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L113",
+      "weight": 1.0,
+      "_src": "dashboard_app_settings_page_tsx",
+      "_tgt": "page_handleeditconfig",
+      "source": "dashboard_app_settings_page_tsx",
+      "target": "page_handleeditconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L118",
+      "weight": 1.0,
+      "_src": "dashboard_app_settings_page_tsx",
+      "_tgt": "page_handlesaveconfig",
+      "source": "dashboard_app_settings_page_tsx",
+      "target": "page_handlesaveconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L127",
+      "weight": 1.0,
+      "_src": "dashboard_app_settings_page_tsx",
+      "_tgt": "page_handletoggleinbox",
+      "source": "dashboard_app_settings_page_tsx",
+      "target": "page_handletoggleinbox",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L119",
+      "weight": 1.0,
+      "_src": "page_handlesaveconfig",
+      "_tgt": "supabase_createclient",
+      "source": "page_handlesaveconfig",
+      "target": "supabase_createclient"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard\\app\\settings\\page.tsx",
+      "source_location": "L128",
+      "weight": 1.0,
+      "_src": "page_handletoggleinbox",
+      "_tgt": "supabase_createclient",
+      "source": "page_handletoggleinbox",
+      "target": "supabase_createclient"
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\components\\Sidebar.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "dashboard_components_sidebar_tsx",
+      "_tgt": "supabase",
+      "source": "dashboard_components_sidebar_tsx",
+      "target": "supabase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\components\\Sidebar.tsx",
+      "source_location": "L102",
+      "weight": 1.0,
+      "_src": "dashboard_components_sidebar_tsx",
+      "_tgt": "sidebar_handlelogout",
+      "source": "dashboard_components_sidebar_tsx",
+      "target": "sidebar_handlelogout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard\\components\\Sidebar.tsx",
+      "source_location": "L103",
+      "weight": 1.0,
+      "_src": "sidebar_handlelogout",
+      "_tgt": "supabase_createclient",
+      "source": "sidebar_handlelogout",
+      "target": "supabase_createclient"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\components\\TopBar.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "dashboard_components_topbar_tsx",
+      "_tgt": "topbar_topbar",
+      "source": "dashboard_components_topbar_tsx",
+      "target": "topbar_topbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\lib\\hooks.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "dashboard_lib_hooks_ts",
+      "_tgt": "hooks_useasync",
+      "source": "dashboard_lib_hooks_ts",
+      "target": "hooks_useasync",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard\\lib\\supabase.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "dashboard_lib_supabase_ts",
+      "_tgt": "supabase_createclient",
+      "source": "dashboard_lib_supabase_ts",
+      "target": "supabase_createclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/claude.md",
+      "source_location": "File Structure Conventions",
+      "weight": 1.0,
+      "_src": "dpca_system",
+      "_tgt": "dpca_architecture",
+      "source": "dpca_system",
+      "target": "dpca_architecture"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/claude.md",
+      "source_location": "File Structure Conventions",
+      "weight": 1.0,
+      "_src": "dpca_system",
+      "_tgt": "dpca_workflows",
+      "source": "dpca_system",
+      "target": "dpca_workflows"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/claude.md",
+      "source_location": "File Structure Conventions",
+      "weight": 1.0,
+      "_src": "dpca_system",
+      "_tgt": "dpca_database_schema",
+      "source": "dpca_system",
+      "target": "dpca_database_schema"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/claude.md",
+      "source_location": "File Structure Conventions",
+      "weight": 1.0,
+      "_src": "dpca_system",
+      "_tgt": "dpca_prompts",
+      "source": "dpca_system",
+      "target": "dpca_prompts"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Week_1_Work_Report_36d60983.md",
+      "source_location": "Executive Summary",
+      "weight": 1.0,
+      "_src": "week1_report",
+      "_tgt": "dpca_system",
+      "source": "dpca_system",
+      "target": "week1_report"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/claude.md",
+      "source_location": "Project Context \u2014 Client",
+      "weight": 1.0,
+      "_src": "dpca_system",
+      "_tgt": "dream_paris_wedding_brand",
+      "source": "dpca_system",
+      "target": "dream_paris_wedding_brand"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_users",
+      "source": "dpca_database_schema",
+      "target": "db_table_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_messages",
+      "source": "dpca_database_schema",
+      "target": "db_table_messages"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_drafts",
+      "source": "dpca_database_schema",
+      "target": "db_table_drafts"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_leads",
+      "source": "dpca_database_schema",
+      "target": "db_table_leads"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_knowledge_base",
+      "source": "dpca_database_schema",
+      "target": "db_table_knowledge_base"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_inboxes",
+      "source": "dpca_database_schema",
+      "target": "db_table_inboxes"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_audit_log",
+      "source": "dpca_database_schema",
+      "target": "db_table_audit_log"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_system_config",
+      "source": "dpca_database_schema",
+      "target": "db_table_system_config"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_errors_log",
+      "source": "dpca_database_schema",
+      "target": "db_table_errors_log"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Schema Definitions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "db_table_ignored_messages",
+      "source": "dpca_database_schema",
+      "target": "db_table_ignored_messages"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "RLS Policies throughout",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "rls_policies",
+      "source": "dpca_database_schema",
+      "target": "rls_policies"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "Database Functions",
+      "weight": 1.0,
+      "_src": "dpca_database_schema",
+      "_tgt": "get_dashboard_stats_fn",
+      "source": "dpca_database_schema",
+      "target": "get_dashboard_stats_fn"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tasks/todo.md",
+      "source_location": "Source of truth",
+      "weight": 1.0,
+      "_src": "todo_implementation_plan",
+      "_tgt": "dpca_database_schema",
+      "source": "dpca_database_schema",
+      "target": "todo_implementation_plan"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tasks/todo.md",
+      "source_location": "Source of truth",
+      "weight": 1.0,
+      "_src": "todo_implementation_plan",
+      "_tgt": "dpca_workflows",
+      "source": "dpca_workflows",
+      "target": "todo_implementation_plan"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/README.md",
+      "source_location": "Quick start",
+      "weight": 1.0,
+      "_src": "backend_api",
+      "_tgt": "supabase_db",
+      "source": "backend_api",
+      "target": "supabase_db"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/README.md",
+      "source_location": "Endpoints \u2014 /api/drafts/:id/regenerate",
+      "weight": 1.0,
+      "_src": "backend_api",
+      "_tgt": "n8n_engine",
+      "source": "backend_api",
+      "target": "n8n_engine"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a72.1",
+      "weight": 1.0,
+      "_src": "dashboard_frontend",
+      "_tgt": "backend_api",
+      "source": "backend_api",
+      "target": "dashboard_frontend"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Week_1_Work_Report_36d60983.md",
+      "source_location": "Completed Deliverables \u00a74",
+      "weight": 1.0,
+      "_src": "week1_report",
+      "_tgt": "backend_api",
+      "source": "backend_api",
+      "target": "week1_report"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/README.md",
+      "source_location": "GET /api/messages/stats/summary \u2014 Dashboard stats via RPC",
+      "weight": 1.0,
+      "_src": "backend_api",
+      "_tgt": "get_dashboard_stats_fn",
+      "source": "backend_api",
+      "target": "get_dashboard_stats_fn"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "dashboard/README.md",
+      "source_location": "Authentication",
+      "weight": 1.0,
+      "_src": "dashboard_frontend",
+      "_tgt": "supabase_db",
+      "source": "dashboard_frontend",
+      "target": "supabase_db"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Week_1_Work_Report_36d60983.md",
+      "source_location": "Completed Deliverables \u00a72",
+      "weight": 1.0,
+      "_src": "week1_report",
+      "_tgt": "dashboard_frontend",
+      "source": "dashboard_frontend",
+      "target": "week1_report"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Usama UI Enhancements",
+      "weight": 1.0,
+      "_src": "team_usama",
+      "_tgt": "dashboard_frontend",
+      "source": "dashboard_frontend",
+      "target": "team_usama"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "info-docs/dashboard.html",
+      "source_location": null,
+      "weight": 0.85,
+      "_src": "dashboard_html_mockup",
+      "_tgt": "dashboard_frontend",
+      "source": "dashboard_frontend",
+      "target": "dashboard_html_mockup"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "System Overview diagram",
+      "weight": 1.0,
+      "_src": "n8n_engine",
+      "_tgt": "supabase_db",
+      "source": "n8n_engine",
+      "target": "supabase_db"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "System Overview diagram",
+      "weight": 1.0,
+      "_src": "n8n_engine",
+      "_tgt": "pinecone_vectorstore",
+      "source": "n8n_engine",
+      "target": "pinecone_vectorstore"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "System Overview diagram",
+      "weight": 1.0,
+      "_src": "n8n_engine",
+      "_tgt": "openai_gpt4o",
+      "source": "n8n_engine",
+      "target": "openai_gpt4o"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "External Channels",
+      "weight": 1.0,
+      "_src": "n8n_engine",
+      "_tgt": "gmail_api",
+      "source": "n8n_engine",
+      "target": "gmail_api"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "External Channels",
+      "weight": 1.0,
+      "_src": "n8n_engine",
+      "_tgt": "meta_whatsapp_api",
+      "source": "n8n_engine",
+      "target": "meta_whatsapp_api"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "External Channels",
+      "weight": 1.0,
+      "_src": "n8n_engine",
+      "_tgt": "meta_instagram_api",
+      "source": "n8n_engine",
+      "target": "meta_instagram_api"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Abdur tasks \u2014 Workflow Implementation",
+      "weight": 1.0,
+      "_src": "team_abdur",
+      "_tgt": "n8n_engine",
+      "source": "n8n_engine",
+      "target": "team_abdur"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Reports/Supabase_Setup_Report.md",
+      "source_location": "Part 3",
+      "weight": 1.0,
+      "_src": "supabase_migrations",
+      "_tgt": "supabase_db",
+      "source": "supabase_db",
+      "target": "supabase_migrations"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Week_1_Work_Report_36d60983.md",
+      "source_location": "Completed Deliverables \u00a71",
+      "weight": 1.0,
+      "_src": "week1_report",
+      "_tgt": "supabase_db",
+      "source": "supabase_db",
+      "target": "week1_report"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF3 Flow \u2014 Pinecone Upsert",
+      "weight": 1.0,
+      "_src": "wf3_kb_embedding",
+      "_tgt": "pinecone_vectorstore",
+      "source": "pinecone_vectorstore",
+      "target": "wf3_kb_embedding"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF4 Flow \u2014 Pinecone Query",
+      "weight": 1.0,
+      "_src": "wf4_context_retrieval",
+      "_tgt": "pinecone_vectorstore",
+      "source": "pinecone_vectorstore",
+      "target": "wf4_context_retrieval"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "knowledge_base \u2014 pinecone_id column",
+      "weight": 1.0,
+      "_src": "db_table_knowledge_base",
+      "_tgt": "pinecone_vectorstore",
+      "source": "pinecone_vectorstore",
+      "target": "db_table_knowledge_base"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF2 Flow",
+      "weight": 1.0,
+      "_src": "wf2_classification",
+      "_tgt": "openai_gpt4o",
+      "source": "openai_gpt4o",
+      "target": "wf2_classification"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF3 Flow \u2014 OpenAI Embeddings API",
+      "weight": 1.0,
+      "_src": "wf3_kb_embedding",
+      "_tgt": "openai_gpt4o",
+      "source": "openai_gpt4o",
+      "target": "wf3_kb_embedding"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF5 Flow \u2014 OpenAI Chat Completion",
+      "weight": 1.0,
+      "_src": "wf5_draft_generation",
+      "_tgt": "openai_gpt4o",
+      "source": "openai_gpt4o",
+      "target": "wf5_draft_generation"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF7 Flow",
+      "weight": 1.0,
+      "_src": "wf7_lead_extraction",
+      "_tgt": "openai_gpt4o",
+      "source": "openai_gpt4o",
+      "target": "wf7_lead_extraction"
+    },
+    {
+      "relation": "USES",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "openai_gpt4o",
+      "source": "openai_gpt4o",
+      "target": "dpca_project"
+    },
+    {
+      "relation": "ORCHESTRATES",
+      "confidence_score": 1.0,
+      "_src": "n8n",
+      "_tgt": "openai_gpt4o",
+      "source": "openai_gpt4o",
+      "target": "n8n"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF1 Trigger",
+      "weight": 1.0,
+      "_src": "wf1_email_ingestion",
+      "_tgt": "gmail_api",
+      "source": "gmail_api",
+      "target": "wf1_email_ingestion"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF6 Flow \u2014 Route by Channel",
+      "weight": 1.0,
+      "_src": "wf6_auto_send",
+      "_tgt": "gmail_api",
+      "source": "gmail_api",
+      "target": "wf6_auto_send"
+    },
+    {
+      "relation": "INTEGRATES",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "gmail_api",
+      "source": "gmail_api",
+      "target": "dpca_project"
+    },
+    {
+      "relation": "USES",
+      "confidence_score": 1.0,
+      "_src": "n8n",
+      "_tgt": "gmail_api",
+      "source": "gmail_api",
+      "target": "n8n"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF6 Flow \u2014 Route by Channel",
+      "weight": 1.0,
+      "_src": "wf6_auto_send",
+      "_tgt": "meta_whatsapp_api",
+      "source": "meta_whatsapp_api",
+      "target": "wf6_auto_send"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Meta App Review blocker",
+      "weight": 1.0,
+      "_src": "meta_app_review_blocker",
+      "_tgt": "meta_whatsapp_api",
+      "source": "meta_whatsapp_api",
+      "target": "meta_app_review_blocker"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF6 Flow \u2014 Route by Channel",
+      "weight": 1.0,
+      "_src": "wf6_auto_send",
+      "_tgt": "meta_instagram_api",
+      "source": "meta_instagram_api",
+      "target": "wf6_auto_send"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Meta App Review blocker",
+      "weight": 1.0,
+      "_src": "meta_app_review_blocker",
+      "_tgt": "meta_instagram_api",
+      "source": "meta_instagram_api",
+      "target": "meta_app_review_blocker"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF1 Flow",
+      "weight": 1.0,
+      "_src": "wf1_email_ingestion",
+      "_tgt": "wf2_classification",
+      "source": "wf1_email_ingestion",
+      "target": "wf2_classification"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF1 Flow \u2014 Store in Supabase",
+      "weight": 1.0,
+      "_src": "wf1_email_ingestion",
+      "_tgt": "db_table_messages",
+      "source": "wf1_email_ingestion",
+      "target": "db_table_messages"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF2 Flow",
+      "weight": 1.0,
+      "_src": "wf2_classification",
+      "_tgt": "p2_classification_prompt",
+      "source": "wf2_classification",
+      "target": "p2_classification_prompt"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF2 Flow \u2014 Route by Tier",
+      "weight": 1.0,
+      "_src": "wf2_classification",
+      "_tgt": "tiered_routing_logic",
+      "source": "wf2_classification",
+      "target": "tiered_routing_logic"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF2 Flow \u2014 Tier 3 route",
+      "weight": 1.0,
+      "_src": "wf2_classification",
+      "_tgt": "wf7_lead_extraction",
+      "source": "wf2_classification",
+      "target": "wf7_lead_extraction"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF2 Flow \u2014 Tier 1/2 route",
+      "weight": 1.0,
+      "_src": "wf2_classification",
+      "_tgt": "wf5_draft_generation",
+      "source": "wf2_classification",
+      "target": "wf5_draft_generation"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF3 Flow",
+      "weight": 1.0,
+      "_src": "wf3_kb_embedding",
+      "_tgt": "text_embedding_3_small",
+      "source": "wf3_kb_embedding",
+      "target": "text_embedding_3_small"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF3 Flow \u2014 Update Supabase",
+      "weight": 1.0,
+      "_src": "wf3_kb_embedding",
+      "_tgt": "db_table_knowledge_base",
+      "source": "wf3_kb_embedding",
+      "target": "db_table_knowledge_base"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF4 Flow \u2014 OpenAI Embeddings API",
+      "weight": 1.0,
+      "_src": "wf4_context_retrieval",
+      "_tgt": "text_embedding_3_small",
+      "source": "wf4_context_retrieval",
+      "target": "text_embedding_3_small"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF5 Flow",
+      "weight": 1.0,
+      "_src": "wf5_draft_generation",
+      "_tgt": "wf4_context_retrieval",
+      "source": "wf4_context_retrieval",
+      "target": "wf5_draft_generation"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF5 Flow \u2014 Assemble Prompt",
+      "weight": 1.0,
+      "_src": "wf5_draft_generation",
+      "_tgt": "p1_brand_voice_prompt",
+      "source": "wf5_draft_generation",
+      "target": "p1_brand_voice_prompt"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P3 \u2014 Used by WF5",
+      "weight": 1.0,
+      "_src": "wf5_draft_generation",
+      "_tgt": "p3_draft_generation_prompt",
+      "source": "wf5_draft_generation",
+      "target": "p3_draft_generation_prompt"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P6 \u2014 Used by WF5 post-processing",
+      "weight": 1.0,
+      "_src": "wf5_draft_generation",
+      "_tgt": "p6_tone_validation_prompt",
+      "source": "wf5_draft_generation",
+      "target": "p6_tone_validation_prompt"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF5 Flow \u2014 Store in Supabase",
+      "weight": 1.0,
+      "_src": "wf5_draft_generation",
+      "_tgt": "db_table_drafts",
+      "source": "wf5_draft_generation",
+      "target": "db_table_drafts"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF5 Flow \u2014 Tier 1 route",
+      "weight": 1.0,
+      "_src": "wf5_draft_generation",
+      "_tgt": "wf6_auto_send",
+      "source": "wf5_draft_generation",
+      "target": "wf6_auto_send"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF8 Regenerate flow",
+      "weight": 1.0,
+      "_src": "wf8_dashboard_actions",
+      "_tgt": "wf5_draft_generation",
+      "source": "wf5_draft_generation",
+      "target": "wf8_dashboard_actions"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF8 Approve & Send flow",
+      "weight": 1.0,
+      "_src": "wf8_dashboard_actions",
+      "_tgt": "wf6_auto_send",
+      "source": "wf6_auto_send",
+      "target": "wf8_dashboard_actions"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Blocked Items \u2014 WF6 partial",
+      "weight": 0.85,
+      "_src": "meta_app_review_blocker",
+      "_tgt": "wf6_auto_send",
+      "source": "wf6_auto_send",
+      "target": "meta_app_review_blocker"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF7 Flow",
+      "weight": 1.0,
+      "_src": "wf7_lead_extraction",
+      "_tgt": "p4_lead_extraction_prompt",
+      "source": "wf7_lead_extraction",
+      "target": "p4_lead_extraction_prompt"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF7 Flow \u2014 Store to leads table",
+      "weight": 1.0,
+      "_src": "wf7_lead_extraction",
+      "_tgt": "db_table_leads",
+      "source": "wf7_lead_extraction",
+      "target": "db_table_leads"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P5 \u2014 Used by WF8",
+      "weight": 1.0,
+      "_src": "wf8_dashboard_actions",
+      "_tgt": "p5_regeneration_prompt",
+      "source": "wf8_dashboard_actions",
+      "target": "p5_regeneration_prompt"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md",
+      "source_location": "WF8 Audit Logging",
+      "weight": 1.0,
+      "_src": "wf8_dashboard_actions",
+      "_tgt": "db_table_audit_log",
+      "source": "wf8_dashboard_actions",
+      "target": "db_table_audit_log"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P3 System Message \u2014 {{P1_BRAND_VOICE_SYSTEM_PROMPT}}",
+      "weight": 1.0,
+      "_src": "p1_brand_voice_prompt",
+      "_tgt": "p3_draft_generation_prompt",
+      "source": "p1_brand_voice_prompt",
+      "target": "p3_draft_generation_prompt"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P5 System Message \u2014 {{P1_BRAND_VOICE_SYSTEM_PROMPT}}",
+      "weight": 1.0,
+      "_src": "p1_brand_voice_prompt",
+      "_tgt": "p5_regeneration_prompt",
+      "source": "p1_brand_voice_prompt",
+      "target": "p5_regeneration_prompt"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "system_config default entries \u2014 brand_voice_prompt",
+      "weight": 1.0,
+      "_src": "db_table_system_config",
+      "_tgt": "p1_brand_voice_prompt",
+      "source": "p1_brand_voice_prompt",
+      "target": "db_table_system_config"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Sophie Laurent tasks \u2014 P1 finalization",
+      "weight": 1.0,
+      "_src": "team_sophie",
+      "_tgt": "p1_brand_voice_prompt",
+      "source": "p1_brand_voice_prompt",
+      "target": "team_sophie"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P1 Voice & Tone Rules",
+      "weight": 0.9,
+      "_src": "p1_brand_voice_prompt",
+      "_tgt": "dpw_communication_tone",
+      "source": "p1_brand_voice_prompt",
+      "target": "dpw_communication_tone"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P1 Brand Identity section",
+      "weight": 1.0,
+      "_src": "p1_brand_voice_prompt",
+      "_tgt": "dream_paris_wedding_brand",
+      "source": "p1_brand_voice_prompt",
+      "target": "dream_paris_wedding_brand"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "system_config default entries \u2014 classification_prompt",
+      "weight": 1.0,
+      "_src": "db_table_system_config",
+      "_tgt": "p2_classification_prompt",
+      "source": "p2_classification_prompt",
+      "target": "db_table_system_config"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "system_config default entries \u2014 lead_extraction_prompt",
+      "weight": 1.0,
+      "_src": "db_table_system_config",
+      "_tgt": "p4_lead_extraction_prompt",
+      "source": "p4_lead_extraction_prompt",
+      "target": "db_table_system_config"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "drafts table \u2014 message_id FK",
+      "weight": 1.0,
+      "_src": "db_table_messages",
+      "_tgt": "db_table_drafts",
+      "source": "db_table_messages",
+      "target": "db_table_drafts"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "messages table \u2014 lead_id FK / leads \u2014 first_message_id FK",
+      "weight": 1.0,
+      "_src": "db_table_messages",
+      "_tgt": "db_table_leads",
+      "source": "db_table_messages",
+      "target": "db_table_leads"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "messages table \u2014 inbox_id FK",
+      "weight": 1.0,
+      "_src": "db_table_messages",
+      "_tgt": "db_table_inboxes",
+      "source": "db_table_messages",
+      "target": "db_table_inboxes"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "get_dashboard_stats SQL \u2014 messages queries",
+      "weight": 1.0,
+      "_src": "get_dashboard_stats_fn",
+      "_tgt": "db_table_messages",
+      "source": "db_table_messages",
+      "target": "get_dashboard_stats_fn"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "get_dashboard_stats SQL \u2014 drafts queries",
+      "weight": 1.0,
+      "_src": "get_dashboard_stats_fn",
+      "_tgt": "db_table_drafts",
+      "source": "db_table_drafts",
+      "target": "get_dashboard_stats_fn"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md",
+      "source_location": "\u00a74 Tiered Routing Logic",
+      "weight": 1.0,
+      "_src": "rationale_tiered_routing",
+      "_tgt": "tiered_routing_logic",
+      "source": "tiered_routing_logic",
+      "target": "rationale_tiered_routing"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md",
+      "source_location": "RLS Policies \u2014 role checks throughout",
+      "weight": 1.0,
+      "_src": "rls_policies",
+      "_tgt": "rbac_roles",
+      "source": "rbac_roles",
+      "target": "rls_policies"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Team Assignments",
+      "weight": 1.0,
+      "_src": "sprint_roadmap",
+      "_tgt": "team_abdur",
+      "source": "sprint_roadmap",
+      "target": "team_abdur"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Team Assignments",
+      "weight": 1.0,
+      "_src": "sprint_roadmap",
+      "_tgt": "team_usama",
+      "source": "sprint_roadmap",
+      "target": "team_usama"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Team Assignments",
+      "weight": 1.0,
+      "_src": "sprint_roadmap",
+      "_tgt": "team_sophie",
+      "source": "sprint_roadmap",
+      "target": "team_sophie"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Critical Dependencies & Blockers",
+      "weight": 1.0,
+      "_src": "sprint_roadmap",
+      "_tgt": "meta_app_review_blocker",
+      "source": "sprint_roadmap",
+      "target": "meta_app_review_blocker"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md",
+      "source_location": "Phase 1 VPS Infrastructure",
+      "weight": 1.0,
+      "_src": "team_abdur",
+      "_tgt": "vps_infrastructure",
+      "source": "team_abdur",
+      "target": "vps_infrastructure"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "docs/PROMPTS.md",
+      "source_location": "P1 \u2014 sign off as Sophie Laurent",
+      "weight": 0.8,
+      "_src": "team_sophie",
+      "_tgt": "dream_paris_wedding_brand",
+      "source": "team_sophie",
+      "target": "dream_paris_wedding_brand"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Reports/Supabase_Setup_Report.md",
+      "source_location": "Part 3",
+      "weight": 1.0,
+      "_src": "supabase_setup_report",
+      "_tgt": "supabase_migrations",
+      "source": "supabase_setup_report",
+      "target": "supabase_migrations"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tasks/lessons.md",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "lessons_learned",
+      "_tgt": "supabase_setup_report",
+      "source": "supabase_setup_report",
+      "target": "lessons_learned"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tasks/todo.md",
+      "source_location": "STEP 3 \u2014 Schema Deployment",
+      "weight": 1.0,
+      "_src": "todo_implementation_plan",
+      "_tgt": "supabase_migrations",
+      "source": "supabase_migrations",
+      "target": "todo_implementation_plan"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Reports/Supabase_Setup_Report.md",
+      "source_location": "Appendix C",
+      "weight": 1.0,
+      "_src": "rationale_migrations_over_manual",
+      "_tgt": "supabase_migrations",
+      "source": "supabase_migrations",
+      "target": "rationale_migrations_over_manual"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "guides/DPCA_DEVELOPER_GUIDE.md",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "_src": "developer_guide",
+      "_tgt": "developer_workflow_guide",
+      "source": "developer_guide",
+      "target": "developer_workflow_guide"
+    },
+    {
+      "relation": "AUTHORED",
+      "confidence_score": 1.0,
+      "_src": "abdur_rehman",
+      "_tgt": "developer_guide",
+      "source": "developer_guide",
+      "target": "abdur_rehman"
+    },
+    {
+      "relation": "DOCUMENTS",
+      "confidence_score": 1.0,
+      "_src": "developer_guide",
+      "_tgt": "dpca_project",
+      "source": "developer_guide",
+      "target": "dpca_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Founder profile",
+      "weight": 1.0,
+      "_src": "dream_paris_wedding_brand",
+      "_tgt": "audrey_founder",
+      "source": "dream_paris_wedding_brand",
+      "target": "audrey_founder"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Team members \u2014 Vanessa",
+      "weight": 1.0,
+      "_src": "dream_paris_wedding_brand",
+      "_tgt": "vanessa_planner",
+      "source": "dream_paris_wedding_brand",
+      "target": "vanessa_planner"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Team members \u2014 Frederic",
+      "weight": 1.0,
+      "_src": "dream_paris_wedding_brand",
+      "_tgt": "frederic_team",
+      "source": "dream_paris_wedding_brand",
+      "target": "frederic_team"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Dream Paris Wedding planning logic",
+      "weight": 1.0,
+      "_src": "dream_paris_wedding_brand",
+      "_tgt": "dpw_planning_philosophy",
+      "source": "dream_paris_wedding_brand",
+      "target": "dpw_planning_philosophy"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Communication tone",
+      "weight": 1.0,
+      "_src": "dream_paris_wedding_brand",
+      "_tgt": "dpw_communication_tone",
+      "source": "dream_paris_wedding_brand",
+      "target": "dpw_communication_tone"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Vendor management philosophy",
+      "weight": 1.0,
+      "_src": "dream_paris_wedding_brand",
+      "_tgt": "dpw_vendor_management",
+      "source": "dream_paris_wedding_brand",
+      "target": "dpw_vendor_management"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Step 5: Masterfile creation",
+      "weight": 1.0,
+      "_src": "dream_paris_wedding_brand",
+      "_tgt": "dpw_masterfile",
+      "source": "dream_paris_wedding_brand",
+      "target": "dpw_masterfile"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Planning fee philosophy",
+      "weight": 1.0,
+      "_src": "rationale_flat_fee_model",
+      "_tgt": "dream_paris_wedding_brand",
+      "source": "dream_paris_wedding_brand",
+      "target": "rationale_flat_fee_model"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "graphify-out/converted/WEDDING TIMELINE - HELENA & ANDY_6651eb75.md",
+      "source_location": "Timeline header \u2014 Dream Paris Wedding Team",
+      "weight": 0.85,
+      "_src": "wedding_helena_andy",
+      "_tgt": "dream_paris_wedding_brand",
+      "source": "dream_paris_wedding_brand",
+      "target": "wedding_helena_andy"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "graphify-out/converted/WEDDING TIMELINE - SABINE & ARBI docx (1)_8055fd0b.md",
+      "source_location": "Timeline \u2014 Vanessa (DPW team)",
+      "weight": 0.85,
+      "_src": "wedding_sabine_arbi",
+      "_tgt": "dream_paris_wedding_brand",
+      "source": "dream_paris_wedding_brand",
+      "target": "wedding_sabine_arbi"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/WEDDING TIMELINE - HELENA & ANDY_6651eb75.md",
+      "source_location": "Timeline entries \u2014 Vanessa",
+      "weight": 1.0,
+      "_src": "vanessa_planner",
+      "_tgt": "wedding_helena_andy",
+      "source": "vanessa_planner",
+      "target": "wedding_helena_andy"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/WEDDING TIMELINE - SABINE & ARBI docx (1)_8055fd0b.md",
+      "source_location": "Timeline entries \u2014 Vanessa",
+      "weight": 1.0,
+      "_src": "vanessa_planner",
+      "_tgt": "wedding_sabine_arbi",
+      "source": "vanessa_planner",
+      "target": "wedding_sabine_arbi"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Dream Paris Wedding planning logic",
+      "weight": 1.0,
+      "_src": "rationale_venue_first",
+      "_tgt": "dpw_planning_philosophy",
+      "source": "dpw_planning_philosophy",
+      "target": "rationale_venue_first"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Service philosophy",
+      "weight": 1.0,
+      "_src": "rationale_pre_post_signature",
+      "_tgt": "dpw_planning_philosophy",
+      "source": "dpw_planning_philosophy",
+      "target": "rationale_pre_post_signature"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Step 5: Masterfile creation",
+      "weight": 1.0,
+      "_src": "dpw_planning_philosophy",
+      "_tgt": "dpw_masterfile",
+      "source": "dpw_planning_philosophy",
+      "target": "dpw_masterfile"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md",
+      "source_location": "Vendor management philosophy",
+      "weight": 1.0,
+      "_src": "rationale_vendor_centralization",
+      "_tgt": "dpw_vendor_management",
+      "source": "dpw_vendor_management",
+      "target": "rationale_vendor_centralization"
+    },
+    {
+      "relation": "DEVELOPS",
+      "confidence_score": 1.0,
+      "_src": "nexstair_technologies",
+      "_tgt": "dpca_project",
+      "source": "dpca_project",
+      "target": "nexstair_technologies"
+    },
+    {
+      "relation": "SERVES_CLIENT",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "dream_paris_wedding",
+      "source": "dpca_project",
+      "target": "dream_paris_wedding"
+    },
+    {
+      "relation": "LEADS_BACKEND_DEVELOPMENT",
+      "confidence_score": 1.0,
+      "_src": "abdur_rehman",
+      "_tgt": "dpca_project",
+      "source": "dpca_project",
+      "target": "abdur_rehman"
+    },
+    {
+      "relation": "LEADS_FRONTEND_DEVELOPMENT",
+      "confidence_score": 1.0,
+      "_src": "usama",
+      "_tgt": "dpca_project",
+      "source": "dpca_project",
+      "target": "usama"
+    },
+    {
+      "relation": "USES",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "n8n",
+      "source": "dpca_project",
+      "target": "n8n"
+    },
+    {
+      "relation": "USES",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "supabase",
+      "source": "dpca_project",
+      "target": "supabase"
+    },
+    {
+      "relation": "DEPLOYED_ON",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "railway",
+      "source": "dpca_project",
+      "target": "railway"
+    },
+    {
+      "relation": "DEPLOYED_ON",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "vercel",
+      "source": "dpca_project",
+      "target": "vercel"
+    },
+    {
+      "relation": "USES",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "nextjs",
+      "source": "dpca_project",
+      "target": "nextjs"
+    },
+    {
+      "relation": "USES",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "expressjs",
+      "source": "dpca_project",
+      "target": "expressjs"
+    },
+    {
+      "relation": "USES",
+      "confidence_score": 0.9,
+      "_src": "dpca_project",
+      "_tgt": "pinecone",
+      "source": "dpca_project",
+      "target": "pinecone"
+    },
+    {
+      "relation": "ORIGINALLY_PLANNED_TO_USE",
+      "confidence_score": 0.8,
+      "_src": "dpca_project",
+      "_tgt": "mongodb",
+      "source": "dpca_project",
+      "target": "mongodb"
+    },
+    {
+      "relation": "USES",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "postgresql",
+      "source": "dpca_project",
+      "target": "postgresql"
+    },
+    {
+      "relation": "INTEGRATES",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "meta_cloud_api",
+      "source": "dpca_project",
+      "target": "meta_cloud_api"
+    },
+    {
+      "relation": "INTEGRATES",
+      "confidence_score": 1.0,
+      "_src": "dpca_project",
+      "_tgt": "meta_graph_api",
+      "source": "dpca_project",
+      "target": "meta_graph_api"
+    },
+    {
+      "relation": "DOCUMENTS",
+      "confidence_score": 1.0,
+      "_src": "week2_report",
+      "_tgt": "dpca_project",
+      "source": "dpca_project",
+      "target": "week2_report"
+    },
+    {
+      "relation": "DOCUMENTS",
+      "confidence_score": 1.0,
+      "_src": "week3_report",
+      "_tgt": "dpca_project",
+      "source": "dpca_project",
+      "target": "week3_report"
+    },
+    {
+      "relation": "SCHEDULES",
+      "confidence_score": 1.0,
+      "_src": "project_schedule",
+      "_tgt": "dpca_project",
+      "source": "dpca_project",
+      "target": "project_schedule"
+    },
+    {
+      "relation": "SPECIFIES",
+      "confidence_score": 1.0,
+      "_src": "team_brief",
+      "_tgt": "dpca_project",
+      "source": "dpca_project",
+      "target": "team_brief"
+    },
+    {
+      "relation": "PROVIDES_BRAND_VOICE_CONTENT_FOR",
+      "confidence_score": 0.8,
+      "_src": "sophie",
+      "_tgt": "dpca_project",
+      "source": "dpca_project",
+      "target": "sophie"
+    },
+    {
+      "relation": "REFERENCED_FOR_AI_ASSISTANT_CONFIGURATION",
+      "confidence_score": 0.6,
+      "_src": "claude_md_image",
+      "_tgt": "dpca_project",
+      "source": "dpca_project",
+      "target": "claude_md_image"
+    },
+    {
+      "relation": "WORKS_FOR",
+      "confidence_score": 1.0,
+      "_src": "abdur_rehman",
+      "_tgt": "nexstair_technologies",
+      "source": "nexstair_technologies",
+      "target": "abdur_rehman"
+    },
+    {
+      "relation": "WORKS_FOR",
+      "confidence_score": 1.0,
+      "_src": "usama",
+      "_tgt": "nexstair_technologies",
+      "source": "nexstair_technologies",
+      "target": "usama"
+    },
+    {
+      "relation": "OWNS",
+      "confidence_score": 1.0,
+      "_src": "nexstair_technologies",
+      "_tgt": "repo_org",
+      "source": "nexstair_technologies",
+      "target": "repo_org"
+    },
+    {
+      "relation": "EMPLOYED_BY",
+      "confidence_score": 1.0,
+      "_src": "vanessa",
+      "_tgt": "dream_paris_wedding",
+      "source": "dream_paris_wedding",
+      "target": "vanessa"
+    },
+    {
+      "relation": "EMPLOYED_BY",
+      "confidence_score": 0.8,
+      "_src": "patricia",
+      "_tgt": "dream_paris_wedding",
+      "source": "dream_paris_wedding",
+      "target": "patricia"
+    },
+    {
+      "relation": "EMPLOYED_BY",
+      "confidence_score": 0.8,
+      "_src": "kimberlee",
+      "_tgt": "dream_paris_wedding",
+      "source": "dream_paris_wedding",
+      "target": "kimberlee"
+    },
+    {
+      "relation": "BELONGS_TO",
+      "confidence_score": 1.0,
+      "_src": "mood_board_requirements",
+      "_tgt": "dream_paris_wedding",
+      "source": "dream_paris_wedding",
+      "target": "mood_board_requirements"
+    },
+    {
+      "relation": "PLANNED",
+      "confidence_score": 0.8,
+      "_src": "vanessa",
+      "_tgt": "couple_tomiko_adam",
+      "source": "vanessa",
+      "target": "couple_tomiko_adam"
+    },
+    {
+      "relation": "PLANNED",
+      "confidence_score": 0.8,
+      "_src": "vanessa",
+      "_tgt": "couple_zach_toni",
+      "source": "vanessa",
+      "target": "couple_zach_toni"
+    },
+    {
+      "relation": "PLANNED",
+      "confidence_score": 1.0,
+      "_src": "vanessa",
+      "_tgt": "couple_colin_veronica",
+      "source": "vanessa",
+      "target": "couple_colin_veronica"
+    },
+    {
+      "relation": "PLANNED",
+      "confidence_score": 1.0,
+      "_src": "vanessa",
+      "_tgt": "couple_holly_james",
+      "source": "vanessa",
+      "target": "couple_holly_james"
+    },
+    {
+      "relation": "PLANNED",
+      "confidence_score": 0.8,
+      "_src": "vanessa",
+      "_tgt": "couple_kathy_alexandre",
+      "source": "vanessa",
+      "target": "couple_kathy_alexandre"
+    },
+    {
+      "relation": "PLANNED",
+      "confidence_score": 0.8,
+      "_src": "vanessa",
+      "_tgt": "couple_christine_anant",
+      "source": "vanessa",
+      "target": "couple_christine_anant"
+    },
+    {
+      "relation": "COORDINATED",
+      "confidence_score": 1.0,
+      "_src": "patricia",
+      "_tgt": "couple_colin_veronica",
+      "source": "patricia",
+      "target": "couple_colin_veronica"
+    },
+    {
+      "relation": "COORDINATED",
+      "confidence_score": 1.0,
+      "_src": "patricia",
+      "_tgt": "couple_erika_elliott",
+      "source": "patricia",
+      "target": "couple_erika_elliott"
+    },
+    {
+      "relation": "COORDINATED",
+      "confidence_score": 1.0,
+      "_src": "patricia",
+      "_tgt": "couple_holly_james",
+      "source": "patricia",
+      "target": "couple_holly_james"
+    },
+    {
+      "relation": "COORDINATED",
+      "confidence_score": 1.0,
+      "_src": "kimberlee",
+      "_tgt": "couple_christine_anant",
+      "source": "kimberlee",
+      "target": "couple_christine_anant"
+    },
+    {
+      "relation": "COORDINATED",
+      "confidence_score": 1.0,
+      "_src": "kimberly",
+      "_tgt": "couple_tomiko_adam",
+      "source": "kimberly",
+      "target": "couple_tomiko_adam"
+    },
+    {
+      "relation": "OWNS",
+      "confidence_score": 1.0,
+      "_src": "abdur_rehman",
+      "_tgt": "repo_personal",
+      "source": "abdur_rehman",
+      "target": "repo_personal"
+    },
+    {
+      "relation": "ASSIGNS_REVIEW_TO",
+      "confidence_score": 1.0,
+      "_src": "codeowners_file",
+      "_tgt": "abdur_rehman",
+      "source": "abdur_rehman",
+      "target": "codeowners_file"
+    },
+    {
+      "relation": "DESIGNATED_AS_CODE_REVIEWER",
+      "confidence_score": 1.0,
+      "_src": "abdur_rehman",
+      "_tgt": "usama",
+      "source": "abdur_rehman",
+      "target": "usama"
+    },
+    {
+      "relation": "ASSIGNS_REVIEW_TO",
+      "confidence_score": 1.0,
+      "_src": "codeowners_file",
+      "_tgt": "usama",
+      "source": "usama",
+      "target": "codeowners_file"
+    },
+    {
+      "relation": "WRITES_TO",
+      "confidence_score": 1.0,
+      "_src": "n8n",
+      "_tgt": "supabase",
+      "source": "n8n",
+      "target": "supabase"
+    },
+    {
+      "relation": "IMPLEMENTS",
+      "confidence_score": 1.0,
+      "_src": "supabase",
+      "_tgt": "rls_policy",
+      "source": "supabase",
+      "target": "rls_policy"
+    },
+    {
+      "relation": "TARGETS",
+      "confidence_score": 1.0,
+      "_src": "db_migration_sql",
+      "_tgt": "supabase",
+      "source": "supabase",
+      "target": "db_migration_sql"
+    },
+    {
+      "relation": "HOSTS",
+      "confidence_score": 1.0,
+      "_src": "railway",
+      "_tgt": "expressjs",
+      "source": "railway",
+      "target": "expressjs"
+    },
+    {
+      "relation": "HOSTS",
+      "confidence_score": 1.0,
+      "_src": "vercel",
+      "_tgt": "nextjs",
+      "source": "vercel",
+      "target": "nextjs"
+    },
+    {
+      "relation": "BYPASSED_BY_SERVICE_ROLE_KEY_IN",
+      "confidence_score": 1.0,
+      "_src": "rls_policy",
+      "_tgt": "expressjs",
+      "source": "expressjs",
+      "target": "rls_policy"
+    },
+    {
+      "relation": "IMPLEMENTED_IN",
+      "confidence_score": 1.0,
+      "_src": "api_inboxes",
+      "_tgt": "expressjs",
+      "source": "expressjs",
+      "target": "api_inboxes"
+    },
+    {
+      "relation": "IMPLEMENTED_IN",
+      "confidence_score": 1.0,
+      "_src": "api_leads",
+      "_tgt": "expressjs",
+      "source": "expressjs",
+      "target": "api_leads"
+    },
+    {
+      "relation": "IMPLEMENTED_IN",
+      "confidence_score": 1.0,
+      "_src": "api_messages",
+      "_tgt": "expressjs",
+      "source": "expressjs",
+      "target": "api_messages"
+    },
+    {
+      "relation": "MIGRATED_TO",
+      "confidence_score": 1.0,
+      "_src": "repo_personal",
+      "_tgt": "repo_org",
+      "source": "repo_personal",
+      "target": "repo_org"
+    },
+    {
+      "relation": "HELD_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_tomiko_adam",
+      "_tgt": "venue_shangri_la",
+      "source": "couple_tomiko_adam",
+      "target": "venue_shangri_la"
+    },
+    {
+      "relation": "PHOTOGRAPHED",
+      "confidence_score": 1.0,
+      "_src": "laura",
+      "_tgt": "couple_tomiko_adam",
+      "source": "couple_tomiko_adam",
+      "target": "laura"
+    },
+    {
+      "relation": "DJED",
+      "confidence_score": 1.0,
+      "_src": "loic",
+      "_tgt": "couple_tomiko_adam",
+      "source": "couple_tomiko_adam",
+      "target": "loic"
+    },
+    {
+      "relation": "MC_AND_OFFICIATED",
+      "confidence_score": 1.0,
+      "_src": "naim",
+      "_tgt": "couple_tomiko_adam",
+      "source": "couple_tomiko_adam",
+      "target": "naim"
+    },
+    {
+      "relation": "HELD_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_zach_toni",
+      "_tgt": "venue_shangri_la",
+      "source": "couple_zach_toni",
+      "target": "venue_shangri_la"
+    },
+    {
+      "relation": "PHOTOGRAPHED",
+      "confidence_score": 1.0,
+      "_src": "laura",
+      "_tgt": "couple_zach_toni",
+      "source": "couple_zach_toni",
+      "target": "laura"
+    },
+    {
+      "relation": "CREATED_CONTENT_FOR",
+      "confidence_score": 1.0,
+      "_src": "minh",
+      "_tgt": "couple_zach_toni",
+      "source": "couple_zach_toni",
+      "target": "minh"
+    },
+    {
+      "relation": "FILMED",
+      "confidence_score": 1.0,
+      "_src": "tuan",
+      "_tgt": "couple_zach_toni",
+      "source": "couple_zach_toni",
+      "target": "tuan"
+    },
+    {
+      "relation": "SECOND_SHOT",
+      "confidence_score": 1.0,
+      "_src": "raphael",
+      "_tgt": "couple_zach_toni",
+      "source": "couple_zach_toni",
+      "target": "raphael"
+    },
+    {
+      "relation": "MC_AND_OFFICIATED",
+      "confidence_score": 1.0,
+      "_src": "naim",
+      "_tgt": "couple_zach_toni",
+      "source": "couple_zach_toni",
+      "target": "naim"
+    },
+    {
+      "relation": "PERFORMED_AT",
+      "confidence_score": 1.0,
+      "_src": "santiago",
+      "_tgt": "couple_zach_toni",
+      "source": "couple_zach_toni",
+      "target": "santiago"
+    },
+    {
+      "relation": "PERFORMED_AT",
+      "confidence_score": 1.0,
+      "_src": "revart_dancers",
+      "_tgt": "couple_zach_toni",
+      "source": "couple_zach_toni",
+      "target": "revart_dancers"
+    },
+    {
+      "relation": "CEREMONY_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_stephanie_joshua",
+      "_tgt": "venue_chateau_villette",
+      "source": "couple_stephanie_joshua",
+      "target": "venue_chateau_villette"
+    },
+    {
+      "relation": "RECEPTION_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_stephanie_joshua",
+      "_tgt": "venue_hotel_crillon",
+      "source": "couple_stephanie_joshua",
+      "target": "venue_hotel_crillon"
+    },
+    {
+      "relation": "PHOTOGRAPHED",
+      "confidence_score": 1.0,
+      "_src": "claire_morris",
+      "_tgt": "couple_stephanie_joshua",
+      "source": "couple_stephanie_joshua",
+      "target": "claire_morris"
+    },
+    {
+      "relation": "CREATED_CONTENT_FOR",
+      "confidence_score": 1.0,
+      "_src": "melissa",
+      "_tgt": "couple_stephanie_joshua",
+      "source": "couple_stephanie_joshua",
+      "target": "melissa"
+    },
+    {
+      "relation": "HELD_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_erika_elliott",
+      "_tgt": "venue_chateau_aveny",
+      "source": "couple_erika_elliott",
+      "target": "venue_chateau_aveny"
+    },
+    {
+      "relation": "PHOTOGRAPHED",
+      "confidence_score": 1.0,
+      "_src": "catalin",
+      "_tgt": "couple_erika_elliott",
+      "source": "couple_erika_elliott",
+      "target": "catalin"
+    },
+    {
+      "relation": "FILMED",
+      "confidence_score": 1.0,
+      "_src": "chris_ohana",
+      "_tgt": "couple_erika_elliott",
+      "source": "couple_erika_elliott",
+      "target": "chris_ohana"
+    },
+    {
+      "relation": "CATERED",
+      "confidence_score": 1.0,
+      "_src": "grand_chemin",
+      "_tgt": "couple_erika_elliott",
+      "source": "couple_erika_elliott",
+      "target": "grand_chemin"
+    },
+    {
+      "relation": "PROVIDED_FIREWORKS_FOR",
+      "confidence_score": 1.0,
+      "_src": "blackstone_fireworks",
+      "_tgt": "couple_erika_elliott",
+      "source": "couple_erika_elliott",
+      "target": "blackstone_fireworks"
+    },
+    {
+      "relation": "HELD_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_christine_anant",
+      "_tgt": "venue_pavillon_dauphine",
+      "source": "couple_christine_anant",
+      "target": "venue_pavillon_dauphine"
+    },
+    {
+      "relation": "CEREMONY_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_christine_anant",
+      "_tgt": "venue_eglise_madeleine",
+      "source": "couple_christine_anant",
+      "target": "venue_eglise_madeleine"
+    },
+    {
+      "relation": "DJED",
+      "confidence_score": 1.0,
+      "_src": "dahood_dj",
+      "_tgt": "couple_christine_anant",
+      "source": "couple_christine_anant",
+      "target": "dahood_dj"
+    },
+    {
+      "relation": "MC_AND_ILLUSTRATED",
+      "confidence_score": 1.0,
+      "_src": "inna",
+      "_tgt": "couple_christine_anant",
+      "source": "couple_christine_anant",
+      "target": "inna"
+    },
+    {
+      "relation": "HELD_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_colin_veronica",
+      "_tgt": "venue_chateau_aveny",
+      "source": "couple_colin_veronica",
+      "target": "venue_chateau_aveny"
+    },
+    {
+      "relation": "PHOTOGRAPHED",
+      "confidence_score": 1.0,
+      "_src": "catalin",
+      "_tgt": "couple_colin_veronica",
+      "source": "couple_colin_veronica",
+      "target": "catalin"
+    },
+    {
+      "relation": "CREATED_CONTENT_FOR",
+      "confidence_score": 1.0,
+      "_src": "minh",
+      "_tgt": "couple_colin_veronica",
+      "source": "couple_colin_veronica",
+      "target": "minh"
+    },
+    {
+      "relation": "CATERED",
+      "confidence_score": 1.0,
+      "_src": "entremets_fragrances",
+      "_tgt": "couple_colin_veronica",
+      "source": "couple_colin_veronica",
+      "target": "entremets_fragrances"
+    },
+    {
+      "relation": "HELD_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_kathy_alexandre",
+      "_tgt": "venue_cercle_union",
+      "source": "couple_kathy_alexandre",
+      "target": "venue_cercle_union"
+    },
+    {
+      "relation": "CEREMONY_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_kathy_alexandre",
+      "_tgt": "venue_saint_germain_church",
+      "source": "couple_kathy_alexandre",
+      "target": "venue_saint_germain_church"
+    },
+    {
+      "relation": "PHOTOGRAPHED",
+      "confidence_score": 1.0,
+      "_src": "olivier_neuville",
+      "_tgt": "couple_kathy_alexandre",
+      "source": "couple_kathy_alexandre",
+      "target": "olivier_neuville"
+    },
+    {
+      "relation": "CREATED_CONTENT_FOR",
+      "confidence_score": 1.0,
+      "_src": "minh",
+      "_tgt": "couple_kathy_alexandre",
+      "source": "couple_kathy_alexandre",
+      "target": "minh"
+    },
+    {
+      "relation": "PROVIDED_DJ_AV",
+      "confidence_score": 1.0,
+      "_src": "jl_events",
+      "_tgt": "couple_kathy_alexandre",
+      "source": "couple_kathy_alexandre",
+      "target": "jl_events"
+    },
+    {
+      "relation": "PERFORMED_AT",
+      "confidence_score": 1.0,
+      "_src": "santiago",
+      "_tgt": "couple_kathy_alexandre",
+      "source": "couple_kathy_alexandre",
+      "target": "santiago"
+    },
+    {
+      "relation": "HELD_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_holly_james",
+      "_tgt": "venue_chateau_nainville",
+      "source": "couple_holly_james",
+      "target": "venue_chateau_nainville"
+    },
+    {
+      "relation": "PHOTOGRAPHED",
+      "confidence_score": 1.0,
+      "_src": "aude_lucas",
+      "_tgt": "couple_holly_james",
+      "source": "couple_holly_james",
+      "target": "aude_lucas"
+    },
+    {
+      "relation": "CREATED_CONTENT_FOR",
+      "confidence_score": 1.0,
+      "_src": "minh",
+      "_tgt": "couple_holly_james",
+      "source": "couple_holly_james",
+      "target": "minh"
+    },
+    {
+      "relation": "CATERED",
+      "confidence_score": 1.0,
+      "_src": "entremets_fragrances",
+      "_tgt": "couple_holly_james",
+      "source": "couple_holly_james",
+      "target": "entremets_fragrances"
+    },
+    {
+      "relation": "DJED",
+      "confidence_score": 1.0,
+      "_src": "anthony_dj",
+      "_tgt": "couple_holly_james",
+      "source": "couple_holly_james",
+      "target": "anthony_dj"
+    },
+    {
+      "relation": "HELD_AT",
+      "confidence_score": 1.0,
+      "_src": "couple_steve_chloe",
+      "_tgt": "venue_chateau_nainville",
+      "source": "couple_steve_chloe",
+      "target": "venue_chateau_nainville"
+    },
+    {
+      "relation": "PHOTOGRAPHED",
+      "confidence_score": 1.0,
+      "_src": "catalin",
+      "_tgt": "couple_steve_chloe",
+      "source": "couple_steve_chloe",
+      "target": "catalin"
+    },
+    {
+      "relation": "FILMED",
+      "confidence_score": 1.0,
+      "_src": "chris_ohana",
+      "_tgt": "couple_steve_chloe",
+      "source": "couple_steve_chloe",
+      "target": "chris_ohana"
+    },
+    {
+      "relation": "CATERED",
+      "confidence_score": 1.0,
+      "_src": "grand_chemin",
+      "_tgt": "couple_steve_chloe",
+      "source": "couple_steve_chloe",
+      "target": "grand_chemin"
+    },
+    {
+      "relation": "DJED",
+      "confidence_score": 1.0,
+      "_src": "loic",
+      "_tgt": "couple_steve_chloe",
+      "source": "couple_steve_chloe",
+      "target": "loic"
+    },
+    {
+      "relation": "PROVIDED_CAKE_FOR",
+      "confidence_score": 1.0,
+      "_src": "planete_sucree",
+      "_tgt": "couple_steve_chloe",
+      "source": "couple_steve_chloe",
+      "target": "planete_sucree"
+    },
+    {
+      "relation": "FILTERS_BY",
+      "confidence_score": 1.0,
+      "_src": "api_messages",
+      "_tgt": "channel_gmail",
+      "source": "api_messages",
+      "target": "channel_gmail"
+    },
+    {
+      "relation": "FILTERS_BY",
+      "confidence_score": 1.0,
+      "_src": "api_messages",
+      "_tgt": "channel_whatsapp",
+      "source": "api_messages",
+      "target": "channel_whatsapp"
+    },
+    {
+      "relation": "FILTERS_BY",
+      "confidence_score": 1.0,
+      "_src": "api_messages",
+      "_tgt": "channel_instagram",
+      "source": "api_messages",
+      "target": "channel_instagram"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "n8n_ai_pipeline",
+      "label": "n8n AI Message Processing Pipeline (WF1\u2192WF2\u2192WF4\u2192WF5\u2192WF6)",
+      "nodes": [
+        "wf1_email_ingestion",
+        "wf2_classification",
+        "wf4_context_retrieval",
+        "wf5_draft_generation",
+        "wf6_auto_send"
+      ],
+      "relation": "implement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/WORKFLOWS.md"
+    },
+    {
+      "id": "core_tech_stack",
+      "label": "DPCA Core Technology Stack",
+      "nodes": [
+        "n8n_engine",
+        "supabase_db",
+        "pinecone_vectorstore",
+        "openai_gpt4o",
+        "backend_api",
+        "dashboard_frontend"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md"
+    },
+    {
+      "id": "external_channels",
+      "label": "External Message Channels",
+      "nodes": [
+        "gmail_api",
+        "meta_whatsapp_api",
+        "meta_instagram_api"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/ARCHITECTURE.md"
+    },
+    {
+      "id": "dpca_team",
+      "label": "DPCA Development Team",
+      "nodes": [
+        "team_abdur",
+        "team_usama",
+        "team_sophie"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/Pending_Tasks_Sprint_Roadmap_586f3dd1.md"
+    },
+    {
+      "id": "supabase_db_tables",
+      "label": "Supabase Database Tables (10 tables)",
+      "nodes": [
+        "db_table_users",
+        "db_table_messages",
+        "db_table_drafts",
+        "db_table_leads",
+        "db_table_knowledge_base",
+        "db_table_inboxes",
+        "db_table_audit_log",
+        "db_table_system_config",
+        "db_table_errors_log",
+        "db_table_ignored_messages"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/DATABASE_SCHEMA.md"
+    },
+    {
+      "id": "ai_prompts_suite",
+      "label": "DPCA AI Prompt Suite (P1-P6)",
+      "nodes": [
+        "p1_brand_voice_prompt",
+        "p2_classification_prompt",
+        "p3_draft_generation_prompt",
+        "p4_lead_extraction_prompt",
+        "p5_regeneration_prompt",
+        "p6_tone_validation_prompt"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/PROMPTS.md"
+    },
+    {
+      "id": "dpw_real_weddings",
+      "label": "Dream Paris Wedding Real Event Timelines",
+      "nodes": [
+        "wedding_helena_andy",
+        "wedding_sabine_arbi"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "graphify-out/converted/WEDDING TIMELINE - HELENA & ANDY_6651eb75.md"
+    },
+    {
+      "id": "dpw_brand_intelligence",
+      "label": "DPW Brand Intelligence & AI Behavior Rules",
+      "nodes": [
+        "dpw_planning_philosophy",
+        "dpw_communication_tone",
+        "dpw_vendor_management",
+        "dpw_masterfile",
+        "p1_brand_voice_prompt"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "graphify-out/converted/Ai Brain Date and Core Report - DREAM PARIS WEDDING_b9bf4da8.md"
+    },
+    {
+      "id": "dpca_tech_stack",
+      "label": "DPCA Core Technology Stack",
+      "type": "TechnologyStack",
+      "participants": [
+        "dpca_project",
+        "n8n",
+        "openai_gpt4o",
+        "supabase",
+        "railway",
+        "vercel",
+        "nextjs",
+        "expressjs",
+        "pinecone"
+      ],
+      "relation": "CONSTITUTES_TECH_STACK_OF",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "dream_paris_team",
+      "label": "Dream Paris Wedding Internal Team",
+      "type": "Team",
+      "participants": [
+        "dream_paris_wedding",
+        "vanessa",
+        "patricia",
+        "kimberlee"
+      ],
+      "relation": "TEAM_MEMBERS_OF",
+      "confidence_score": 0.9
+    },
+    {
+      "id": "dpca_dev_team",
+      "label": "DPCA Development Team",
+      "type": "Team",
+      "participants": [
+        "nexstair_technologies",
+        "abdur_rehman",
+        "usama"
+      ],
+      "relation": "DEVELOPMENT_TEAM_OF",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "week2_deliverables",
+      "label": "Week 2 Key Deliverables",
+      "type": "SprintDeliverable",
+      "participants": [
+        "week2_report",
+        "api_inboxes",
+        "api_leads",
+        "api_messages",
+        "db_migration_sql",
+        "rls_policy"
+      ],
+      "relation": "DELIVERED_IN_WEEK_2",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "week3_deliverables",
+      "label": "Week 3 Key Deliverables",
+      "type": "SprintDeliverable",
+      "participants": [
+        "week3_report",
+        "developer_guide",
+        "codeowners_file",
+        "repo_org"
+      ],
+      "relation": "DELIVERED_IN_WEEK_3",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "colin_veronica_wedding_team",
+      "label": "Colin & Veronica Wedding Vendor Team",
+      "type": "EventTeam",
+      "participants": [
+        "couple_colin_veronica",
+        "vanessa",
+        "patricia",
+        "catalin",
+        "minh",
+        "entremets_fragrances"
+      ],
+      "relation": "SERVED_EVENT",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "zach_toni_wedding_team",
+      "label": "Zach & Toni Wedding Vendor Team",
+      "type": "EventTeam",
+      "participants": [
+        "couple_zach_toni",
+        "laura",
+        "tuan",
+        "minh",
+        "raphael",
+        "naim",
+        "revart_dancers",
+        "santiago"
+      ],
+      "relation": "SERVED_EVENT",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "tomiko_adam_wedding_team",
+      "label": "Tomiko & Adam Wedding Vendor Team",
+      "type": "EventTeam",
+      "participants": [
+        "couple_tomiko_adam",
+        "laura",
+        "chris_ohana",
+        "kimberly",
+        "naim",
+        "loic"
+      ],
+      "relation": "SERVED_EVENT",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "holly_james_wedding_team",
+      "label": "Holly & James Wedding Vendor Team",
+      "type": "EventTeam",
+      "participants": [
+        "couple_holly_james",
+        "vanessa",
+        "patricia",
+        "aude_lucas",
+        "minh",
+        "entremets_fragrances",
+        "anthony_dj"
+      ],
+      "relation": "SERVED_EVENT",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "message_channels",
+      "label": "DPCA Supported Message Channels",
+      "type": "ChannelSet",
+      "participants": [
+        "dpca_project",
+        "channel_gmail",
+        "channel_whatsapp",
+        "channel_instagram"
+      ],
+      "relation": "MANAGES_CHANNELS",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "code_review_governance",
+      "label": "DPCA Code Review Governance",
+      "type": "Governance",
+      "participants": [
+        "codeowners_file",
+        "abdur_rehman",
+        "usama",
+        "repo_org"
+      ],
+      "relation": "GOVERNS_REVIEW_PROCESS_FOR",
+      "confidence_score": 1.0
+    }
+  ]
+}
