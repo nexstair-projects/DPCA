@@ -15,7 +15,7 @@ import { Message } from "@/app/types/message";
 import {S} from '@/lib/theme';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
 import { MessageItem } from '@/components/ui/MessageItem';
-
+import { MetaRow } from '@/components/ui/MetaRow';
 
 
 
@@ -40,17 +40,6 @@ const FILTERS = [
   { key: 'collaboration',   label: 'Collab' },
 ]
 
-// ── Small reusable pieces ──────────────────────────────────────────────────────
-
-
-function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, fontSize: 11 }}>
-      <span style={{ color: S.muted }}>{label}</span>
-      <span style={{ color: S.text, fontWeight: 500 }}>{children}</span>
-    </div>
-  )
-}
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3001'
 
