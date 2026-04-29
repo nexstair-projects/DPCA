@@ -1,6 +1,3 @@
-import {S} from '@/lib/theme';
-
-
 function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className='meta-row font-sans flex justify-between items-center mb-2' >
