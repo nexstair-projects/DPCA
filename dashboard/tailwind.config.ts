@@ -19,8 +19,11 @@ const config: Config = {
         'dpw-muted':     '#9c8f6f',
         'dpw-mid':       '#6b5d3f',
         'dpw-green':     '#2d7a4e',
-        'dpw-blue':      '#2d5a8a',
-        // legacy compat
+        'dpw-blue':      '#2e5c8a',
+        'dpw-red':       '#8b3a3a',
+        'dpw-red-bg':    '#fde8e8',
+        'dpw-purple':    '#833ab4',
+        'dpw-white':     '#ffffff',
         'dpw-light':     '#faf8f3',
       },
       fontFamily: {

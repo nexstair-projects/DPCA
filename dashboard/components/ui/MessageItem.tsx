@@ -1,4 +1,3 @@
-import { S } from "@/lib/theme";
 import { CategoryBadge } from "./CategoryBadge";
 import { formatDistanceToNow, parseISO } from 'date-fns'
 import { Message } from "@/app/types/message";
@@ -12,21 +11,16 @@ type MessageItemProps = {
 const relativeTime = (iso: string) => {
     try { return formatDistanceToNow(parseISO(iso), { addSuffix: false }) }
     catch { return '' }
-  }
+}
 
 /* Message Item Component */
 export function MessageItem({ msg, isActive, onClick }: MessageItemProps) {
     return (
         <div
-            className='message-item'
+            className={`message-item px-[16px] py-[14px] border-b border-dpw-border cursor-pointer transition-colors duration-150 bg-transparent hover:bg-dpw-light ${isActive ? 'bg-dpw-gold-light/10 border-dpw-gold' : 'border-transparent'}`}
             key={msg.id}
             onClick={() => onClick(msg)}
-            style={{
-                padding: '14px 16px', borderBottom: `1px solid #f0e8d4`,
-                cursor: 'pointer', transition: 'all 0.12s',
-                background: isActive ? S.pale : 'transparent',
-                borderLeft: `2px solid ${isActive ? S.gold : 'transparent'}`,
-            }}
+
         >
             <div className="flex justify-between items-center mb-0.5">
                 <div>
