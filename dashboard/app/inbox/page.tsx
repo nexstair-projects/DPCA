@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase'
 import Sidebar from '@/components/Sidebar'
 import { useSearchParams } from 'next/navigation'
 import { formatDistanceToNow, parseISO } from 'date-fns'
+import { Button } from "@/components/ui/Button";
 
 /*Importing Types*/
 import { Message } from "@/app/types/message";
@@ -215,13 +216,56 @@ function InboxContent() {
               </span>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => mutate()} style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${S.border}`, background: S.white, color: S.mid, fontSize: 12, cursor: 'pointer', fontFamily: S.sans }}>
-              ⟳ Refresh
-            </button>
-            <button style={{ padding: '6px 14px', borderRadius: 8, background: S.gold, color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: S.sans }}>
-              ✓ Approve All Safe
-            </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button
+              onClick={() => mutate()}
+              bgColor="bg-transaparent hover:bg-[#faf8f3]"
+              textColor="text-[#8a7a5a]"
+              border="border-[#e8dfc8]"
+              className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+              icon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+              }
+            >
+              Refresh
+            </Button>
+            <Button
+              bgColor="bg-[#B8960C] hover:bg-[#D4AF37]"
+              textColor="text-white"
+              border="border-[#B8960C] hover:border-[#D4AF37]"
+              className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+              icon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m4.5 12.75 6 6 9-13.5"
+                  />
+                </svg>
+              }
+            >
+              Approve All Safe
+            </Button>
           </div>
         </div>
 
@@ -294,27 +338,139 @@ function InboxContent() {
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
                 {/* Review header */}
-                <div style={{ padding: '12px 20px', borderBottom: `1px solid ${S.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0, background: S.white }}>
+                <div
+                  style={{
+                    padding: "12px 20px",
+                    borderBottom: `1px solid ${S.border}`,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexShrink: 0,
+                    background: S.white,
+                  }}
+                >
                   <div>
-                    <div style={{ fontFamily: S.serif, fontSize: 18, fontWeight: 600, color: S.dark }}>
+                    <div
+                      style={{
+                        fontFamily: S.serif,
+                        fontSize: 18,
+                        fontWeight: 600,
+                        color: S.dark,
+                      }}
+                    >
                       {selected.sender_name}
                     </div>
-                    <div style={{ fontSize: 11, color: S.muted, marginTop: 3, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                      {selected.sender_email && <span>✉️ {selected.sender_email}</span>}
-                      <span>🕐 {new Date(selected.created_at).toLocaleDateString()} {new Date(selected.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      <span>📍 Via {(selected.channel ?? 'Gmail').replace(/^\w/, c => c.toUpperCase())}</span>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: S.muted,
+                        marginTop: 3,
+                        display: "flex",
+                        gap: 14,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {selected.sender_email && (
+                        <span>✉️ {selected.sender_email}</span>
+                      )}
+                      <span>
+                        🕐 {new Date(selected.created_at).toLocaleDateString()}{" "}
+                        {new Date(selected.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      <span>
+                        📍 Via{" "}
+                        {(selected.channel ?? "Gmail").replace(/^\w/, (c) =>
+                          c.toUpperCase(),
+                        )}
+                      </span>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 16 }}>
-                    <button onClick={() => setSelectedId(null)} style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${S.border}`, background: S.white, color: S.mid, fontSize: 12, cursor: 'pointer', fontFamily: S.sans }}>
-                      ↩ Skip
-                    </button>
-                    <button onClick={handleDiscard} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #e8c0c0', background: '#fff8f8', color: '#8b3a3a', fontSize: 12, cursor: 'pointer', fontFamily: S.sans }}>
-                      ✕ Discard
-                    </button>
-                    <button onClick={handleApprove} style={{ padding: '6px 14px', borderRadius: 8, background: S.gold, color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: S.sans }}>
-                      ✓ Approve &amp; Send
-                    </button>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      flexShrink: 0,
+                      marginLeft: 16,
+                    }}
+                  >
+                    <Button
+                      onClick={() => setSelectedId(null)}
+                      bgColor="bg-transaparent hover:bg-[#faf8f3]"
+                      textColor="text-[#8a7a5a]"
+                      border="border-[#e8dfc8]"
+                      className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+                      icon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m7.49 12-3.75 3.75m0 0 3.75 3.75m-3.75-3.75h16.5V4.499"
+                          />
+                        </svg>
+                      }
+                    >
+                      Skip
+                    </Button>
+                    <Button
+                      onClick={handleDiscard}
+                      bgColor="bg-[#fdf0f0] hover:bg-[#fde8e8]"
+                      textColor="text-[#8b3a3a]"
+                      border="border-[#e8c0c0]"
+                      className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+                      icon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18 18 6M6 6l12 12"
+                          />
+                        </svg>
+                      }
+                    >
+                      Discard
+                    </Button>
+                    <Button
+                      onClick={handleApprove}
+                      bgColor="bg-[#3d7a5a] hover:bg-[#2d6048]"
+                      textColor="text-white"
+                      border="border-[#2d6048] hover:border-[#3d7a5a]"
+                      className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+                      icon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m4.5 12.75 6 6 9-13.5"
+                          />
+                        </svg>
+                      }
+                    >
+                      Approve & Send
+                    </Button>
                   </div>
                 </div>
 
