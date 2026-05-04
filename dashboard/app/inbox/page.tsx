@@ -1,60 +1,94 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
-import useSWR from 'swr'
-import { createClient } from '@/lib/supabase'
-import Sidebar from '@/components/Sidebar'
-import { useSearchParams } from 'next/navigation'
-import { formatDistanceToNow, parseISO } from 'date-fns'
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import useSWR from "swr";
+import { createClient } from "@/lib/supabase";
+import Sidebar from "@/components/Sidebar";
+import { useSearchParams } from "next/navigation";
+import { formatDistanceToNow, parseISO } from "date-fns";
 import { Button } from "@/components/ui/Button";
+import { ChannelActivity } from "@/components/ui/ChannelActivity";
 
 /*Importing Types*/
 import { Message } from "@/app/types/message";
 
-/*End*/ 
+/*End*/
 
-import {S} from '@/lib/theme';
-import { CategoryBadge } from '@/components/ui/CategoryBadge';
-import { MessageItem } from '@/components/ui/MessageItem';
-import { MetaRow } from '@/components/ui/MetaRow';
-
-
-
+import { S } from "@/lib/theme";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { MessageItem } from "@/components/ui/MessageItem";
+import { MetaRow } from "@/components/ui/MetaRow";
 
 // ── Category look-up ────────────────────────────────────────────────────────────
 
-const CAT: Record<string, { label: string; bg: string; color: string; border: string }> = {
-  new_inquiry:     { label: 'New Inquiry', bg: '#fffbe6', color: '#7a5c00', border: '#f5d87a' },
-  vendor:          { label: 'Vendor',      bg: '#edfaf2', color: '#1a5c35', border: '#7bd4a5' },
-  existing_client: { label: 'Client',      bg: '#eff5ff', color: '#1a3a6e', border: '#90b8f0' },
-  collaboration:   { label: 'Collab',      bg: '#f3eeff', color: '#5a2a8a', border: '#c0a0e0' },
-  general:         { label: 'General',     bg: '#f5f5f5', color: '#5a5a5a', border: '#d0d0d0' },
-}
+const CAT: Record<
+  string,
+  { label: string; bg: string; color: string; border: string }
+> = {
+  new_inquiry: {
+    label: "New Inquiry",
+    bg: "#fffbe6",
+    color: "#7a5c00",
+    border: "#f5d87a",
+  },
+  vendor: {
+    label: "Vendor",
+    bg: "#edfaf2",
+    color: "#1a5c35",
+    border: "#7bd4a5",
+  },
+  existing_client: {
+    label: "Client",
+    bg: "#eff5ff",
+    color: "#1a3a6e",
+    border: "#90b8f0",
+  },
+  collaboration: {
+    label: "Collab",
+    bg: "#f3eeff",
+    color: "#5a2a8a",
+    border: "#c0a0e0",
+  },
+  general: {
+    label: "General",
+    bg: "#f5f5f5",
+    color: "#5a5a5a",
+    border: "#d0d0d0",
+  },
+};
 
-const catMeta = (key: string | null) => CAT[key ?? 'general'] ?? CAT.general
+const catMeta = (key: string | null) => CAT[key ?? "general"] ?? CAT.general;
 
 const FILTERS = [
-  { key: 'all',             label: 'All' },
-  { key: 'new_inquiry',     label: 'Inquiry' },
-  { key: 'existing_client', label: 'Client' },
-  { key: 'vendor',          label: 'Vendor' },
-  { key: 'collaboration',   label: 'Collab' },
-]
+  { key: "all", label: "All" },
+  { key: "new_inquiry", label: "Inquiry" },
+  { key: "existing_client", label: "Client" },
+  { key: "vendor", label: "Vendor" },
+  { key: "collaboration", label: "Collab" },
+];
 
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3001'
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
 
 // Status groupings
-const PENDING_STATUSES  = ['received', 'new', 'processing', 'classified', 'draft_ready', 'pending_review', 'needs_human_reply']
-const APPROVED_STATUSES = ['approved', 'edited_approved']
-const SENT_STATUSES     = ['auto_sent', 'auto_approved', 'sent', 'replied']
+const PENDING_STATUSES = [
+  "received",
+  "new",
+  "processing",
+  "classified",
+  "draft_ready",
+  "pending_review",
+  "needs_human_reply",
+];
+const APPROVED_STATUSES = ["approved", "edited_approved"];
+const SENT_STATUSES = ["auto_sent", "auto_approved", "sent", "replied"];
 
 const CHANNEL_TABS = [
-  { key: 'all',       label: 'All',       icon: '' },
-  { key: 'gmail',     label: 'Gmail',     icon: '✉️' },
-  { key: 'whatsapp',  label: 'WhatsApp',  icon: '💬' },
-  { key: 'instagram', label: 'Instagram', icon: '📸' },
-]
+  { key: "all", label: "All", icon: "" },
+  { key: "gmail", label: "Gmail", icon: "✉️" },
+  { key: "whatsapp", label: "WhatsApp", icon: "💬" },
+  { key: "instagram", label: "Instagram", icon: "📸" },
+];
 
 // ── Page ────────────────────────────────────────────────────────────────────────
 
@@ -63,155 +97,242 @@ export default function InboxPage() {
     <Suspense>
       <InboxContent />
     </Suspense>
-  )
+  );
 }
 
 function InboxContent() {
-  const searchParams = useSearchParams()
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [filter, setFilter]         = useState('all')
-  const [channelFilter, setChannelFilter] = useState(searchParams.get('channel') ?? 'all')
-  const [draftText, setDraftText]   = useState('')
-  const [userId, setUserId]         = useState<string | null>(null)
+  const searchParams = useSearchParams();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState("all");
+  const [channelFilter, setChannelFilter] = useState(
+    searchParams.get("channel") ?? "all",
+  );
+  const [draftText, setDraftText] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
 
   // Get current user ID for audit logging
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null))
-  }, [])
+    const supabase = createClient();
+    supabase.auth
+      .getUser()
+      .then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
 
-  const { data: messages = [], isLoading, mutate } = useSWR<Message[]>('inbox-messages', async () => {
-    const res = await fetch(`${BACKEND_URL}/api/messages`)
-    if (!res.ok) throw new Error('Failed to fetch messages')
-    return res.json()
-  })
+  const {
+    data: messages = [],
+    isLoading,
+    mutate,
+  } = useSWR<Message[]>("inbox-messages", async () => {
+    const res = await fetch(`${BACKEND_URL}/api/messages`);
+    if (!res.ok) throw new Error("Failed to fetch messages");
+    return res.json();
+  });
 
-  const selected = messages.find(m => m.id === selectedId) ?? null
+  const selected = messages.find((m) => m.id === selectedId) ?? null;
 
   useEffect(() => {
-    if (selected) setDraftText(selected.drafts?.[0]?.draft_text ?? '')
-  }, [selectedId]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (selected) setDraftText(selected.drafts?.[0]?.draft_text ?? "");
+  }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
-    let result = messages
-    if (channelFilter !== 'all') result = result.filter(m => m.channel === channelFilter)
-    if (filter !== 'all') result = result.filter(m => m.category === filter)
-    return result
-  }, [messages, channelFilter, filter])
+    let result = messages;
+    if (channelFilter !== "all")
+      result = result.filter((m) => m.channel === channelFilter);
+    if (filter !== "all") result = result.filter((m) => m.category === filter);
+    return result;
+  }, [messages, channelFilter, filter]);
 
   const handleSelect = useCallback((msg: Message) => {
-    setSelectedId(msg.id)
-    setDraftText(msg.drafts?.[0]?.draft_text ?? '')
-  }, [])
+    setSelectedId(msg.id);
+    setDraftText(msg.drafts?.[0]?.draft_text ?? "");
+  }, []);
 
   const advanceSelection = useCallback(() => {
-    if (!selected) return
-    const idx = filtered.findIndex(m => m.id === selected.id)
-    const next = filtered[idx + 1] ?? filtered[idx - 1] ?? null
-    if (next) handleSelect(next)
-    else setSelectedId(null)
-  }, [selected, filtered, handleSelect])
+    if (!selected) return;
+    const idx = filtered.findIndex((m) => m.id === selected.id);
+    const next = filtered[idx + 1] ?? filtered[idx - 1] ?? null;
+    if (next) handleSelect(next);
+    else setSelectedId(null);
+  }, [selected, filtered, handleSelect]);
 
   const handleApprove = async () => {
-    if (!selected || !userId) return
-    const draftId = selected.drafts?.[0]?.id
+    if (!selected || !userId) return;
+    const draftId = selected.drafts?.[0]?.id;
     if (draftId) {
-      const editedText = draftText !== selected.drafts[0]?.draft_text ? draftText : undefined
+      const editedText =
+        draftText !== selected.drafts[0]?.draft_text ? draftText : undefined;
       await fetch(`${BACKEND_URL}/api/drafts/${draftId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reviewed_by: userId, edited_text: editedText }),
-      })
+      });
     } else {
-      const supabase = createClient()
-      await supabase.from('messages').update({ status: 'approved' }).eq('id', selected.id)
+      const supabase = createClient();
+      await supabase
+        .from("messages")
+        .update({ status: "approved" })
+        .eq("id", selected.id);
     }
-    mutate()
-    advanceSelection()
-  }
+    mutate();
+    advanceSelection();
+  };
 
   const handleDiscard = async () => {
-    if (!selected || !userId) return
-    const draftId = selected.drafts?.[0]?.id
+    if (!selected || !userId) return;
+    const draftId = selected.drafts?.[0]?.id;
     if (draftId) {
       await fetch(`${BACKEND_URL}/api/drafts/${draftId}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reviewed_by: userId, review_notes: 'Discarded from inbox' }),
-      })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reviewed_by: userId,
+          review_notes: "Discarded from inbox",
+        }),
+      });
     } else {
-      const supabase = createClient()
-      await supabase.from('messages').update({ status: 'discarded' }).eq('id', selected.id)
+      const supabase = createClient();
+      await supabase
+        .from("messages")
+        .update({ status: "discarded" })
+        .eq("id", selected.id);
     }
-    mutate()
-    advanceSelection()
-  }
+    mutate();
+    advanceSelection();
+  };
 
-  const pendingCount  = messages.filter(m => PENDING_STATUSES.includes(m.status ?? '')).length
-  const approvedCount = messages.filter(m => APPROVED_STATUSES.includes(m.status ?? '')).length
-  const autoSentCount = messages.filter(m => SENT_STATUSES.includes(m.status ?? '')).length
-  const activeDraft   = selected?.drafts?.[0]
-  const [sendingMode, setSendingMode] = useState<'auto' | 'approve' | 'draft'>('approve')
+  const pendingCount = messages.filter((m) =>
+    PENDING_STATUSES.includes(m.status ?? ""),
+  ).length;
+  const approvedCount = messages.filter((m) =>
+    APPROVED_STATUSES.includes(m.status ?? ""),
+  ).length;
+  const autoSentCount = messages.filter((m) =>
+    SENT_STATUSES.includes(m.status ?? ""),
+  ).length;
+  const activeDraft = selected?.drafts?.[0];
+  const [sendingMode, setSendingMode] = useState<"auto" | "approve" | "draft">(
+    "approve",
+  );
 
   // Channel activity counts
   const channelCounts = useMemo(() => {
-    const counts = { gmail: 0, whatsapp: 0, instagram: 0 }
-    messages.forEach(m => {
-      const ch = (m.channel ?? 'gmail').toLowerCase()
-      if (ch in counts) counts[ch as keyof typeof counts]++
-    })
-    const total = Math.max(counts.gmail + counts.whatsapp + counts.instagram, 1)
-    return { ...counts, total }
-  }, [messages])
+    const counts = { gmail: 0, whatsapp: 0, instagram: 0 };
+    messages.forEach((m) => {
+      const ch = (m.channel ?? "gmail").toLowerCase();
+      if (ch in counts) counts[ch as keyof typeof counts]++;
+    });
+    const total = Math.max(
+      counts.gmail + counts.whatsapp + counts.instagram,
+      1,
+    );
+    return { ...counts, total };
+  }, [messages]);
 
   // Average tone score
   const avgToneScore = useMemo(() => {
     const scores = messages
-      .flatMap(m => m.drafts)
-      .map(d => d?.tone_confidence)
-      .filter((s): s is number => s != null)
-    return scores.length > 0 ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 100) : null
-  }, [messages])
+      .flatMap((m) => m.drafts)
+      .map((d) => d?.tone_confidence)
+      .filter((s): s is number => s != null);
+    return scores.length > 0
+      ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 100)
+      : null;
+  }, [messages]);
 
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return
-      if (e.key === 'a' || e.key === 'A') { e.preventDefault(); handleApprove() }
-      if (e.key === 'd' || e.key === 'D') { e.preventDefault(); handleDiscard() }
-      if (e.key === 'j' || e.key === 'J') {
-        e.preventDefault()
-        const idx = selected ? filtered.findIndex(m => m.id === selected.id) : -1
-        const next = filtered[idx + 1]
-        if (next) handleSelect(next)
+      if (
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLInputElement
+      )
+        return;
+      if (e.key === "a" || e.key === "A") {
+        e.preventDefault();
+        handleApprove();
       }
-      if (e.key === 'k' || e.key === 'K') {
-        e.preventDefault()
-        const idx = selected ? filtered.findIndex(m => m.id === selected.id) : filtered.length
-        const prev = filtered[idx - 1]
-        if (prev) handleSelect(prev)
+      if (e.key === "d" || e.key === "D") {
+        e.preventDefault();
+        handleDiscard();
       }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }) // intentionally no deps — always uses latest state
-
- 
+      if (e.key === "j" || e.key === "J") {
+        e.preventDefault();
+        const idx = selected
+          ? filtered.findIndex((m) => m.id === selected.id)
+          : -1;
+        const next = filtered[idx + 1];
+        if (next) handleSelect(next);
+      }
+      if (e.key === "k" || e.key === "K") {
+        e.preventDefault();
+        const idx = selected
+          ? filtered.findIndex((m) => m.id === selected.id)
+          : filtered.length;
+        const prev = filtered[idx - 1];
+        if (prev) handleSelect(prev);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }); // intentionally no deps — always uses latest state
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: S.bg, fontFamily: S.sans }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        background: S.bg,
+        fontFamily: S.sans,
+      }}
+    >
       <Sidebar />
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
-
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
+          overflow: "hidden",
+        }}
+      >
         {/* ── TOPBAR ──────────────────────────────────────────────────────── */}
-        <div style={{ background: S.white, borderBottom: `1px solid ${S.border}`, padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <h1 style={{ fontFamily: S.serif, fontSize: 18, fontWeight: 600, color: S.dark, margin: 0 }}>
+        <div
+          style={{
+            background: S.white,
+            borderBottom: `1px solid ${S.border}`,
+            padding: "0 24px",
+            height: 56,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <h1
+              style={{
+                fontFamily: S.serif,
+                fontSize: 18,
+                fontWeight: 600,
+                color: S.dark,
+                margin: 0,
+              }}
+            >
               Approval Queue
             </h1>
             {pendingCount > 0 && (
-              <span style={{ background: S.pale, color: S.gold, border: `1px solid ${S.border}`, borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 500 }}>
+              <span
+                style={{
+                  background: S.pale,
+                  color: S.gold,
+                  border: `1px solid ${S.border}`,
+                  borderRadius: 20,
+                  padding: "2px 10px",
+                  fontSize: 11,
+                  fontWeight: 500,
+                }}
+              >
                 {pendingCount} Pending Review
               </span>
             )}
@@ -270,24 +391,42 @@ function InboxContent() {
         </div>
 
         {/* ── 3-PANEL CONTENT ─────────────────────────────────────────────── */}
-        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-
+        <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
           {/* ── INBOX LIST PANEL ──────────────────────────────────────────── */}
-          <div style={{ width: 310, flexShrink: 0, borderRight: `1px solid ${S.border}`, display: 'flex', flexDirection: 'column', background: S.white }}>
-
+          <div
+            style={{
+              width: 310,
+              flexShrink: 0,
+              borderRight: `1px solid ${S.border}`,
+              display: "flex",
+              flexDirection: "column",
+              background: S.white,
+            }}
+          >
             {/* Channel tabs */}
-            <div style={{ padding: '8px 12px 0', borderBottom: `1px solid ${S.border}` }}>
-              <div style={{ display: 'flex', gap: 2, marginBottom: 4 }}>
-                {CHANNEL_TABS.map(ch => (
+            <div
+              style={{
+                padding: "8px 12px 0",
+                borderBottom: `1px solid ${S.border}`,
+              }}
+            >
+              <div style={{ display: "flex", gap: 2, marginBottom: 4 }}>
+                {CHANNEL_TABS.map((ch) => (
                   <button
                     key={ch.key}
                     onClick={() => setChannelFilter(ch.key)}
                     style={{
-                      padding: '4px 9px', borderRadius: 6, border: 'none',
-                      background: channelFilter === ch.key ? S.dark : 'transparent',
-                      color: channelFilter === ch.key ? '#fff' : S.muted,
-                      fontSize: 10, fontWeight: channelFilter === ch.key ? 600 : 400,
-                      cursor: 'pointer', fontFamily: S.sans, transition: 'all 0.12s',
+                      padding: "4px 9px",
+                      borderRadius: 6,
+                      border: "none",
+                      background:
+                        channelFilter === ch.key ? S.dark : "transparent",
+                      color: channelFilter === ch.key ? "#fff" : S.muted,
+                      fontSize: 10,
+                      fontWeight: channelFilter === ch.key ? 600 : 400,
+                      cursor: "pointer",
+                      fontFamily: S.sans,
+                      transition: "all 0.12s",
                     }}
                   >
                     {ch.icon} {ch.label}
@@ -295,38 +434,53 @@ function InboxContent() {
                 ))}
               </div>
               {/* Category filter tabs */}
-              <div style={{ display: 'flex', gap: 2 }}>
-                {FILTERS.map(f => (
+              <div style={{ display: "flex", gap: 2 }}>
+                {FILTERS.map((f) => (
                   <button
                     key={f.key}
                     onClick={() => setFilter(f.key)}
                     style={{
-                      padding: '5px 9px', borderRadius: '6px 6px 0 0', border: 'none',
-                      background: filter === f.key ? S.gold : 'transparent',
-                      color: filter === f.key ? '#fff' : S.muted,
-                      fontSize: 10.5, fontWeight: filter === f.key ? 600 : 400,
-                      cursor: 'pointer', fontFamily: S.sans, transition: 'all 0.12s',
+                      padding: "5px 9px",
+                      borderRadius: "6px 6px 0 0",
+                      border: "none",
+                      background: filter === f.key ? S.gold : "transparent",
+                      color: filter === f.key ? "#fff" : S.muted,
+                      fontSize: 10.5,
+                      fontWeight: filter === f.key ? 600 : 400,
+                      cursor: "pointer",
+                      fontFamily: S.sans,
+                      transition: "all 0.12s",
                     }}
                   >
-                    {f.label}{f.key === 'all' ? ` (${filtered.length})` : ''}
+                    {f.label}
+                    {f.key === "all" ? ` (${filtered.length})` : ""}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Message list */}
-            <div style={{ flex: 1, overflowY: 'auto' }}>
+            <div style={{ flex: 1, overflowY: "auto" }}>
               {isLoading && (
-                <div style={{ padding: 24, color: S.muted, fontSize: 13 }}>Loading messages…</div>
+                <div style={{ padding: 24, color: S.muted, fontSize: 13 }}>
+                  Loading messages…
+                </div>
               )}
               {!isLoading && filtered.length === 0 && (
-                <div style={{ padding: 24, color: S.muted, fontSize: 13 }}>No messages</div>
+                <div style={{ padding: 24, color: S.muted, fontSize: 13 }}>
+                  No messages
+                </div>
               )}
-              {filtered.map(msg => {
-                const isActive = msg.id === selectedId
+              {filtered.map((msg) => {
+                const isActive = msg.id === selectedId;
                 return (
-                  <MessageItem key={msg.id} msg={msg} isActive={isActive} onClick={handleSelect} />
-                )
+                  <MessageItem
+                    key={msg.id}
+                    msg={msg}
+                    isActive={isActive}
+                    onClick={handleSelect}
+                  />
+                );
               })}
             </div>
           </div>
@@ -335,8 +489,14 @@ function InboxContent() {
           {selected ? (
             <>
               {/* Review panel */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                }}
+              >
                 {/* Review header */}
                 <div
                   style={{
@@ -475,24 +635,78 @@ function InboxContent() {
                 </div>
 
                 {/* Review body — two columns */}
-                <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-
+                <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
                   {/* Original message */}
-                  <div style={{ flex: 1, padding: 20, overflowY: 'auto', borderRight: `1px solid ${S.border}` }}>
-                    <div style={{ fontSize: 10, fontWeight: 600, color: S.muted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
+                  <div
+                    style={{
+                      flex: 1,
+                      padding: 20,
+                      overflowY: "auto",
+                      borderRight: `1px solid ${S.border}`,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        color: S.muted,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        marginBottom: 12,
+                      }}
+                    >
                       Original Message
                     </div>
-                    <div style={{ background: S.white, border: `1px solid ${S.border}`, borderRadius: 12, padding: 20, fontSize: 13, color: S.text, lineHeight: 1.75 }}>
-                      {(selected.body_raw ?? '(no content)').split('\n').map((line, i) => (
-                        <p key={i} style={{ margin: '0 0 10px' }}>{line || <br />}</p>
-                      ))}
+                    <div
+                      style={{
+                        background: S.white,
+                        border: `1px solid ${S.border}`,
+                        borderRadius: 12,
+                        padding: 20,
+                        fontSize: 13,
+                        color: S.text,
+                        lineHeight: 1.75,
+                      }}
+                    >
+                      {(selected.body_raw ?? "(no content)")
+                        .split("\n")
+                        .map((line, i) => (
+                          <p key={i} style={{ margin: "0 0 10px" }}>
+                            {line || <br />}
+                          </p>
+                        ))}
                     </div>
                   </div>
 
                   {/* AI Draft */}
-                  <div style={{ flex: 1, padding: 20, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                      <span style={{ background: S.dark, color: '#D4AF37', padding: '2px 9px', borderRadius: 12, fontSize: 9, fontWeight: 700, letterSpacing: '0.06em' }}>
+                  <div
+                    style={{
+                      flex: 1,
+                      padding: 20,
+                      overflowY: "auto",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        marginBottom: 10,
+                      }}
+                    >
+                      <span
+                        style={{
+                          background: S.dark,
+                          color: "#D4AF37",
+                          padding: "2px 9px",
+                          borderRadius: 12,
+                          fontSize: 9,
+                          fontWeight: 700,
+                          letterSpacing: "0.06em",
+                        }}
+                      >
                         ✦ AI DRAFT
                       </span>
                       {activeDraft?.tone_confidence != null && (
@@ -503,42 +717,108 @@ function InboxContent() {
                     </div>
                     <textarea
                       value={draftText}
-                      onChange={e => setDraftText(e.target.value)}
-                      style={{ flex: 1, minHeight: 260, padding: 16, border: `1px solid ${S.border}`, borderRadius: 12, fontSize: 13, color: S.text, lineHeight: 1.75, fontFamily: S.sans, resize: 'none', background: '#fffdf8', outline: 'none' }}
+                      onChange={(e) => setDraftText(e.target.value)}
+                      style={{
+                        flex: 1,
+                        minHeight: 260,
+                        padding: 16,
+                        border: `1px solid ${S.border}`,
+                        borderRadius: 12,
+                        fontSize: 13,
+                        color: S.text,
+                        lineHeight: 1.75,
+                        fontFamily: S.sans,
+                        resize: "none",
+                        background: "#fffdf8",
+                        outline: "none",
+                      }}
                     />
-                    <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: S.muted }}>
+                    <div
+                      style={{
+                        marginTop: 8,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontSize: 10,
+                        color: S.muted,
+                      }}
+                    >
                       <span>✎ Click to edit before sending</span>
                       <span>{draftText.length} characters</span>
                     </div>
                   </div>
-
                 </div>
               </div>
 
               {/* ── META PANEL ──────────────────────────────────────────── */}
-              <div style={{ width: 220, flexShrink: 0, borderLeft: `1px solid ${S.border}`, padding: '18px 16px', overflowY: 'auto', background: S.white, display: 'flex', flexDirection: 'column', gap: 18 }}>
-
+              <div
+                style={{
+                  width: 220,
+                  flexShrink: 0,
+                  borderLeft: `1px solid ${S.border}`,
+                  padding: "18px 16px",
+                  overflowY: "auto",
+                  background: S.white,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 18,
+                }}
+              >
                 {/* Classification */}
                 <div>
-                  <div style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: S.muted, marginBottom: 10, paddingBottom: 6, borderBottom: `1px solid ${S.border}` }}>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      color: S.muted,
+                      marginBottom: 10,
+                      paddingBottom: 6,
+                      borderBottom: `1px solid ${S.border}`,
+                    }}
+                  >
                     Classification
                   </div>
-                  <MetaRow label="Category"><CategoryBadge category={selected.category} /></MetaRow>
+                  <MetaRow label="Category">
+                    <CategoryBadge category={selected.category} />
+                  </MetaRow>
                   <MetaRow label="Priority">
                     {(() => {
-                      const p = selected.priority ?? 'medium'
-                      const cfg: Record<string, { bg: string; color: string }> = {
-                        high:   { bg: S.redBg, color: S.red },
-                        medium: { bg: S.pale, color: S.gold },
-                        low:    { bg: '#f5f5f5', color: '#666' },
-                      }
-                      const c = cfg[p] ?? cfg.medium
-                      return <span style={{ background: c.bg, color: c.color, padding: '2px 8px', borderRadius: 8, fontSize: 10, fontWeight: 600, textTransform: 'capitalize' }}>{p}</span>
+                      const p = selected.priority ?? "medium";
+                      const cfg: Record<string, { bg: string; color: string }> =
+                        {
+                          high: { bg: S.redBg, color: S.red },
+                          medium: { bg: S.pale, color: S.gold },
+                          low: { bg: "#f5f5f5", color: "#666" },
+                        };
+                      const c = cfg[p] ?? cfg.medium;
+                      return (
+                        <span
+                          style={{
+                            background: c.bg,
+                            color: c.color,
+                            padding: "2px 8px",
+                            borderRadius: 8,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {p}
+                        </span>
+                      );
                     })()}
                   </MetaRow>
-                  <MetaRow label="Source">{(selected.channel ?? 'Gmail').replace(/^\w/, c => c.toUpperCase())}</MetaRow>
+                  <MetaRow label="Source">
+                    {(selected.channel ?? "Gmail").replace(/^\w/, (c) =>
+                      c.toUpperCase(),
+                    )}
+                  </MetaRow>
                   {selected.estimated_value != null && (
-                    <MetaRow label="Est. Value"><span style={{ color: S.green }}>&euro;{selected.estimated_value.toLocaleString()}+</span></MetaRow>
+                    <MetaRow label="Est. Value">
+                      <span style={{ color: S.green }}>
+                        &euro;{selected.estimated_value.toLocaleString()}+
+                      </span>
+                    </MetaRow>
                   )}
                   {selected.guest_count != null && (
                     <MetaRow label="Guests">~{selected.guest_count}</MetaRow>
@@ -547,56 +827,137 @@ function InboxContent() {
 
                 {/* Sending Mode */}
                 <div>
-                  <div style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: S.muted, marginBottom: 10, paddingBottom: 6, borderBottom: `1px solid ${S.border}` }}>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      color: S.muted,
+                      marginBottom: 10,
+                      paddingBottom: 6,
+                      borderBottom: `1px solid ${S.border}`,
+                    }}
+                  >
                     Sending Mode
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {([
-                      ['auto', 'Auto-Send'],
-                      ['approve', 'Approve First'],
-                      ['draft', 'Draft Only'],
-                    ] as const).map(([key, label]) => {
-                      const active = sendingMode === key
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
+                  >
+                    {(
+                      [
+                        ["auto", "Auto-Send"],
+                        ["approve", "Approve First"],
+                        ["draft", "Draft Only"],
+                      ] as const
+                    ).map(([key, label]) => {
+                      const active = sendingMode === key;
                       return (
                         <div
                           key={key}
                           onClick={() => setSendingMode(key)}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8,
-                            border: `1px solid ${active ? '#e8d5a3' : S.border}`,
-                            background: active ? S.pale : 'transparent',
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: "7px 10px",
+                            borderRadius: 8,
+                            border: `1px solid ${active ? "#e8d5a3" : S.border}`,
+                            background: active ? S.pale : "transparent",
                             color: active ? S.gold : S.muted,
-                            fontWeight: active ? 500 : 400, fontSize: 11, cursor: 'pointer', transition: 'all 0.12s',
+                            fontWeight: active ? 500 : 400,
+                            fontSize: 11,
+                            cursor: "pointer",
+                            transition: "all 0.12s",
                           }}
                         >
-                          <div style={{
-                            width: 12, height: 12, borderRadius: '50%', border: `1.5px solid currentColor`,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                          }}>
-                            {active && <div style={{ width: 6, height: 6, background: S.gold, borderRadius: '50%' }} />}
+                          <div
+                            style={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              border: `1.5px solid currentColor`,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {active && (
+                              <div
+                                style={{
+                                  width: 6,
+                                  height: 6,
+                                  background: S.gold,
+                                  borderRadius: "50%",
+                                }}
+                              />
+                            )}
                           </div>
                           {label}
                         </div>
-                      )
+                      );
                     })}
                   </div>
                 </div>
 
                 {/* Stats */}
                 <div>
-                  <div style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: S.muted, marginBottom: 10, paddingBottom: 6, borderBottom: `1px solid ${S.border}` }}>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      color: S.muted,
+                      marginBottom: 10,
+                      paddingBottom: 6,
+                      borderBottom: `1px solid ${S.border}`,
+                    }}
+                  >
                     Today&apos;s Stats
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    {([
-                      [pendingCount,  'Pending',   S.gold],
-                      [autoSentCount, 'Auto-sent', S.green],
-                      [approvedCount, 'Approved',  S.dark],
-                      [avgToneScore != null ? `${avgToneScore}%` : '—', 'Tone Score', S.mid],
-                    ] as [string | number, string, string][]).map(([val, lbl, col]) => (
-                      <div key={lbl} style={{ background: S.bg, border: `1px solid ${S.border}`, borderRadius: 8, padding: '10px 10px 8px' }}>
-                        <div style={{ fontFamily: S.serif, fontSize: 22, fontWeight: 600, color: col, lineHeight: 1, marginBottom: 3 }}>{val}</div>
-                        <div style={{ fontSize: 9.5, color: S.muted }}>{lbl}</div>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 8,
+                    }}
+                  >
+                    {(
+                      [
+                        [pendingCount, "Pending", S.gold],
+                        [autoSentCount, "Auto-sent", S.green],
+                        [approvedCount, "Approved", S.dark],
+                        [
+                          avgToneScore != null ? `${avgToneScore}%` : "—",
+                          "Tone Score",
+                          S.mid,
+                        ],
+                      ] as [string | number, string, string][]
+                    ).map(([val, lbl, col]) => (
+                      <div
+                        key={lbl}
+                        style={{
+                          background: S.bg,
+                          border: `1px solid ${S.border}`,
+                          borderRadius: 8,
+                          padding: "10px 10px 8px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontFamily: S.serif,
+                            fontSize: 22,
+                            fontWeight: 600,
+                            color: col,
+                            lineHeight: 1,
+                            marginBottom: 3,
+                          }}
+                        >
+                          {val}
+                        </div>
+                        <div style={{ fontSize: 9.5, color: S.muted }}>
+                          {lbl}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -604,50 +965,32 @@ function InboxContent() {
 
                 {/* Channel Activity */}
                 <div>
-                  <div style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: S.muted, marginBottom: 10, paddingBottom: 6, borderBottom: `1px solid ${S.border}` }}>
-                    Channel Activity
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                    {([
-                      { key: 'gmail' as const, icon: '✉', label: 'Gmail', color: S.gold, iconBg: S.redBg, iconColor: '#c23b22' },
-                      { key: 'whatsapp' as const, icon: '💬', label: 'WhatsApp', color: S.green, iconBg: '#e8f7ee', iconColor: '#25a244' },
-                      { key: 'instagram' as const, icon: '📸', label: 'Instagram', color: S.purple, iconBg: '#f3eeff', iconColor: S.purple },
-                    ]).map(ch => {
-                      const count = channelCounts[ch.key]
-                      const pct = Math.round((count / channelCounts.total) * 100)
-                      return (
-                        <div key={ch.key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <div style={{ width: 18, height: 18, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, flexShrink: 0, background: ch.iconBg, color: ch.iconColor }}>
-                            {ch.icon}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 11, color: S.text, marginBottom: 3 }}>
-                              {ch.label} <span style={{ color: S.muted }}>· {count} msgs</span>
-                            </div>
-                            <div style={{ height: 4, background: S.border, borderRadius: 4 }}>
-                              <div style={{ height: 4, background: ch.color, borderRadius: 4, width: `${pct}%`, transition: 'width 0.3s' }} />
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
+                  <ChannelActivity channelCounts={channelCounts} />
                 </div>
-
               </div>
             </>
           ) : (
             /* ── EMPTY STATE ─────────────────────────────────────────────── */
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: S.muted, gap: 10 }}>
+            <div
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                color: S.muted,
+                gap: 10,
+              }}
+            >
               <div style={{ fontSize: 28, color: S.gold }}>✦</div>
               <div style={{ fontFamily: S.serif, fontSize: 20, color: S.mid }}>
-                {isLoading ? 'Loading…' : 'Select a message to review'}
+                {isLoading ? "Loading…" : "Select a message to review"}
               </div>
               {!isLoading && (
                 <div style={{ fontSize: 12 }}>
                   {pendingCount > 0
-                    ? `${pendingCount} message${pendingCount === 1 ? '' : 's'} awaiting review`
-                    : 'All caught up!'}
+                    ? `${pendingCount} message${pendingCount === 1 ? "" : "s"} awaiting review`
+                    : "All caught up!"}
                 </div>
               )}
             </div>
@@ -655,31 +998,84 @@ function InboxContent() {
         </div>
 
         {/* ── STATS BAR ───────────────────────────────────────────────────── */}
-        <div style={{ background: S.white, borderTop: `1px solid ${S.border}`, padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0, fontSize: 11, color: S.muted }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: S.gold }} />
-            <strong style={{ color: S.text }}>{pendingCount}</strong>&nbsp;awaiting approval
+        <div
+          style={{
+            background: S.white,
+            borderTop: `1px solid ${S.border}`,
+            padding: "8px 24px",
+            display: "flex",
+            alignItems: "center",
+            gap: 24,
+            flexShrink: 0,
+            fontSize: 11,
+            color: S.muted,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: S.gold,
+              }}
+            />
+            <strong style={{ color: S.text }}>{pendingCount}</strong>
+            &nbsp;awaiting approval
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: S.green }} />
-            <strong style={{ color: S.text }}>{autoSentCount}</strong>&nbsp;auto-sent today
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: S.green,
+              }}
+            />
+            <strong style={{ color: S.text }}>{autoSentCount}</strong>
+            &nbsp;auto-sent today
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: S.blue }} />
-            <strong style={{ color: S.text }}>{approvedCount}</strong>&nbsp;manually approved
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: S.blue,
+              }}
+            />
+            <strong style={{ color: S.text }}>{approvedCount}</strong>
+            &nbsp;manually approved
           </div>
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div
+            style={{
+              marginLeft: "auto",
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+            }}
+          >
             {avgToneScore != null && (
-              <span>AI tone accuracy: <strong style={{ color: S.green }}>{avgToneScore}%</strong></span>
+              <span>
+                AI tone accuracy:{" "}
+                <strong style={{ color: S.green }}>{avgToneScore}%</strong>
+              </span>
             )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: S.green, animation: 'pulse 2s infinite' }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: S.green,
+                  animation: "pulse 2s infinite",
+                }}
+              />
               System online
             </div>
           </div>
         </div>
-
       </div>
     </div>
-  )
+  );
 }
