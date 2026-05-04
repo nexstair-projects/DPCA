@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(pandoc --version 2>$null)",
+      "PowerShell(python --version 2>$null)",
+      "PowerShell(python3 --version 2>$null)",
+      "PowerShell(python \"d:\\\\workspace\\\\DPCA\\\\work_reports\\\\convert_to_docx.py\")"
+    ]
+  }
+}
