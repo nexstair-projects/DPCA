@@ -9,6 +9,8 @@ import { webhooksRouter } from './routes/webhooks'
 import { healthRouter } from './routes/health'
 import { inboxesRouter } from './routes/inboxes'
 import { leadsRouter } from './routes/leads'
+import { requireAuth } from './middleware/auth'
+import { requireHmac } from './middleware/hmac'
 
 const app = express()
 const PORT = process.env.PORT ?? 3001
@@ -21,13 +23,12 @@ app.use(morgan('short'))
 
 // ── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/health', healthRouter)
-app.use('/api/messages', messagesRouter)
-app.use('/api/drafts', draftsRouter)
-app.use('/api/webhooks', webhooksRouter)
-app.use('/api/inboxes', inboxesRouter)
-app.use('/api/leads', leadsRouter)
+app.use('/api/messages', requireAuth, messagesRouter)
+app.use('/api/drafts', requireAuth, draftsRouter)
+app.use('/api/webhooks', requireHmac, webhooksRouter)
+app.use('/api/inboxes', requireAuth, inboxesRouter)
+app.use('/api/leads', requireAuth, leadsRouter)
 
-//root route
 app.get('/', (_req, res) => {
   res.json({
     status: 'DPCA API running',
@@ -35,8 +36,10 @@ app.get('/', (_req, res) => {
       '/api/health',
       '/api/messages',
       '/api/drafts',
-      '/api/webhooks'
-    ]
+      '/api/webhooks',
+      '/api/inboxes',
+      '/api/leads',
+    ],
   })
 })
 

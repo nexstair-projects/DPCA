@@ -39,9 +39,10 @@ const classifySchema = z.object({
   category: z.string(),
   priority: z.string(),
   tier: z.number().int().min(1).max(3),
-  confidence_score: z.number().min(0).max(1),
+  classification_confidence: z.number().min(0).max(1),
   estimated_value: z.number().optional(),
   guest_count: z.number().int().optional(),
+  classification_reasoning: z.string().optional(),
 })
 
 webhooksRouter.post('/n8n/message-classified', async (req: Request, res: Response) => {
@@ -100,16 +101,19 @@ webhooksRouter.post('/n8n/draft-generated', async (req: Request, res: Response) 
 const leadSchema = z.object({
   message_id: z.string().uuid().optional(),
   inbox_id: z.string().uuid(),
-  client_name: z.string(),
-  client_email: z.string().email().optional(),
-  client_phone: z.string().optional(),
+  client_names: z.array(z.string()).optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  location: z.string().optional(),
   wedding_date: z.string().optional(),
+  wedding_date_flexible: z.boolean().optional(),
   guest_count: z.number().int().optional(),
   estimated_value: z.number().optional(),
   venue_preference: z.string().optional(),
   services_requested: z.array(z.string()).optional(),
+  how_found_us: z.string().optional(),
   ai_summary: z.string().optional(),
-  source: z.string().optional(),
+  source_channel: z.enum(['gmail', 'whatsapp', 'instagram']).optional(),
 })
 
 webhooksRouter.post('/n8n/lead-extracted', async (req: Request, res: Response) => {
@@ -149,7 +153,7 @@ webhooksRouter.post('/n8n/send-result', async (req: Request, res: Response) => {
     await supabase.from('messages').update({ status: 'send_failed' }).eq('id', message_id)
     await supabase.from('errors_log').insert({
       error_type: 'send_failure',
-      source: 'WF6',
+      workflow_name: 'WF6',
       message_id,
       error_message: error_message ?? 'Unknown send error',
       metadata: { draft_id },

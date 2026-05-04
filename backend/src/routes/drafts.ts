@@ -47,19 +47,19 @@ draftsRouter.post('/:id/approve', async (req: Request, res: Response) => {
 // POST /api/drafts/:id/reject — reject draft with reason
 const rejectSchema = z.object({
   reviewed_by: z.string().uuid(),
-  review_notes: z.string().min(1),
+  rejection_reason: z.string().min(1),
 })
 
 draftsRouter.post('/:id/reject', async (req: Request, res: Response) => {
   const parsed = rejectSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
 
-  const { reviewed_by, review_notes } = parsed.data
+  const { reviewed_by, rejection_reason } = parsed.data
   const draftId = req.params.id
 
   const { data: draft, error: draftErr } = await supabase
     .from('drafts')
-    .update({ status: 'rejected', reviewed_by, review_notes, updated_at: new Date().toISOString() })
+    .update({ status: 'rejected', reviewed_by, rejection_reason, updated_at: new Date().toISOString() })
     .eq('id', draftId)
     .select('message_id')
     .single()
@@ -76,7 +76,7 @@ draftsRouter.post('/:id/reject', async (req: Request, res: Response) => {
     user_id: reviewed_by,
     draft_id: draftId,
     message_id: draft.message_id,
-    metadata: { reason: review_notes },
+    metadata: { reason: rejection_reason },
   })
 
   res.json({ ok: true })
