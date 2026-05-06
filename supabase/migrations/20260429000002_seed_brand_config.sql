@@ -2,9 +2,8 @@
 -- Uses ON CONFLICT DO UPDATE so re-running is safe.
 
 -- P1 — Brand voice system prompt
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('brand_voice_prompt', to_jsonb($P1$
-You are the AI communication assistant for Dream Paris Wedding (DPW), a luxury Paris destination-wedding planning company founded by Audrey. You write replies on behalf of the team. The current sender persona is: {{sender_persona}} ({{sender_full_name}}). Always sign off as {{sender_signature}}.
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('brand_voice_prompt', to_jsonb($P1$You are the AI communication assistant for Dream Paris Wedding (DPW), a luxury Paris destination-wedding planning company founded by Audrey. You write replies on behalf of the team. The current sender persona is: {{sender_persona}} ({{sender_full_name}}). Always sign off as {{sender_signature}}.
 
 ## Brand Identity
 DPW is a high-end, expert-led, process-heavy planning company. Voice: clear, direct, professional, elegant, guiding. Tone descriptor: LUXURY AUTHORITY — never weak, generic, salesy, or apologetic. Confidence without arrogance. Warmth without weakness.
@@ -44,14 +43,12 @@ Current state: signature_signed = {{signature_signed}}.
 - Instagram: 40-100 words
 
 ## Sign-off
-{{sender_signature}}
-$P1$), 'Master brand voice system prompt (P1). Slots: sender_persona, sender_full_name, sender_signature, fixed_subject, signature_signed, pre_signature_constraint.')
+{{sender_signature}}$P1$::text), 'Master brand voice system prompt (P1). Slots: sender_persona, sender_full_name, sender_signature, fixed_subject, signature_signed, pre_signature_constraint.')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- P2 — Classification prompt
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('classification_prompt', to_jsonb($P2$
-You are a message classification engine for Dream Paris Wedding, a luxury Paris wedding planning company.
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('classification_prompt', to_jsonb($P2$You are a message classification engine for Dream Paris Wedding, a luxury Paris wedding planning company.
 
 Analyse the following incoming message and classify it. Return ONLY a valid JSON object with no additional text.
 
@@ -74,14 +71,12 @@ Subject: {{subject}}
 Body:
 {{body_clean}}
 
-Return JSON: {"category": string, "priority": string, "confidence": number, "tier": number, "estimated_value": number|null, "guest_count": number|null, "reasoning": string}
-$P2$), 'Classification prompt (P2).')
+Return JSON: {"category": string, "priority": string, "confidence": number, "tier": number, "estimated_value": number|null, "guest_count": number|null, "reasoning": string}$P2$::text), 'Classification prompt (P2).')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- P3 — Draft generation user message template
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('draft_user_template', to_jsonb($P3$
-## Your Task
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('draft_user_template', to_jsonb($P3$## Your Task
 Write a reply to the following incoming message on behalf of Dream Paris Wedding.
 
 Sender persona for this reply: {{sender_persona}} ({{sender_full_name}}, {{sender_email}})
@@ -113,14 +108,12 @@ The following are brand-approved templates, email examples, and FAQs retrieved f
 4. Include a clear next step. If proposing a call, say "Monday or Wednesday at your preferred time (Paris time)" — never offer a specific weekend or Friday slot.
 5. Stay within the word-count guideline for this category.
 6. Do NOT invent any details not in the message or KB context above.
-7. Do NOT mention commission, vendor markup, or any pay-to-recommend phrasing.
-$P3$), 'Draft generation user-message template (P3).')
+7. Do NOT mention commission, vendor markup, or any pay-to-recommend phrasing.$P3$::text), 'Draft generation user-message template (P3).')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- P4 — Lead extraction prompt
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('lead_extraction_prompt', to_jsonb($P4$
-You are a lead data extraction engine for Dream Paris Wedding.
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('lead_extraction_prompt', to_jsonb($P4$You are a lead data extraction engine for Dream Paris Wedding.
 
 Extract structured lead information from the message. Return ONLY a valid JSON object. Use null for any field not explicitly present.
 
@@ -130,14 +123,12 @@ Subject: {{subject}}
 {{body_clean}}
 
 Return JSON:
-{"client_names": ["string"]|null, "email": "string"|null, "phone": "string"|null, "location": "string"|null, "wedding_date": "YYYY-MM-DD or descriptive"|null, "wedding_date_flexible": true|false|null, "guest_count": number|null, "budget_range": "string"|null, "venue_preference": "string"|null, "services_requested": ["string"]|null, "how_found_us": "string"|null, "ai_summary": "2-3 sentences"}
-$P4$), 'Lead extraction prompt (P4).')
+{"client_names": ["string"]|null, "email": "string"|null, "phone": "string"|null, "location": "string"|null, "wedding_date": "YYYY-MM-DD or descriptive"|null, "wedding_date_flexible": true|false|null, "guest_count": number|null, "budget_range": "string"|null, "venue_preference": "string"|null, "services_requested": ["string"]|null, "how_found_us": "string"|null, "ai_summary": "2-3 sentences"}$P4$::text), 'Lead extraction prompt (P4).')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- P5 — Regeneration prompt
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('regeneration_prompt', to_jsonb($P5$
-## Task
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('regeneration_prompt', to_jsonb($P5$## Task
 Write a fresh reply. A previous draft was generated but needs improvement based on team feedback.
 
 ## Previous Draft (do not reuse phrasing)
@@ -164,14 +155,12 @@ Category: {{category}}
 2. Address the specific feedback above.
 3. All brand-voice rules from your system instructions apply.
 4. If no specific feedback, aim for a warmer, more personalised tone.
-5. Sign off as {{sender_signature}}. Do not include a Subject line.
-$P5$), 'Regeneration prompt (P5).')
+5. Sign off as {{sender_signature}}. Do not include a Subject line.$P5$::text), 'Regeneration prompt (P5).')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- P6 — Tone validation prompt
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('tone_validation_prompt', to_jsonb($P6$
-You evaluate AI-generated draft replies against Dream Paris Wedding brand standards. Voice: warm, elegant, personal, confident, guiding, never weak or generic. No corporate filler. No commission language. No invented details. Appropriate length for category and channel.
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('tone_validation_prompt', to_jsonb($P6$You evaluate AI-generated draft replies against Dream Paris Wedding brand standards. Voice: warm, elegant, personal, confident, guiding, never weak or generic. No corporate filler. No commission language. No invented details. Appropriate length for category and channel.
 
 Category: {{category}}
 Channel: {{channel}}
@@ -184,99 +173,96 @@ Original message (for context):
 
 Return JSON only: {"tone_score": 0-100, "passes": boolean, "issues": ["string"], "suggestion": "string"|null}
 
-Scoring: 90-100 excellent, 75-89 good, 60-74 acceptable with edits, <60 fails. passes=true if tone_score >= 75.
-$P6$), 'Tone validation prompt (P6).')
+Scoring: 90-100 excellent, 75-89 good, 60-74 acceptable with edits, <60 fails. passes=true if tone_score >= 75.$P6$::text), 'Tone validation prompt (P6).')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- Sender routing map
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('sender_routing', '{
-  "lead_qualification": {"sender":"audrey","from":"audrey@dreampariswedding.com","full_name":"Audrey","signature":"Warm regards,\nAudrey\nDream Paris Wedding"},
-  "consultation_followup": {"sender":"audrey","from":"audrey@dreampariswedding.com","full_name":"Audrey","signature":"Warm regards,\nAudrey\nDream Paris Wedding"},
-  "package_pricing_email": {"sender":"audrey","from":"audrey@dreampariswedding.com","full_name":"Audrey","signature":"Looking forward to working with you,\nAudrey"},
-  "contract_transmission": {"sender":"audrey","from":"audrey@dreampariswedding.com","full_name":"Audrey","cc":["vanessa@dreampariswedding.com","admin@dreampariswedding.com"],"signature":"Warm regards,\nAudrey"},
-  "masterfile_welcome_kit": {"sender":"frederic","from":"admin@dreampariswedding.com","full_name":"Frédéric","signature":"Warm regards,\nFrédéric\nEvent Administrative Assistant\nDream Paris Wedding"},
-  "day_of_form": {"sender":"frederic","from":"admin@dreampariswedding.com","full_name":"Frédéric","signature":"Warm regards,\nFrédéric\nDream Paris Wedding"},
-  "venue_sourcing": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "catering_selection": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "cake_selection": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "save_the_date": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "photo_video": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "mc_officiant": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "music": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "entertainment": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "beauty": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "transport": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "room_blocks": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "design_consultation": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "mood_board_proposal": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "tastings_trials": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "rsvp_print": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "month_of_coordination": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "rehearsal_walkthrough": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa\nDream Paris Wedding"},
-  "wedding_day": {"sender":"vanessa","from":"vanessa@dreampariswedding.com","full_name":"Vanessa","signature":"Best,\nVanessa"},
-  "vendor_communication": {"sender":"partners","from":"partners@dreampariswedding.com","full_name":"Dream Paris Wedding","signature":"Best regards,\nDream Paris Wedding"},
-  "freeform_general": {"sender":"audrey","from":"audrey@dreampariswedding.com","full_name":"Audrey","signature":"Warm regards,\nAudrey\nDream Paris Wedding"}
-}'::jsonb, 'Mapping from planning_step to sender persona, from-address, signature, and optional CCs.')
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('sender_routing', jsonb_build_object(
+  'lead_qualification', jsonb_build_object('sender','audrey','from','audrey@dreampariswedding.com','full_name','Audrey','signature','Warm regards,'||chr(10)||'Audrey'||chr(10)||'Dream Paris Wedding'),
+  'consultation_followup', jsonb_build_object('sender','audrey','from','audrey@dreampariswedding.com','full_name','Audrey','signature','Warm regards,'||chr(10)||'Audrey'||chr(10)||'Dream Paris Wedding'),
+  'package_pricing_email', jsonb_build_object('sender','audrey','from','audrey@dreampariswedding.com','full_name','Audrey','signature','Looking forward to working with you,'||chr(10)||'Audrey'),
+  'contract_transmission', jsonb_build_object('sender','audrey','from','audrey@dreampariswedding.com','full_name','Audrey','cc',jsonb_build_array('vanessa@dreampariswedding.com','admin@dreampariswedding.com'),'signature','Warm regards,'||chr(10)||'Audrey'),
+  'masterfile_welcome_kit', jsonb_build_object('sender','frederic','from','admin@dreampariswedding.com','full_name','Frederic','signature','Warm regards,'||chr(10)||'Frederic'||chr(10)||'Event Administrative Assistant'||chr(10)||'Dream Paris Wedding'),
+  'day_of_form', jsonb_build_object('sender','frederic','from','admin@dreampariswedding.com','full_name','Frederic','signature','Warm regards,'||chr(10)||'Frederic'||chr(10)||'Dream Paris Wedding'),
+  'venue_sourcing', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'catering_selection', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'cake_selection', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'save_the_date', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'photo_video', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'mc_officiant', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'music', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'entertainment', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'beauty', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'transport', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'room_blocks', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'design_consultation', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'mood_board_proposal', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'tastings_trials', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'rsvp_print', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'month_of_coordination', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'rehearsal_walkthrough', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'||chr(10)||'Dream Paris Wedding'),
+  'wedding_day', jsonb_build_object('sender','vanessa','from','vanessa@dreampariswedding.com','full_name','Vanessa','signature','Best,'||chr(10)||'Vanessa'),
+  'vendor_communication', jsonb_build_object('sender','partners','from','partners@dreampariswedding.com','full_name','Dream Paris Wedding','signature','Best regards,'||chr(10)||'Dream Paris Wedding'),
+  'freeform_general', jsonb_build_object('sender','audrey','from','audrey@dreampariswedding.com','full_name','Audrey','signature','Warm regards,'||chr(10)||'Audrey'||chr(10)||'Dream Paris Wedding')
+), 'Mapping from planning_step to sender persona, from-address, signature, and optional CCs.')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- Fixed subject lines (exact match only — never paraphrase)
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('planning_step_subjects', '{
-  "contract_transmission": "YOUR WEDDING WITH DREAM PARIS WEDDING",
-  "masterfile_welcome_kit": "MASTERFILE + PAYMENT RECEIPT + WELCOME KIT",
-  "day_of_form": "Your Wedding Day-Of Details Form ✨",
-  "venue_sourcing": "VENUE SELECTION",
-  "catering_selection": "CATERING SELECTION",
-  "cake_selection": "WEDDING CAKE",
-  "save_the_date": "SAVE THE DATE & INVITATION DIRECTION",
-  "photo_video": "PHOTOGRAPHER & VIDEOGRAPHER",
-  "mc_officiant": "MC / OFFICIANT",
-  "music": "MUSIC SELECTION",
-  "entertainment": "ENTERTAINMENT VENDORS",
-  "beauty": "BEAUTY SERVICES",
-  "transport": "TRANSPORTATION",
-  "room_blocks": "ROOM BLOCKS",
-  "design_consultation": "DESIGN CONSULTATION",
-  "mood_board_proposal": "MOOD BOARD & DECOR PROPOSAL",
-  "tastings_trials": "TASTINGS & TRIALS",
-  "rsvp_print": "RSVP & PRINT MATERIALS",
-  "month_of_coordination": "MONTH-OF COORDINATION",
-  "rehearsal_walkthrough": "REHEARSAL & FINAL WALKTHROUGH"
-}'::jsonb, 'Fixed exact-match subject lines per planning step. Never paraphrase.')
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('planning_step_subjects', jsonb_build_object(
+  'contract_transmission', 'YOUR WEDDING WITH DREAM PARIS WEDDING',
+  'masterfile_welcome_kit', 'MASTERFILE + PAYMENT RECEIPT + WELCOME KIT',
+  'day_of_form', 'Your Wedding Day-Of Details Form',
+  'venue_sourcing', 'VENUE SELECTION',
+  'catering_selection', 'CATERING SELECTION',
+  'cake_selection', 'WEDDING CAKE',
+  'save_the_date', 'SAVE THE DATE & INVITATION DIRECTION',
+  'photo_video', 'PHOTOGRAPHER & VIDEOGRAPHER',
+  'mc_officiant', 'MC / OFFICIANT',
+  'music', 'MUSIC SELECTION',
+  'entertainment', 'ENTERTAINMENT VENDORS',
+  'beauty', 'BEAUTY SERVICES',
+  'transport', 'TRANSPORTATION',
+  'room_blocks', 'ROOM BLOCKS',
+  'design_consultation', 'DESIGN CONSULTATION',
+  'mood_board_proposal', 'MOOD BOARD & DECOR PROPOSAL',
+  'tastings_trials', 'TASTINGS & TRIALS',
+  'rsvp_print', 'RSVP & PRINT MATERIALS',
+  'month_of_coordination', 'MONTH-OF COORDINATION',
+  'rehearsal_walkthrough', 'REHEARSAL & FINAL WALKTHROUGH'
+), 'Fixed exact-match subject lines per planning step. Never paraphrase.')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- Forbidden tokens — commission/kickback language filter
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('forbidden_tokens', '{
-  "patterns": [
-    "(?i)\\bcommission\\b",
-    "(?i)\\bkickback\\b",
-    "(?i)\\b(?<!time\\s)markup\\b",
-    "(?i)\\bvendor\\s+pays\\b",
-    "(?i)\\bwe\\s+receive\\s+a?\\s*fee\\s+from\\b",
-    "(?i)\\bpay-?to-?recommend\\b",
-    "(?i)commissionnement",
-    "(?i)pourcentage\\s+sur",
-    "(?i)comiss[\\u00e3a]o"
-  ],
-  "action": "regenerate_then_flag"
-}'::jsonb, 'Regex patterns for commission/kickback language. Action: regenerate up to 2x; if still present, flag for human review.')
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('forbidden_tokens', jsonb_build_object(
+  'patterns', jsonb_build_array(
+    '(?i)\bcommission\b',
+    '(?i)\bkickback\b',
+    '(?i)\bmarkup\b',
+    '(?i)\bvendor pays\b',
+    '(?i)\bwe receive a fee from\b',
+    '(?i)\bpay-to-recommend\b',
+    '(?i)commissionnement',
+    '(?i)pourcentage sur',
+    '(?i)comissao'
+  ),
+  'action', 'regenerate_then_flag'
+), 'Regex patterns for commission/kickback language. Action: regenerate up to 2x; if still present, flag for human review.')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- Pre-signature constraint (injected into P1 when signature_signed = false)
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('pre_signature_constraint', to_jsonb($PSC$
-The lead has NOT yet signed the contract. Pre-signature behavior:
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('pre_signature_constraint', to_jsonb($PSC$The lead has NOT yet signed the contract. Pre-signature behavior:
 - Reply must qualify the lead, set expectations, and position our service. Do NOT deliver detailed planning work.
 - Do NOT provide specific venue lists, vendor names, design proposals, or custom timelines.
 - Tone: warm, professional, but controlled. The objective is to determine fit, not to over-deliver.
 - If the inquiry has insufficient info (no date, no guest count, no budget), use the qualification template flow.
-- If sufficient info, propose a Monday or Wednesday call (Paris time).
-$PSC$), 'Constraint injected into P1 when lead.signature_signed = false.')
+- If sufficient info, propose a Monday or Wednesday call (Paris time).$PSC$::text), 'Constraint injected into P1 when lead.signature_signed = false.')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();
 
 -- Auto-send rules
-INSERT INTO system_config (config_key, config_value, description) VALUES
-('auto_send_rules', '{"tier_1_enabled": true, "min_tone_confidence": 75, "min_classification_confidence": 0.85}'::jsonb, 'Rules governing when Tier 1 drafts are auto-sent vs routed for review.')
+INSERT INTO system_config (config_key, config_value, description)
+VALUES ('auto_send_rules', jsonb_build_object('tier_1_enabled', true, 'min_tone_confidence', 75, 'min_classification_confidence', 0.85), 'Rules governing when Tier 1 drafts are auto-sent vs routed for review.')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = now();

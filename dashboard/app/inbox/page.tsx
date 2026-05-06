@@ -109,22 +109,47 @@ function InboxContent() {
   );
   const [draftText, setDraftText] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  // Get current user ID for audit logging
+  // Get current user ID and session token for API calls
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth
-      .getUser()
-      .then(({ data }) => setUserId(data.user?.id ?? null));
+    console.log('🔐 Checking auth session...');
+    supabase.auth.getSession().then(({ data, error }) => {
+      console.log('🔐 getSession result:', { session: data.session ? 'EXISTS' : 'NONE', error });
+      if (error) {
+        console.error('🔐 Auth error:', error.message);
+        return;
+      }
+      if (!data.session) {
+        console.warn('🔐 No session found. User may not be logged in.');
+        return;
+      }
+      console.log('🔐 Session user:', data.session.user?.email);
+      console.log('🔐 Token (first 30 chars):', data.session.access_token.slice(0, 30) + '...');
+      setUserId(data.session.user?.id ?? null);
+      setAccessToken(data.session.access_token ?? null);
+    }).catch(err => {
+      console.error('🔐 Unexpected auth error:', err);
+    });
   }, []);
+
+  const authHeaders: Record<string, string> = accessToken
+    ? { Authorization: `Bearer ${accessToken}` }
+    : {};
 
   const {
     data: messages = [],
     isLoading,
     mutate,
-  } = useSWR<Message[]>("inbox-messages", async () => {
-    const res = await fetch(`${BACKEND_URL}/api/messages`);
-    if (!res.ok) throw new Error("Failed to fetch messages");
+  } = useSWR<Message[]>(accessToken ? "inbox-messages" : null, async () => {
+    console.log('📡 Fetching messages with token:', accessToken ? accessToken.slice(0, 20) + '…' : 'NULL');
+    const res = await fetch(`${BACKEND_URL}/api/messages`, { headers: authHeaders });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      console.error('📡 API error:', res.status, body);
+      throw new Error(`${res.status}: ${body.error ?? 'Unknown'} — ${body.detail ?? ''}`);
+    }
     return res.json();
   });
 
@@ -163,7 +188,7 @@ function InboxContent() {
         draftText !== selected.drafts[0]?.draft_text ? draftText : undefined;
       await fetch(`${BACKEND_URL}/api/drafts/${draftId}/approve`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify({ reviewed_by: userId, edited_text: editedText }),
       });
     } else {
@@ -183,10 +208,10 @@ function InboxContent() {
     if (draftId) {
       await fetch(`${BACKEND_URL}/api/drafts/${draftId}/reject`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify({
           reviewed_by: userId,
-          review_notes: "Discarded from inbox",
+          rejection_reason: "Discarded from inbox",
         }),
       });
     } else {

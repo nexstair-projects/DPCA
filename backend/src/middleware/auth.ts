@@ -1,11 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { createClient } from '@supabase/supabase-js'
 
-const adminClient = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export interface AuthedRequest extends Request {
   user?: {
     id: string
@@ -19,19 +14,36 @@ export interface AuthedRequest extends Request {
 export async function requireAuth(req: AuthedRequest, res: Response, next: NextFunction) {
   const header = req.header('authorization') ?? ''
   const token = header.startsWith('Bearer ') ? header.slice(7) : null
+
+  console.log(`[Auth] ${req.method} ${req.path} | header=${header ? 'present' : 'MISSING'} | token=${token ? token.slice(0, 20) + '…' : 'NULL'}`)
+
   if (!token) return res.status(401).json({ error: 'Missing bearer token' })
 
-  const { data, error } = await adminClient.auth.getUser(token)
-  if (error || !data.user) return res.status(401).json({ error: 'Invalid token' })
+  // Create a fresh client per-request so there is no stale auth state
+  const client = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } }
+  )
 
-  const { data: userRow, error: userErr } = await adminClient
+  const { data, error } = await client.auth.getUser(token)
+
+  console.log(`[Auth] getUser → user=${data?.user?.id ?? 'null'} | error=${error?.message ?? 'none'}`)
+
+  if (error || !data.user) {
+    return res.status(401).json({ error: 'Invalid token', detail: error?.message ?? 'no user returned' })
+  }
+
+  const { data: userRow, error: userErr } = await client
     .from('users')
     .select('id, auth_id, email, role, is_active')
     .eq('auth_id', data.user.id)
     .single()
 
+  console.log(`[Auth] users table → id=${userRow?.id ?? 'null'} | error=${userErr?.message ?? 'none'}`)
+
   if (userErr || !userRow || !userRow.is_active) {
-    return res.status(403).json({ error: 'User not provisioned or inactive' })
+    return res.status(403).json({ error: 'User not provisioned or inactive', detail: userErr?.message })
   }
 
   req.user = {
