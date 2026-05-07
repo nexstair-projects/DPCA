@@ -9,7 +9,8 @@
       "Bash(Select-Object -ExpandProperty FullName)",
       "PowerShell(New-Item -ItemType Directory -Path \"d:\\\\workspace\\\\DPCA\\\\backend\\\\src\\\\middleware\" -Force)",
       "Bash(npm install *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(node -e \"const {Pinecone} = require\\('@pinecone-database/pinecone'\\); const i = new Pinecone\\({apiKey:'x'}\\).index\\('x'\\); console.log\\(typeof i.upsert\\)\")"
     ]
   }
 }

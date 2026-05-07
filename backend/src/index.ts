@@ -9,8 +9,9 @@ import { webhooksRouter } from './routes/webhooks'
 import { healthRouter } from './routes/health'
 import { inboxesRouter } from './routes/inboxes'
 import { leadsRouter } from './routes/leads'
+import { internalRouter } from './routes/internal'
 import { requireAuth } from './middleware/auth'
-import { requireHmac } from './middleware/hmac'
+import { requireHmac, requireInternalToken } from './middleware/hmac'
 
 const app = express()
 const PORT = process.env.PORT ?? 3001
@@ -28,6 +29,7 @@ app.use('/api/drafts', requireAuth, draftsRouter)
 app.use('/api/webhooks', requireHmac, webhooksRouter)
 app.use('/api/inboxes', requireAuth, inboxesRouter)
 app.use('/api/leads', requireAuth, leadsRouter)
+app.use('/api/internal', requireInternalToken, internalRouter)
 
 app.get('/', (_req, res) => {
   res.json({
@@ -39,6 +41,7 @@ app.get('/', (_req, res) => {
       '/api/webhooks',
       '/api/inboxes',
       '/api/leads',
+      '/api/internal',
     ],
   })
 })
