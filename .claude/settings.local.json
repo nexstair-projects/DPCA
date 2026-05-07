@@ -7,7 +7,9 @@
       "PowerShell(python \"d:\\\\workspace\\\\DPCA\\\\work_reports\\\\convert_to_docx.py\")",
       "Bash(Get-ChildItem -Path \"d:\\\\workspace\\\\DPCA\\\\backend\\\\src\" -Recurse -File)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "PowerShell(New-Item -ItemType Directory -Path \"d:\\\\workspace\\\\DPCA\\\\backend\\\\src\\\\middleware\" -Force)"
+      "PowerShell(New-Item -ItemType Directory -Path \"d:\\\\workspace\\\\DPCA\\\\backend\\\\src\\\\middleware\" -Force)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)"
     ]
   }
 }
