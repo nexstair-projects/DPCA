@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import { anthropic, MODELS } from '../lib/anthropic'
+import { callLLM } from '../lib/llm'
 import { getConfig, getConfigJson } from '../lib/systemConfig'
 import { retrieveContext } from './retrieval'
 import { commissionSanitize, callAvailabilitySanitize, subjectLineEnforcer } from './sanitizers'
@@ -38,16 +38,9 @@ async function callSonnetDraft(system: string, user: string): Promise<{
   text: string
   inputTokens: number
   outputTokens: number
+  modelUsed: string
 }> {
-  const res = await anthropic.messages.create({
-    model: MODELS.DRAFT,
-    max_tokens: 1024,
-    temperature: 1,
-    system,
-    messages: [{ role: 'user', content: user }],
-  })
-  const text = res.content[0].type === 'text' ? res.content[0].text : ''
-  return { text, inputTokens: res.usage.input_tokens, outputTokens: res.usage.output_tokens }
+  return callLLM('DRAFT', system, user, 1024, 1)
 }
 
 async function runToneValidation(
@@ -67,13 +60,12 @@ async function runToneValidation(
   })
 
   try {
-    const res = await anthropic.messages.create({
-      model: MODELS.TONE,
-      max_tokens: 200,
-      system: 'You are a tone validation engine. Return ONLY valid JSON, no preamble, no markdown fences.',
-      messages: [{ role: 'user', content: rendered }],
-    })
-    const raw = res.content[0].type === 'text' ? res.content[0].text : ''
+    const { text: raw } = await callLLM(
+      'TONE',
+      'You are a tone validation engine. Return ONLY valid JSON, no preamble, no markdown fences.',
+      rendered,
+      200,
+    )
     return JSON.parse(raw.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim()) as ToneValidationResult
   } catch {
     return null
@@ -162,6 +154,7 @@ export async function generateDraft(
   let draftText = ''
   let inputTokens = 0
   let outputTokens = 0
+  let modelUsed = ''
   let commissionFlagged = false
   let stricterSystem = systemPrompt
 
@@ -170,6 +163,7 @@ export async function generateDraft(
     draftText = result.text
     inputTokens = result.inputTokens
     outputTokens = result.outputTokens
+    modelUsed = result.modelUsed
 
     const check = await commissionSanitize(draftText)
     if (check.clean) break
@@ -207,7 +201,7 @@ export async function generateDraft(
     .insert({
       message_id: messageId,
       draft_text: draftText,
-      model_used: MODELS.DRAFT,
+      model_used: modelUsed,
       prompt_tokens: inputTokens,
       completion_tokens: outputTokens,
       tone_confidence: toneScore ? toneScore / 100 : null,

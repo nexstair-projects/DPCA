@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import { anthropic, MODELS } from '../lib/anthropic'
+import { callLLM } from '../lib/llm'
 import { getConfig } from '../lib/systemConfig'
 
 interface ClassificationResult {
@@ -74,18 +74,17 @@ export async function classifyMessage(messageId: string): Promise<Classification
     body_clean: msg.body_clean ?? msg.body_raw ?? '',
   })
 
-  // Call Claude Sonnet
   let raw: string
   try {
-    const response = await anthropic.messages.create({
-      model: MODELS.CLASSIFY,
-      max_tokens: 300,
-      system: 'You are a message classification engine. Return ONLY valid JSON, no preamble, no markdown fences.',
-      messages: [{ role: 'user', content: rendered }],
-    })
-    raw = response.content[0].type === 'text' ? response.content[0].text : ''
+    const { text } = await callLLM(
+      'CLASSIFY',
+      'You are a message classification engine. Return ONLY valid JSON, no preamble, no markdown fences.',
+      rendered,
+      300,
+    )
+    raw = text
   } catch (err) {
-    throw new Error(`Claude classification failed: ${err}`)
+    throw new Error(`LLM classification failed: ${err}`)
   }
 
   // Parse JSON with one retry

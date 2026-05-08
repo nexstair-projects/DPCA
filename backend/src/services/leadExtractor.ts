@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import { anthropic, MODELS } from '../lib/anthropic'
+import { callLLM } from '../lib/llm'
 import { getConfig } from '../lib/systemConfig'
 
 interface ExtractedLead {
@@ -44,15 +44,15 @@ export async function extractLead(messageId: string): Promise<{ lead_id: string;
 
   let raw: string
   try {
-    const res = await anthropic.messages.create({
-      model: MODELS.CLASSIFY,
-      max_tokens: 500,
-      system: 'You are a lead extraction engine. Return ONLY valid JSON, no preamble, no markdown fences.',
-      messages: [{ role: 'user', content: rendered }],
-    })
-    raw = res.content[0].type === 'text' ? res.content[0].text : ''
+    const { text } = await callLLM(
+      'CLASSIFY',
+      'You are a lead extraction engine. Return ONLY valid JSON, no preamble, no markdown fences.',
+      rendered,
+      500,
+    )
+    raw = text
   } catch (err) {
-    throw new Error(`Claude lead extraction failed: ${err}`)
+    throw new Error(`LLM lead extraction failed: ${err}`)
   }
 
   let extracted: ExtractedLead
