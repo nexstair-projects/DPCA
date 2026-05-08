@@ -2,74 +2,179 @@
   "name": "WF2 — Message Classification",
   "nodes": [
     {
-      "parameters": { "httpMethod": "POST", "path": "classify-message" },
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wf2-classify",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "wf2-1",
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
-      "position": [250, 300],
-      "typeVersion": 1,
-      "notes": "Triggered by WF1 with { message_id }."
-    },
-    {
-      "parameters": {},
-      "name": "Fetch Message",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [450, 300],
-      "typeVersion": 4,
-      "notes": "GET /api/messages/:id to retrieve full message body."
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "wf2-classify"
     },
     {
       "parameters": {
-        "model": "gpt-4o",
-        "temperature": 0.1,
-        "maxTokens": 300
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL }}/api/internal/classify",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-internal-token", "value": "={{ $env.INTERNAL_API_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message_id: $json.body.message_id }) }}",
+        "options": {
+          "timeout": 30000
+        }
       },
-      "name": "GPT-4o Classify",
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "position": [650, 300],
-      "typeVersion": 1,
-      "notes": "Uses P2 classification prompt. Returns JSON: { category, priority, tier, confidence, estimated_value, guest_count, reasoning }."
-    },
-    {
-      "parameters": {},
-      "name": "Safety Overrides",
-      "type": "n8n-nodes-base.function",
-      "position": [850, 300],
-      "typeVersion": 1,
-      "notes": "Apply safety rules: confidence <0.70 escalates tier; value >€5K or guests >20 → Tier 3; cancel/complaint/legal keywords → Tier 3; unknown sender with Tier 1 → Tier 2."
-    },
-    {
-      "parameters": {},
-      "name": "Store Classification",
+      "id": "wf2-2",
+      "name": "Classify via Backend",
       "type": "n8n-nodes-base.httpRequest",
-      "position": [1050, 300],
-      "typeVersion": 4,
-      "notes": "POST /api/webhooks/n8n/message-classified with final classification result."
+      "typeVersion": 4.2,
+      "position": [460, 300]
     },
     {
-      "parameters": {},
-      "name": "Route by Tier",
-      "type": "n8n-nodes-base.switch",
-      "position": [1250, 300],
-      "typeVersion": 2,
-      "notes": "Tier 1 → WF5 (auto-draft). Tier 2 → WF5 (draft for review). Tier 3 → flag only, notify team."
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "typeValidation": "strict", "version": 2 },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.tier }}",
+              "rightValue": 3,
+              "operator": { "type": "number", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "wf2-3",
+      "name": "Tier 3?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [700, 300]
     },
     {
-      "parameters": {},
-      "name": "Trigger WF5 + WF7",
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL }}/api/webhooks/n8n/tier3-alert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-dpca-signature", "value": "={{ $env.N8N_WEBHOOK_SECRET }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message_id: $('Webhook Trigger').item.json.body.message_id, tier: $json.tier, category: $json.category, reasoning: $json.reasoning }) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "wf2-4",
+      "name": "Notify Tier 3",
       "type": "n8n-nodes-base.httpRequest",
-      "position": [1450, 300],
-      "typeVersion": 4,
-      "notes": "Call WF4→WF5 for draft generation and WF7 for lead extraction (if new_inquiry)."
+      "typeVersion": 4.2,
+      "position": [940, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "typeValidation": "strict", "version": 2 },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "new_inquiry",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "wf2-5",
+      "name": "New Inquiry?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [940, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.N8N_WEBHOOK_BASE_URL }}/webhook/wf5-draft",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message_id: $('Webhook Trigger').item.json.body.message_id }) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "wf2-6",
+      "name": "Trigger WF5 (Draft)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1180, 340]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.N8N_WEBHOOK_BASE_URL }}/webhook/wf7-extract-lead",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message_id: $('Webhook Trigger').item.json.body.message_id }) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "wf2-7",
+      "name": "Trigger WF7 (Lead)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1180, 500]
+    },
+    {
+      "parameters": {},
+      "id": "wf2-8",
+      "name": "Done (Tier 3 - No Draft)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1180, 180]
     }
   ],
   "connections": {
-    "Webhook Trigger": { "main": [[{ "node": "Fetch Message", "type": "main", "index": 0 }]] },
-    "Fetch Message": { "main": [[{ "node": "GPT-4o Classify", "type": "main", "index": 0 }]] },
-    "GPT-4o Classify": { "main": [[{ "node": "Safety Overrides", "type": "main", "index": 0 }]] },
-    "Safety Overrides": { "main": [[{ "node": "Store Classification", "type": "main", "index": 0 }]] },
-    "Store Classification": { "main": [[{ "node": "Route by Tier", "type": "main", "index": 0 }]] },
-    "Route by Tier": { "main": [[{ "node": "Trigger WF5 + WF7", "type": "main", "index": 0 }]] }
+    "Webhook Trigger": {
+      "main": [[ { "node": "Classify via Backend", "type": "main", "index": 0 } ]]
+    },
+    "Classify via Backend": {
+      "main": [[ { "node": "Tier 3?", "type": "main", "index": 0 } ]]
+    },
+    "Tier 3?": {
+      "main": [
+        [ { "node": "Notify Tier 3", "type": "main", "index": 0 } ],
+        [ { "node": "New Inquiry?", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Notify Tier 3": {
+      "main": [[ { "node": "Done (Tier 3 - No Draft)", "type": "main", "index": 0 } ]]
+    },
+    "New Inquiry?": {
+      "main": [
+        [ { "node": "Trigger WF5 (Draft)", "type": "main", "index": 0 }, { "node": "Trigger WF7 (Lead)", "type": "main", "index": 0 } ],
+        [ { "node": "Trigger WF5 (Draft)", "type": "main", "index": 0 } ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" },
-  "tags": [{ "name": "DPCA" }, { "name": "Classification" }]
+  "active": false,
+  "settings": { "executionOrder": "v1" }
 }

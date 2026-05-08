@@ -2,91 +2,141 @@
   "name": "WF8 — Dashboard Actions",
   "nodes": [
     {
-      "parameters": { "httpMethod": "POST", "path": "draft-action" },
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wf8-dashboard-action",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "wf8-1",
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
-      "position": [250, 300],
-      "typeVersion": 1,
-      "notes": "Called by backend API with { action, draft_id, message_id, user_id, ... }. Actions: approve, edit_and_send, reject, regenerate, reassign."
-    },
-    {
-      "parameters": {},
-      "name": "Route by Action",
-      "type": "n8n-nodes-base.switch",
-      "position": [450, 300],
       "typeVersion": 2,
-      "notes": "Branch on action field to appropriate handler."
-    },
-    {
-      "parameters": {},
-      "name": "Approve & Send",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [700, 100],
-      "typeVersion": 4,
-      "notes": "Trigger WF6 send-message webhook. Update draft status → approved."
-    },
-    {
-      "parameters": {},
-      "name": "Edit & Send",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [700, 250],
-      "typeVersion": 4,
-      "notes": "Save edited_text to draft, then trigger WF6 send-message."
-    },
-    {
-      "parameters": {},
-      "name": "Reject",
-      "type": "n8n-nodes-base.function",
-      "position": [700, 400],
-      "typeVersion": 1,
-      "notes": "Update draft status → rejected. Log rejection reason to audit_log."
+      "position": [240, 300],
+      "webhookId": "wf8-dashboard-action"
     },
     {
       "parameters": {
-        "model": "gpt-4o",
-        "temperature": 0.5,
-        "maxTokens": 800
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL }}/api/internal/dashboard-action",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-internal-token", "value": "={{ $env.INTERNAL_API_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  action: $json.body.action,\n  draft_id: $json.body.draft_id,\n  message_id: $json.body.message_id,\n  user_id: $json.body.user_id,\n  instructions: $json.body.instructions,\n  rejection_reason: $json.body.rejection_reason\n}) }}",
+        "options": {
+          "timeout": 60000
+        }
       },
-      "name": "Regenerate Draft",
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "position": [700, 550],
-      "typeVersion": 1,
-      "notes": "Uses P5 regeneration prompt. Previous draft + feedback + original message + KB context → new draft. Stores as new draft row."
-    },
-    {
-      "parameters": {},
-      "name": "Reassign",
-      "type": "n8n-nodes-base.function",
-      "position": [700, 700],
-      "typeVersion": 1,
-      "notes": "Update draft.assigned_to. Optionally send notification to assigned team member."
-    },
-    {
-      "parameters": {},
-      "name": "Audit Log",
+      "id": "wf8-2",
+      "name": "Dashboard Action via Backend",
       "type": "n8n-nodes-base.httpRequest",
-      "position": [950, 400],
-      "typeVersion": 4,
-      "notes": "All actions log to audit_log: { action_type, user_id, draft_id, message_id, metadata }."
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "typeValidation": "strict", "version": 2 },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Webhook Trigger').item.json.body.action }}",
+              "rightValue": "regenerate",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "wf8-3",
+      "name": "Was Regen?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "typeValidation": "strict", "version": 2 },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.auto_send }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "wf8-4",
+      "name": "Regen Auto-Send?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [940, 220]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.N8N_WEBHOOK_BASE_URL }}/webhook/wf6-send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ draft_id: $json.draft_id, message_id: $('Webhook Trigger').item.json.body.message_id }) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "wf8-5",
+      "name": "Trigger WF6 (Regen Auto-Send)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1180, 160]
+    },
+    {
+      "parameters": {},
+      "id": "wf8-6",
+      "name": "Regen Awaiting Review",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1180, 320]
+    },
+    {
+      "parameters": {},
+      "id": "wf8-7",
+      "name": "Done (Approve/Reject)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [940, 420]
     }
   ],
   "connections": {
-    "Webhook Trigger": { "main": [[{ "node": "Route by Action", "type": "main", "index": 0 }]] },
-    "Route by Action": {
+    "Webhook Trigger": {
+      "main": [[ { "node": "Dashboard Action via Backend", "type": "main", "index": 0 } ]]
+    },
+    "Dashboard Action via Backend": {
+      "main": [[ { "node": "Was Regen?", "type": "main", "index": 0 } ]]
+    },
+    "Was Regen?": {
       "main": [
-        [{ "node": "Approve & Send", "type": "main", "index": 0 }],
-        [{ "node": "Edit & Send", "type": "main", "index": 0 }],
-        [{ "node": "Reject", "type": "main", "index": 0 }],
-        [{ "node": "Regenerate Draft", "type": "main", "index": 0 }],
-        [{ "node": "Reassign", "type": "main", "index": 0 }]
+        [ { "node": "Regen Auto-Send?", "type": "main", "index": 0 } ],
+        [ { "node": "Done (Approve/Reject)", "type": "main", "index": 0 } ]
       ]
     },
-    "Approve & Send": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] },
-    "Edit & Send": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] },
-    "Reject": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] },
-    "Regenerate Draft": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] },
-    "Reassign": { "main": [[{ "node": "Audit Log", "type": "main", "index": 0 }]] }
+    "Regen Auto-Send?": {
+      "main": [
+        [ { "node": "Trigger WF6 (Regen Auto-Send)", "type": "main", "index": 0 } ],
+        [ { "node": "Regen Awaiting Review", "type": "main", "index": 0 } ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" },
-  "tags": [{ "name": "DPCA" }, { "name": "Dashboard Actions" }]
+  "active": false,
+  "settings": { "executionOrder": "v1" }
 }

@@ -2,74 +2,107 @@
   "name": "WF5 — Draft Generation",
   "nodes": [
     {
-      "parameters": { "httpMethod": "POST", "path": "generate-draft" },
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wf5-draft",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "wf5-1",
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
-      "position": [250, 300],
-      "typeVersion": 1,
-      "notes": "Called after WF2 classification with { message_id, tier, category }."
-    },
-    {
-      "parameters": {},
-      "name": "Fetch Message + Classification",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [450, 300],
-      "typeVersion": 4,
-      "notes": "GET /api/messages/:id for full message and classification data."
-    },
-    {
-      "parameters": {},
-      "name": "Call WF4 Context",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [650, 300],
-      "typeVersion": 4,
-      "notes": "Call WF4 retrieve-context webhook to get KB context block."
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "wf5-draft"
     },
     {
       "parameters": {
-        "model": "gpt-4o",
-        "temperature": 0.4,
-        "maxTokens": 800
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL }}/api/internal/generate-draft",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-internal-token", "value": "={{ $env.INTERNAL_API_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message_id: $json.body.message_id }) }}",
+        "options": {
+          "timeout": 60000
+        }
       },
-      "name": "GPT-4o Draft",
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "position": [850, 300],
-      "typeVersion": 1,
-      "notes": "System: P1 brand voice. User: P3 draft generation prompt with classification, message, KB context, channel rules."
-    },
-    {
-      "parameters": {},
-      "name": "Post-Process",
-      "type": "n8n-nodes-base.function",
-      "position": [1050, 300],
-      "typeVersion": 1,
-      "notes": "Validate: no placeholder text, check word count, calculate tone_confidence. Optionally run P6 tone validation."
-    },
-    {
-      "parameters": {},
-      "name": "Store Draft",
+      "id": "wf5-2",
+      "name": "Generate Draft via Backend",
       "type": "n8n-nodes-base.httpRequest",
-      "position": [1250, 300],
-      "typeVersion": 4,
-      "notes": "POST /api/webhooks/n8n/draft-generated. auto_approve=true for Tier 1."
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "typeValidation": "strict", "version": 2 },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.auto_send }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "wf5-3",
+      "name": "Auto-Send?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.N8N_WEBHOOK_BASE_URL }}/webhook/wf6-send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ draft_id: $json.draft_id, message_id: $('Webhook Trigger').item.json.body.message_id }) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "wf5-4",
+      "name": "Trigger WF6 (Auto-Send)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 220]
     },
     {
       "parameters": {},
-      "name": "Route Tier 1 → WF6",
-      "type": "n8n-nodes-base.switch",
-      "position": [1450, 300],
-      "typeVersion": 2,
-      "notes": "If Tier 1 and auto_approve, trigger WF6 auto-send. Otherwise, draft awaits human review."
+      "id": "wf5-5",
+      "name": "Awaiting Review",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [940, 420]
     }
   ],
   "connections": {
-    "Webhook Trigger": { "main": [[{ "node": "Fetch Message + Classification", "type": "main", "index": 0 }]] },
-    "Fetch Message + Classification": { "main": [[{ "node": "Call WF4 Context", "type": "main", "index": 0 }]] },
-    "Call WF4 Context": { "main": [[{ "node": "GPT-4o Draft", "type": "main", "index": 0 }]] },
-    "GPT-4o Draft": { "main": [[{ "node": "Post-Process", "type": "main", "index": 0 }]] },
-    "Post-Process": { "main": [[{ "node": "Store Draft", "type": "main", "index": 0 }]] },
-    "Store Draft": { "main": [[{ "node": "Route Tier 1 → WF6", "type": "main", "index": 0 }]] }
+    "Webhook Trigger": {
+      "main": [[ { "node": "Generate Draft via Backend", "type": "main", "index": 0 } ]]
+    },
+    "Generate Draft via Backend": {
+      "main": [[ { "node": "Auto-Send?", "type": "main", "index": 0 } ]]
+    },
+    "Auto-Send?": {
+      "main": [
+        [ { "node": "Trigger WF6 (Auto-Send)", "type": "main", "index": 0 } ],
+        [ { "node": "Awaiting Review", "type": "main", "index": 0 } ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" },
-  "tags": [{ "name": "DPCA" }, { "name": "Draft" }]
+  "active": false,
+  "settings": { "executionOrder": "v1" }
 }
