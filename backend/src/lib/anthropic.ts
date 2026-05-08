@@ -1,10 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-if (!process.env.ANTHROPIC_API_KEY) {
-  throw new Error('Missing ANTHROPIC_API_KEY')
-}
-
-export const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+// Key is optional at startup; calls will fail at runtime if key is absent
+export const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY ?? '' })
 
 export const MODELS = {
   DRAFT: process.env.ANTHROPIC_MODEL_DRAFT ?? 'claude-sonnet-4-6',
