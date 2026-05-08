@@ -103,11 +103,11 @@ draftsRouter.post('/:id/regenerate', async (req: Request, res: Response) => {
 
   if (draftErr) return res.status(404).json({ error: draftErr.message })
 
-  // Trigger n8n regeneration webhook (WF8)
-  const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL
-  if (n8nWebhookUrl) {
+  // Trigger WF8 regeneration webhook (full URL set in WF8_WEBHOOK_URL env)
+  const wf8Url = process.env.WF8_WEBHOOK_URL
+  if (wf8Url) {
     try {
-      await fetch(`${n8nWebhookUrl}/webhook/draft-action`, {
+      await fetch(wf8Url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

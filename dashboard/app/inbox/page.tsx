@@ -8,6 +8,8 @@ import { useSearchParams } from "next/navigation";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { Button } from "@/components/ui/Button";
 import { ChannelActivity } from "@/components/ui/ChannelActivity";
+import { RegenerateModal } from "@/components/RegenerateModal";
+import { RejectModal } from "@/components/RejectModal";
 
 /*Importing Types*/
 import { Message } from "@/app/types/message";
@@ -110,6 +112,8 @@ function InboxContent() {
   const [draftText, setDraftText] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [regenerateModalOpen, setRegenerateModalOpen] = useState(false);
 
   // Get current user ID and session token for API calls
   useEffect(() => {
@@ -202,17 +206,14 @@ function InboxContent() {
     advanceSelection();
   };
 
-  const handleDiscard = async () => {
+  const handleReject = async (rejectionReason: string) => {
     if (!selected || !userId) return;
     const draftId = selected.drafts?.[0]?.id;
     if (draftId) {
       await fetch(`${BACKEND_URL}/api/drafts/${draftId}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders },
-        body: JSON.stringify({
-          reviewed_by: userId,
-          rejection_reason: "Discarded from inbox",
-        }),
+        body: JSON.stringify({ reviewed_by: userId, rejection_reason: rejectionReason }),
       });
     } else {
       const supabase = createClient();
@@ -221,8 +222,22 @@ function InboxContent() {
         .update({ status: "discarded" })
         .eq("id", selected.id);
     }
+    setRejectModalOpen(false);
     mutate();
     advanceSelection();
+  };
+
+  const handleRegenerate = async (instructions: string) => {
+    if (!selected || !userId) return;
+    const draftId = selected.drafts?.[0]?.id;
+    if (!draftId) return;
+    await fetch(`${BACKEND_URL}/api/drafts/${draftId}/regenerate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeaders },
+      body: JSON.stringify({ reviewed_by: userId, instructions }),
+    });
+    setRegenerateModalOpen(false);
+    mutate();
   };
 
   const pendingCount = messages.filter((m) =>
@@ -278,7 +293,7 @@ function InboxContent() {
       }
       if (e.key === "d" || e.key === "D") {
         e.preventDefault();
-        handleDiscard();
+        if (selected) setRejectModalOpen(true);
       }
       if (e.key === "j" || e.key === "J") {
         e.preventDefault();
@@ -607,11 +622,36 @@ function InboxContent() {
                       Skip
                     </Button>
                     <Button
-                      onClick={handleDiscard}
+                      onClick={() => setRegenerateModalOpen(true)}
+                      bgColor="bg-transparent hover:bg-[#faf8f3]"
+                      textColor="text-[#6b5d3f]"
+                      border="border-[#e8dfc8]"
+                      className="font-sans text-[13px]"
+                      icon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                          />
+                        </svg>
+                      }
+                    >
+                      Regenerate
+                    </Button>
+                    <Button
+                      onClick={() => setRejectModalOpen(true)}
                       bgColor="bg-[#fdf0f0] hover:bg-[#fde8e8]"
                       textColor="text-[#8b3a3a]"
                       border="border-[#e8c0c0]"
-                      className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+                      className="font-sans text-[13px]"
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -629,7 +669,7 @@ function InboxContent() {
                         </svg>
                       }
                     >
-                      Discard
+                      Reject
                     </Button>
                     <Button
                       onClick={handleApprove}
@@ -1021,6 +1061,18 @@ function InboxContent() {
             </div>
           )}
         </div>
+
+        {/* ── MODALS ──────────────────────────────────────────────────────── */}
+        <RejectModal
+          open={rejectModalOpen}
+          onClose={() => setRejectModalOpen(false)}
+          onSubmit={handleReject}
+        />
+        <RegenerateModal
+          open={regenerateModalOpen}
+          onClose={() => setRegenerateModalOpen(false)}
+          onSubmit={handleRegenerate}
+        />
 
         {/* ── STATS BAR ───────────────────────────────────────────────────── */}
         <div
