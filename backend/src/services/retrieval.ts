@@ -21,7 +21,15 @@ export async function retrieveContext(
   messageCategory: string,
   topK = 5,
 ): Promise<RetrievalResult> {
-  const vector = await createEmbedding(query)
+  let vector: number[]
+  try {
+    vector = await createEmbedding(query)
+  } catch (err) {
+    // Embedding provider unavailable — degrade gracefully so draft generation
+    // can still proceed without retrieved KB context.
+    console.warn(`[retrieval] embedding failed (${(err as Error).message}); returning empty context`)
+    return { context_text: '', source_ids: [] }
+  }
 
   const allowedCategories = CATEGORY_FILTER_MAP[messageCategory] ?? ['template', 'faq']
 
