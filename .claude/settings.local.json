@@ -11,7 +11,14 @@
       "Bash(npm install *)",
       "Bash(npx tsc *)",
       "Bash(node -e \"const {Pinecone} = require\\('@pinecone-database/pinecone'\\); const i = new Pinecone\\({apiKey:'x'}\\).index\\('x'\\); console.log\\(typeof i.upsert\\)\")",
-      "Bash(Get-ChildItem -Path \"d:\\\\workspace\\\\DPCA\\\\backend\\\\src\" -Recurse -Directory)"
+      "Bash(Get-ChildItem -Path \"d:\\\\workspace\\\\DPCA\\\\backend\\\\src\" -Recurse -Directory)",
+      "Bash(Get-ChildItem -Path \"d:\\\\workspace\\\\DPCA\" -Directory)",
+      "Bash(Select-Object Name)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\workspace\\\\DPCA\" | Where-Object {$_.PSIsContainer})",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\workspace\\\\DPCA\\\\n8n-workflows\" -File | Select-Object Name, @{Name=\"Size\"; Expression={$_.Length}})",
+      "Bash(npx ts-node *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\workspace\\\\DPCA\\\\n8n\" -Force)",
+      "Bash(Select-Object Name, FullName)"
     ]
   }
 }

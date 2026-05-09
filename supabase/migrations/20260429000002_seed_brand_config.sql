@@ -76,7 +76,7 @@ ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, upd
 
 -- P3 — Draft generation user message template
 INSERT INTO system_config (config_key, config_value, description)
-VALUES ('draft_user_template', to_jsonb($P3$## Your Task
+VALUES ('draft_generation_prompt', to_jsonb($P3$## Your Task
 Write a reply to the following incoming message on behalf of Dream Paris Wedding.
 
 Sender persona for this reply: {{sender_persona}} ({{sender_full_name}}, {{sender_email}})
@@ -128,7 +128,7 @@ ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, upd
 
 -- P5 — Regeneration prompt
 INSERT INTO system_config (config_key, config_value, description)
-VALUES ('regeneration_prompt', to_jsonb($P5$## Task
+VALUES ('draft_regeneration_prompt', to_jsonb($P5$## Task
 Write a fresh reply. A previous draft was generated but needs improvement based on team feedback.
 
 ## Previous Draft (do not reuse phrasing)
