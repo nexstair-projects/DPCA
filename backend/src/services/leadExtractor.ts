@@ -71,8 +71,7 @@ export async function extractLead(messageId: string): Promise<{ lead_id: string;
   const email = extracted.email ?? (msg.sender_email as string | null) ?? null
 
   const leadPayload = {
-    inbox_id: msg.inbox_id as string,
-    message_id: messageId,
+    first_message_id: messageId,
     client_names: extracted.client_names,
     email,
     phone: extracted.phone,
@@ -80,7 +79,7 @@ export async function extractLead(messageId: string): Promise<{ lead_id: string;
     wedding_date: extracted.wedding_date,
     wedding_date_flexible: extracted.wedding_date_flexible,
     guest_count: extracted.guest_count,
-    estimated_value: null,
+    budget_range: extracted.budget_range,
     venue_preference: extracted.venue_preference,
     services_requested: extracted.services_requested,
     how_found_us: extracted.how_found_us,
