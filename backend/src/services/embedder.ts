@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import { openai, EMBEDDING_MODEL } from '../lib/openai'
+import { createEmbedding } from '../lib/embeddings'
 import { getIndex } from '../lib/pinecone'
 
 export async function embedKbEntry(kbId: string): Promise<void> {
@@ -14,11 +14,7 @@ export async function embedKbEntry(kbId: string): Promise<void> {
   // Embed title + content concatenated for richer retrieval signal
   const text = `${row.title}\n\n${row.content}`
 
-  const embRes = await openai.embeddings.create({
-    model: EMBEDDING_MODEL,
-    input: text,
-  })
-  const vector = embRes.data[0].embedding
+  const vector = await createEmbedding(text)
 
   // Upsert into Pinecone with category metadata for filter-before-search (Rule 4)
   const index = getIndex()

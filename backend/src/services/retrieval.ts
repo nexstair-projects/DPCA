@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import { openai, EMBEDDING_MODEL } from '../lib/openai'
+import { createEmbedding } from '../lib/embeddings'
 import { getIndex } from '../lib/pinecone'
 
 // Rule 4 from SONNET_EXECUTION: metadata filters MUST apply BEFORE vector similarity search
@@ -21,12 +21,7 @@ export async function retrieveContext(
   messageCategory: string,
   topK = 5,
 ): Promise<RetrievalResult> {
-  // Embed the query via OpenAI text-embedding-3-small
-  const embeddingRes = await openai.embeddings.create({
-    model: EMBEDDING_MODEL,
-    input: query,
-  })
-  const vector = embeddingRes.data[0].embedding
+  const vector = await createEmbedding(query)
 
   const allowedCategories = CATEGORY_FILTER_MAP[messageCategory] ?? ['template', 'faq']
 
