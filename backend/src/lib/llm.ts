@@ -1,5 +1,6 @@
 import { anthropic, MODELS as ANTHROPIC_MODELS } from './anthropic'
 import { createGeminiClient, GEMINI_MODELS } from './gemini'
+import { createOpenRouterClient, OPENROUTER_MODELS } from './openrouter'
 
 export type LLMRole = 'DRAFT' | 'CLASSIFY' | 'TONE'
 
@@ -10,10 +11,14 @@ export interface LLMResult {
   modelUsed: string
 }
 
-function activeProvider(): 'anthropic' | 'gemini' {
-  if (process.env.ANTHROPIC_API_KEY) return 'anthropic'
-  if (process.env.GEMINI_API_KEY) return 'gemini'
-  throw new Error('No LLM API key configured. Set ANTHROPIC_API_KEY or GEMINI_API_KEY.')
+function hasAnthropic(): boolean {
+  return !!process.env.ANTHROPIC_API_KEY
+}
+function hasGemini(): boolean {
+  return !!process.env.GEMINI_API_KEY
+}
+function hasOpenRouter(): boolean {
+  return !!process.env.OPENROUTER_API_KEY
 }
 
 async function callAnthropic(
@@ -59,9 +64,36 @@ async function callGemini(
   }
 }
 
-// Anthropic takes priority when both keys are set; Gemini is the fallback.
-// If Anthropic call fails for any reason (invalid key, quota, etc.) and GEMINI_API_KEY
-// is available, the request is retried with Gemini automatically.
+async function callOpenRouter(
+  role: LLMRole,
+  system: string,
+  user: string,
+  maxTokens: number,
+  temperature: number,
+): Promise<LLMResult> {
+  const client = createOpenRouterClient()
+  const res = await client.chat.completions.create({
+    model: OPENROUTER_MODELS[role],
+    max_tokens: maxTokens,
+    temperature,
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: user },
+    ],
+  })
+  const text = res.choices[0]?.message?.content ?? ''
+  return {
+    text,
+    inputTokens: res.usage?.prompt_tokens ?? 0,
+    outputTokens: res.usage?.completion_tokens ?? 0,
+    modelUsed: OPENROUTER_MODELS[role],
+  }
+}
+
+// Provider chain: Anthropic → Gemini → OpenRouter.
+// Each provider is only attempted if its API key is set. On failure, falls
+// through to the next available provider; throws only if all configured
+// providers fail (or none are configured).
 export async function callLLM(
   role: LLMRole,
   system: string,
@@ -69,19 +101,40 @@ export async function callLLM(
   maxTokens: number,
   temperature = 1,
 ): Promise<LLMResult> {
-  const provider = activeProvider()
+  const errors: string[] = []
 
-  if (provider === 'anthropic') {
+  if (hasAnthropic()) {
     try {
       return await callAnthropic(role, system, user, maxTokens, temperature)
     } catch (err) {
-      if (process.env.GEMINI_API_KEY) {
-        console.warn(`[llm] Anthropic failed (${(err as Error).message}), falling back to Gemini`)
-        return callGemini(role, system, user, maxTokens, temperature)
-      }
-      throw err
+      const msg = (err as Error).message
+      console.warn(`[llm] Anthropic failed (${msg}), trying next provider`)
+      errors.push(`anthropic: ${msg}`)
     }
   }
 
-  return callGemini(role, system, user, maxTokens, temperature)
+  if (hasGemini()) {
+    try {
+      return await callGemini(role, system, user, maxTokens, temperature)
+    } catch (err) {
+      const msg = (err as Error).message
+      console.warn(`[llm] Gemini failed (${msg}), trying next provider`)
+      errors.push(`gemini: ${msg}`)
+    }
+  }
+
+  if (hasOpenRouter()) {
+    try {
+      return await callOpenRouter(role, system, user, maxTokens, temperature)
+    } catch (err) {
+      const msg = (err as Error).message
+      console.warn(`[llm] OpenRouter failed (${msg})`)
+      errors.push(`openrouter: ${msg}`)
+    }
+  }
+
+  if (errors.length === 0) {
+    throw new Error('No LLM API key configured. Set ANTHROPIC_API_KEY, GEMINI_API_KEY, or OPENROUTER_API_KEY.')
+  }
+  throw new Error(`All LLM providers failed. ${errors.join(' | ')}`)
 }
