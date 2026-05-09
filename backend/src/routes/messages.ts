@@ -7,7 +7,7 @@ export const messagesRouter = Router()
 messagesRouter.get('/', async (req: Request, res: Response) => {
   let query = supabase
     .from('messages')
-    .select('*, drafts(id, draft_text, tone_confidence, status)')
+    .select('*, drafts(id, draft_text, tone_confidence, status, version, context_sources, sender_persona, subject_line, created_at)')
     .order('created_at', { ascending: false })
     .limit(100)
 

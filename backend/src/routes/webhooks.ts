@@ -67,8 +67,7 @@ const draftSchema = z.object({
   model_used: z.string().optional(),
   prompt_tokens: z.number().int().optional(),
   completion_tokens: z.number().int().optional(),
-  tone_confidence: z.number().min(0).max(1).optional(),
-  confidence_score: z.number().min(0).max(1).optional(),
+  tone_confidence: z.number().min(0).max(100).optional(),
   context_sources: z.array(z.string()).optional(),
   auto_approve: z.boolean().optional(),
 })

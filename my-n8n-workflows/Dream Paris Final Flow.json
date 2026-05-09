@@ -1,0 +1,1110 @@
+{
+  "name": "Dream Paris Final Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "e6710d9d-0233-46a3-9920-021b41999626",
+      "name": "Poll Gmail2",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1376,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "simple": false,
+        "filters": {
+          "q": "is:unread in:inbox -category:promotions -category:social -category:updates -subject:unsubscribe -filename:unsubscribe -label:AI-Processing -category:forums"
+        },
+        "options": {}
+      },
+      "id": "0456a257-41b7-43c8-9b21-9bd14030b2ee",
+      "name": "Fetch New Emails2",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -1168,
+        -320
+      ],
+      "webhookId": "e9ce4178-e582-4b1b-8723-8145bffbcbd3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JQxXogELlSWsi59W",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getFirstAddress(obj) {\n  if (!obj || !obj.value || !Array.isArray(obj.value) || obj.value.length === 0) {\n    return '';\n  }\n  return obj.value[0].address || '';\n}\n\nfunction getFirstName(obj) {\n  if (!obj || !obj.value || !Array.isArray(obj.value) || obj.value.length === 0) {\n    return '';\n  }\n  return obj.value[0].name || '';\n}\n\nfunction getHeaderValue(headers, key) {\n  if (!headers || typeof headers !== 'object') return '';\n  const value = headers[key.toLowerCase()];\n  if (!value) return '';\n  const idx = value.indexOf(':');\n  return idx >= 0 ? value.slice(idx + 1).trim() : value.trim();\n}\n\nreturn items.map(item => {\n  const j = item.json;\n\n  const fromEmail = getFirstAddress(j.from);\n  const senderName = getFirstName(j.from);\n  const toEmail = getFirstAddress(j.to);\n\n  const messageIdHeader = j.messageId || getHeaderValue(j.headers, 'message-id') || '';\n  const inReplyTo = getHeaderValue(j.headers, 'in-reply-to') || '';\n\n  const subject = j.subject || getHeaderValue(j.headers, 'subject') || '';\n  const receivedAt = j.date ? new Date(j.date).toISOString() : null;\n\n  const bodyText =\n    (j.text && j.text.trim()) ||\n    (j.textAsHtml && j.textAsHtml.trim()) ||\n    (j.html && j.html.trim()) ||\n    '';\n\n  const snippet = bodyText\n    ? bodyText.replace(/\\s+/g, ' ').trim().slice(0, 500)\n    : '';\n\n  return {\n    json: {\n      gmail_message_id: j.id || '',\n      gmail_thread_id: j.threadId || '',\n      message_id_header: messageIdHeader,\n      in_reply_to: inReplyTo,\n      from_email: fromEmail,\n      sender_name: senderName,\n      to_email: toEmail,\n      subject: subject,\n      received_at: receivedAt,\n      snippet: snippet,\n      body_text: bodyText,\n      status: 'new'\n    }\n  };\n});"
+      },
+      "id": "5399e20f-fc58-482a-9cdc-946f288d1395",
+      "name": "Clean Email1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hefkqlkiuiqhgssdmvad.supabase.co/rest/v1/messages?on_conflict=message_external_id",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=ignore-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"inbox_id\": \"{{$json.inbox_id}}\",\n  \"channel\": \"{{$json.channel}}\",\n  \"sender_email\": \"{{$json.sender_email}}\",\n  \"sender_name\": \"{{$json.sender_name}}\",\n  \"subject\": \"{{$json.subject}}\",\n  \"body_raw\": \"{{$json.body_raw}}\",\n  \"body_clean\": \"{{$json.body_clean}}\",\n  \"message_external_id\": \"{{$json.message_external_id}}\",\n  \"thread_id\": \"{{$json.thread_id}}\",\n  \"in_reply_to\": \"{{$json.in_reply_to}}\",\n  \"classification_status\": \"{{$json.classification_status}}\",\n  \"status\": \"{{$json.status}}\",\n  \"received_at\": \"{{$json.received_at}}\",\n  \"created_at\": \"{{$json.created_at}}\",\n  \"updated_at\": \"{{$json.updated_at}}\"\n}",
+        "options": {}
+      },
+      "id": "175e8c31-d1bf-4506-99fb-beb5120ba5bc",
+      "name": "Insert into Supabase1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -224,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{Array.isArray($json) ? $json.length > 0 : !!$json.id}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "866b7058-9a9b-4190-985f-6de4cec55814",
+      "name": "Inserted?1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Fetch New Emails2').item.json.id }}",
+        "labelIds": [
+          "Label_5737128984049390046"
+        ]
+      },
+      "id": "df325ce3-7c58-4edd-9637-c8e9c09499b5",
+      "name": "Label as AI-Processing2",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        -400
+      ],
+      "webhookId": "2e51a932-b539-40da-81b8-c5c6848ca31f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JQxXogELlSWsi59W",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "{{$env.WF2_WEBHOOK_URL || 'http://host.docker.internal:5678/webhook/wf2-trigger'}}",
+        "sendBody": true,
+        "specifyBody": "otherBody",
+        "options": {}
+      },
+      "id": "89abfa7d-6d32-42f8-8942-e77e45117691",
+      "name": "Trigger WF3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1600,
+        -16
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "0e5fe539-9ab1-4a23-a616-e507cba68628",
+      "name": "Skip Duplicate1",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst sanitize = (val) => {\n  if (!val) return null;\n\n  return String(val)\n    .replace(/\\\\/g, '\\\\\\\\')\n    .replace(/\"/g, '\\\\\"')\n    .replace(/\\n/g, '\\\\n')\n    .replace(/\\r/g, '\\\\r')\n    .replace(/\\t/g, '\\\\t');\n};\n\nreturn items.map(({ json: item }) => {\n  const now = new Date().toISOString();\n\n  return {\n    json: {\n      inbox_id: \"70eb1a2a-d50c-4586-96a2-f12a9ed57118\",\n      channel: \"gmail\",\n\n      sender_email: sanitize(item.from_email),\n      sender_name: sanitize(item.sender_name),\n\n      subject: sanitize(item.subject),\n\n      body_raw: sanitize(item.body_text),\n      body_clean: sanitize(item.body_text),\n\n      message_external_id: sanitize(item.gmail_message_id),\n      thread_id: sanitize(item.gmail_thread_id),\n      in_reply_to: sanitize(item.in_reply_to),\n\n      classification_status: \"pending\",\n      status: \"received\",\n\n      received_at: item.received_at || null,\n\n      created_at: now,\n      updated_at: now\n    }\n  };\n});"
+      },
+      "id": "2f284e65-6dbd-4c15-92cc-8a139d8bc88a",
+      "name": "Clean Email2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://hefkqlkiuiqhgssdmvad.supabase.co/rest/v1/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "=eq.{{$json.message_id}}"
+            },
+            {
+              "name": "select",
+              "value": "id,category,subject,body_raw,body_clean"
+            },
+            {
+              "name": "limit",
+              "value": "1"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Fetch Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        48,
+        128
+      ],
+      "typeVersion": 4,
+      "id": "93fed351-3b38-469e-b108-d5d80200003d",
+      "notes": "GET /api/messages/:id to retrieve full message body."
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI assistant responsible for classifying incoming email messages for a luxury wedding planning company.\n\nWebsite:\nhttps://www.dreampariswedding.com/\n\n---\n\n### 📥 INPUT\n{\n  \"subject\": \"{{ $json.subject }}\",\n  \"message\": \"{{ $json.body_raw }}\"\n}\n\n---\n\n### 🎯 TASK\nAnalyze the subject and message content, then classify the message into ONE category.\n\n---\n\n### 📂 PRIMARY CATEGORIES\nChoose ONLY one of these if applicable:\n\n- vendor → service providers, venues, photographers, florists, etc.\n- collaboration → partnerships, influencers, brand collaborations\n- new_inquiry → potential clients asking about wedding services\n- general → generic questions, unclear intent, or misc messages\n\n---\n\n### 🧠 RULES\n- Carefully understand the intent of the message\n- Prioritize meaning over keywords\n- If the message clearly fits one of the 4 categories, use it\n- If NONE of the above categories fit, create a short, relevant custom category (e.g. \"spam\", \"job_application\", \"follow_up\", etc.)\n- Keep category lowercase and snake_case\n- Do NOT explain your reasoning\n\n---\n\n### ✉️ OUTPUT FORMAT\nReturn ONLY category_name, no extra text etc\n\n---\n\nNow classify the message.",
+        "needsFallback": true,
+        "options": {
+          "batching": {
+            "batchSize": 1,
+            "delayBetweenBatches": 5000
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -384,
+        112
+      ],
+      "id": "3c99a46d-f536-450a-9a5c-f225ed46b39a",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f2293441-0237-4f90-b96c-acfb26e739ab",
+              "name": "message_id",
+              "value": "={{ $('Inserted?1').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        144
+      ],
+      "id": "463c03a0-9220-4a7f-8d7b-f3d3fb11e45b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2528,
+        0
+      ],
+      "id": "d265f5ef-550b-4f4a-a00f-fa088e11931c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        352
+      ],
+      "id": "193a7393-59b4-473a-898e-23a91e026c28",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ntmbjCdIqYZ7NhWU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        352
+      ],
+      "id": "3eab2d6c-5e7e-4de2-aebb-35607501df82",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "aJzOwPMb6AGzNovk",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://hefkqlkiuiqhgssdmvad.supabase.co/rest/v1/messages?id=eq.{{ $('Edit Fields').item.json.message_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=category",
+              "value": "={{ $json.classification }}"
+            },
+            {
+              "name": "classification_status",
+              "value": "classified"
+            },
+            {
+              "name": "classified_at",
+              "value": "={{ $json.clasified_at }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "161df74e-acf4-49f9-b1a1-7a5136082211",
+      "name": "Store Classification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1328,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(({ json }) => {\n  return {\n    json: {\n      classification: json.output,\n      classified_at: new Date().toISOString()\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -816,
+        112
+      ],
+      "id": "369e7753-757d-4c7a-aeea-f306384f7ee4",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "content": "## WF1",
+        "height": 384,
+        "width": 2336
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1504,
+        -432
+      ],
+      "id": "5482ec83-f188-4656-b41a-7c5e20ff29f5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## WF2 - Routing Logic\n\n## New inquiry -> WF5\n\n## Else -> WF7",
+        "height": 512,
+        "width": 2336
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1504,
+        16
+      ],
+      "id": "e67a899f-9e1c-416c-8faa-75ea88cf3eb3",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "url": "=https://hefkqlkiuiqhgssdmvad.supabase.co/rest/v1/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "=eq.{{$json.message_id}}"
+            },
+            {
+              "name": "select",
+              "value": "id,category,subject,body_raw,body_clean"
+            },
+            {
+              "name": "limit",
+              "value": "1"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5a94a200-5468-4975-8ef2-969f6b10894e",
+      "name": "Get Message From Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -784,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst sanitize = (val) => {\n  if (val === null || val === undefined) return null;\n\n  return String(val)\n    .trim()\n    .replace(/\\\\/g, '\\\\\\\\')\n    .replace(/\"/g, '\\\\\"')\n    .replace(/\\r?\\n/g, '\\\\n')\n    .replace(/\\t/g, '\\\\t');\n};\n\nreturn items.map((item, index) => {\n  const editFieldItem = $('Edit Fields1').all()[index]?.json || {};\n  const now = new Date().toISOString();\n\n  return {\n    json: {\n      message_id: sanitize(editFieldItem.message_id),\n      draft_text: item.json.output,\n      model_used: sanitize(\"gemini-2.5-flash\"),\n      created_at: now,\n      updated_at: now\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        832
+      ],
+      "id": "e2db1871-0618-447a-88ea-a533bb1e5d19",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f2293441-0237-4f90-b96c-acfb26e739ab",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1312,
+        832
+      ],
+      "id": "ca0a7740-e808-46bb-b859-c1ee89797daa",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(({ json }) => {\n  return {\n    json: {\n      message_id: json.id,\n      subject: json.subject,\n      category: json.category,\n      body_raw: json.body_raw,\n      body_clean: json.body_clean,\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        832
+      ],
+      "id": "74a40c8c-6f4b-474f-a4ae-2d175bb133fd",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a senior customer relations manager for a luxury wedding planning company based in Paris.\n\nWebsite:\nhttps://www.dreampariswedding.com/\n\n---\n\n### 📥 INPUT \n{\n  \"category\": \"{{ $json.category }}\",\n  \"subject\": \"{{ $json.category }}\",\n  \"message\": \"{{ $json.body_raw }}\"\n}\n\n---\n\n### 🎯 TASK\nWrite a professional, warm, and personalized email reply to the client based on the received message.\n\n---\n\n### 🧠 RULES\n- The message has already been received — you are ONLY responding.\n- Be polite, elegant, and human in tone.\n- Acknowledge their inquiry clearly.\n- Personalize the response using their details (name, wedding date, guest count, location, etc. if available).\n- Keep it concise and high-end (luxury service tone).\n- If information is missing, ask 1–2 relevant follow-up questions.\n- Do NOT include subject line.\n- Do NOT add explanations or meta text.\n- No emojis.\n- No marketing-heavy language.\n\n---\n\n### ✉️ OUTPUT FORMAT\nReturn ONLY the email body.\n\nStructure:\nGreeting → Acknowledgement → Response → (Optional questions) → Closing\n\n---\n\nNow write the reply based on the input message.",
+        "needsFallback": true,
+        "options": {
+          "batching": {
+            "batchSize": 1,
+            "delayBetweenBatches": 5000
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -96,
+        832
+      ],
+      "id": "6eed774f-ad21-4c7e-9aa2-24f9ccdb62cf",
+      "name": "AI Agent1",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        1024
+      ],
+      "id": "b8095848-b4a1-4e93-a9da-ce3e39da6b9a",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ntmbjCdIqYZ7NhWU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        1120
+      ],
+      "id": "1ce3b898-3e93-4e8c-96a3-c09bfc657b91",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "aJzOwPMb6AGzNovk",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Trigger to Get Data from Supabase and organize it",
+        "height": 384,
+        "width": 784
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        736
+      ],
+      "id": "7e91301e-bcc7-4b8c-9522-2b3cf1de488d",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Data with Prompt sent to AI And generated response based on Website branding, human tone and realistic response using Agent\n\n## Here WF4 Will work instead of AI Agent",
+        "height": 624,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        672
+      ],
+      "id": "eb79f5a2-98e9-4143-90bc-ccea5ce14cf0",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Workflow 5 & 4 --- Context Retrieval",
+        "height": 800,
+        "width": 2336,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1504,
+        592
+      ],
+      "id": "5f0a8460-3d27-43cb-a1f9-f0067054e176",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://hefkqlkiuiqhgssdmvad.supabase.co/rest/v1/drafts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmtxbGtpdWlxaGdzc2RtdmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk3MDY0OSwiZXhwIjoyMDkwNTQ2NjQ5fQ.1ma3vJcpSs3Vwj2rXjToeV3jn2E9rQIfPvwYXeQJUH8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=draft_text",
+              "value": "={{ $json.draft_text }}"
+            },
+            {
+              "name": "status",
+              "value": "pending_review"
+            },
+            {
+              "name": "version",
+              "value": "1"
+            },
+            {
+              "name": "message_id",
+              "value": "={{ $json.message_id }}"
+            },
+            {
+              "name": "sender_email",
+              "value": "={{ $('Inserted?1').item.json.sender_email }}"
+            },
+            {
+              "name": "subject_line",
+              "value": "={{ $('Inserted?1').item.json.subject }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "df4c434b-a1de-468e-b741-c490eb8f64e5",
+      "name": "Insert into Supabase For Draft Generation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1888,
+        -304
+      ],
+      "id": "aafab80f-730c-4f80-b535-637731f43637",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ebbc456e-bc6c-4a0b-86fd-1234db10ddff",
+              "leftValue": "id",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -960,
+        -320
+      ],
+      "id": "d3cd8d43-77c8-4b37-893c-f1844d8c61b3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "## WF6 -  Auto Sending Flow \n## Sending Automated Response\n",
+        "height": 464,
+        "width": 2336
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        1488
+      ],
+      "id": "9c44c98f-d579-4d1a-80fa-9d653013da72",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst sanitize = (val) => {\n  if (!val) return null;\n  return String(val)\n    .replace(/\\\\/g, '\\\\\\\\')\n    .replace(/\"/g, '\\\\\"')\n    .replace(/\\n/g, '\\\\n')\n    .replace(/\\r/g, '\\\\r')\n    .replace(/\\t/g, '\\\\t');\n};\n\nreturn [{\n  json: {\n    inbox_id: \"70eb1a2a-d50c-4586-96a2-f12a9ed57118\",\n    channel: \"gmail\",\n    sender_email: sanitize(item.from_email),\n    sender_name: sanitize(item.sender_name),\n    subject: sanitize(item.subject),\n    body_raw: sanitize(item.body_text),\n    body_clean: sanitize(item.body_text),\n    message_external_id: sanitize(item.gmail_message_id),\n    thread_id: sanitize(item.gmail_thread_id),\n    in_reply_to: sanitize(item.in_reply_to),\n    classification_status: \"pending\",\n    status: \"received\",\n    received_at: item.received_at || null,\n    created_at: new Date().toISOString(),\n    updated_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "dfe5d39a-4f01-4d4d-b028-f81722d46f74",
+      "name": "Clean Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2928,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn [\n  {\n    json: {\n      message_id: $input.first().json.id,\n      subject: $input.first().json.subject,\n      category: $input.first().json.category,\n      body_raw: $input.first().json.body_raw,\n      body_clean: $input.first().json.body_clean,\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1984,
+        960
+      ],
+      "id": "a3628527-2b33-4fb2-91d1-fb8606020c16",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst sanitize = (val) => {\n  if (val === null || val === undefined) return null;\n\n  return String(val)\n    .trim()\n    .replace(/\\\\/g, '\\\\\\\\')\n    .replace(/\"/g, '\\\\\"')\n    .replace(/\\r?\\n/g, '\\\\n')\n    .replace(/\\t/g, '\\\\t');\n};\n\nreturn [{\n  json: {\n    message_id: sanitize($('Edit Fields1').first().json.message_id),\n    draft_text: $input.first().json.output,\n    model_used: sanitize(\"gemini-2.5-flash\"),\n    created_at: new Date().toISOString(),\n    updated_at: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1968,
+        1152
+      ],
+      "id": "2b415228-9e13-4df5-a57d-93aa99b2e9cc",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        -400
+      ],
+      "id": "3962c3a0-5ee9-41af-9d35-a43d4955fefc",
+      "name": "Mark a message as read",
+      "webhookId": "ca656cc5-7cdd-4df4-a14c-f1fefaf463f2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JQxXogELlSWsi59W",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Poll Gmail2": {
+      "main": [
+        []
+      ]
+    },
+    "Fetch New Emails2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Email1": {
+      "main": [
+        [
+          {
+            "node": "Clean Email2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert into Supabase1": {
+      "main": [
+        [
+          {
+            "node": "Inserted?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inserted?1": {
+      "main": [
+        [
+          {
+            "node": "Label as AI-Processing2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Duplicate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label as AI-Processing2": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Email2": {
+      "main": [
+        [
+          {
+            "node": "Insert into Supabase1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Message": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Fetch Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Store Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Message From Supabase": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Insert into Supabase For Draft Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Get Message From Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Store Classification": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Clean Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark a message as read": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1a4a732d-2553-42f6-a269-9640669080df",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d1ae4080159cd76a206fd5d4b53ad8aae1d2f7ed3d4e594ed35678572b73edce"
+  },
+  "id": "ZB5y5NIuyOHSz1ih",
+  "tags": []
+}

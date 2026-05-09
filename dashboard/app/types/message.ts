@@ -21,4 +21,10 @@ export type Draft = {
     id: string
     draft_text: string | null
     tone_confidence: number | null
+    status?: string | null
+    version?: number | null
+    context_sources?: string[] | null
+    sender_persona?: string | null
+    subject_line?: string | null
+    created_at?: string | null
 }

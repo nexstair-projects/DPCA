@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/Button";
 import { ChannelActivity } from "@/components/ui/ChannelActivity";
 import { RegenerateModal } from "@/components/RegenerateModal";
 import { RejectModal } from "@/components/RejectModal";
+import { VersionHistory } from "@/components/VersionHistory";
+import { ContextSources } from "@/components/ContextSources";
 
 /*Importing Types*/
 import { Message } from "@/app/types/message";
@@ -114,6 +116,7 @@ function InboxContent() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [regenerateModalOpen, setRegenerateModalOpen] = useState(false);
+  const [viewingDraftId, setViewingDraftId] = useState<string | null>(null);
 
   // Get current user ID and session token for API calls
   useEffect(() => {
@@ -159,8 +162,21 @@ function InboxContent() {
 
   const selected = messages.find((m) => m.id === selectedId) ?? null;
 
+  // Drafts sorted latest-first by version (so [0] is always the most recent)
+  const sortedDrafts = useMemo(() => {
+    if (!selected?.drafts) return [];
+    return [...selected.drafts].sort(
+      (a, b) => (b.version ?? 0) - (a.version ?? 0),
+    );
+  }, [selected]);
+
+  // Active draft = whichever version the user is viewing, or the latest
+  const activeDraft =
+    sortedDrafts.find((d) => d.id === viewingDraftId) ?? sortedDrafts[0] ?? null;
+
   useEffect(() => {
-    if (selected) setDraftText(selected.drafts?.[0]?.draft_text ?? "");
+    setViewingDraftId(null);
+    if (selected) setDraftText(sortedDrafts[0]?.draft_text ?? "");
   }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
@@ -186,10 +202,10 @@ function InboxContent() {
 
   const handleApprove = async () => {
     if (!selected || !userId) return;
-    const draftId = selected.drafts?.[0]?.id;
+    const draftId = activeDraft?.id;
     if (draftId) {
       const editedText =
-        draftText !== selected.drafts[0]?.draft_text ? draftText : undefined;
+        draftText !== activeDraft?.draft_text ? draftText : undefined;
       await fetch(`${BACKEND_URL}/api/drafts/${draftId}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders },
@@ -208,7 +224,7 @@ function InboxContent() {
 
   const handleReject = async (rejectionReason: string) => {
     if (!selected || !userId) return;
-    const draftId = selected.drafts?.[0]?.id;
+    const draftId = activeDraft?.id;
     if (draftId) {
       await fetch(`${BACKEND_URL}/api/drafts/${draftId}/reject`, {
         method: "POST",
@@ -229,7 +245,7 @@ function InboxContent() {
 
   const handleRegenerate = async (instructions: string) => {
     if (!selected || !userId) return;
-    const draftId = selected.drafts?.[0]?.id;
+    const draftId = activeDraft?.id;
     if (!draftId) return;
     await fetch(`${BACKEND_URL}/api/drafts/${draftId}/regenerate`, {
       method: "POST",
@@ -249,7 +265,6 @@ function InboxContent() {
   const autoSentCount = messages.filter((m) =>
     SENT_STATUSES.includes(m.status ?? ""),
   ).length;
-  const activeDraft = selected?.drafts?.[0];
   const [sendingMode, setSendingMode] = useState<"auto" | "approve" | "draft">(
     "approve",
   );
@@ -275,7 +290,7 @@ function InboxContent() {
       .map((d) => d?.tone_confidence)
       .filter((s): s is number => s != null);
     return scores.length > 0
-      ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 100)
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
       : null;
   }, [messages]);
 
@@ -964,6 +979,19 @@ function InboxContent() {
                     })}
                   </div>
                 </div>
+
+                {/* Versions (D3) */}
+                <VersionHistory
+                  drafts={sortedDrafts}
+                  activeDraftId={activeDraft?.id ?? null}
+                  onSelectVersion={(d) => {
+                    setViewingDraftId(d.id);
+                    setDraftText(d.draft_text ?? "");
+                  }}
+                />
+
+                {/* Context Sources (D4) */}
+                <ContextSources sourceIds={activeDraft?.context_sources} />
 
                 {/* Stats */}
                 <div>

@@ -187,12 +187,16 @@ export async function generateDraft(
   const toneResult = await runToneValidation(draftText, bodyClean, category, channel)
   const toneScore = toneResult?.tone_score ?? null
 
-  // Determine status: commission-flagged drafts always need human review
+  // Tone gate: scores below threshold force human review even for Tier 1 (SONNET_EXECUTION rule)
+  const toneThreshold = Number(process.env.TONE_CONFIDENCE_THRESHOLD ?? 75)
+  const toneBelowThreshold = toneScore !== null && toneScore < toneThreshold
+
+  // Determine status: commission-flagged or low-tone drafts always need human review
   const autoSendRules = await getConfigJson<AutoSendRule[]>('auto_send_rules') ?? []
   const autoSendRule = autoSendRules.find(
     (r) => r.tier === 1 && r.category === category,
   )
-  const canAutoSend = !commissionFlagged && autoSendRule?.auto_send === true
+  const canAutoSend = !commissionFlagged && !toneBelowThreshold && autoSendRule?.auto_send === true
   const status = canAutoSend ? 'auto_approved' : 'pending_review'
 
   // Insert draft
@@ -204,7 +208,7 @@ export async function generateDraft(
       model_used: modelUsed,
       prompt_tokens: inputTokens,
       completion_tokens: outputTokens,
-      tone_confidence: toneScore ? toneScore / 100 : null,
+      tone_confidence: toneScore,
       sender_persona: route.sender,
       sender_email: route.from,
       subject_line: finalSubject,
