@@ -60,6 +60,8 @@ async function callGemini(
 }
 
 // Anthropic takes priority when both keys are set; Gemini is the fallback.
+// If Anthropic call fails for any reason (invalid key, quota, etc.) and GEMINI_API_KEY
+// is available, the request is retried with Gemini automatically.
 export async function callLLM(
   role: LLMRole,
   system: string,
@@ -68,7 +70,18 @@ export async function callLLM(
   temperature = 1,
 ): Promise<LLMResult> {
   const provider = activeProvider()
-  return provider === 'anthropic'
-    ? callAnthropic(role, system, user, maxTokens, temperature)
-    : callGemini(role, system, user, maxTokens, temperature)
+
+  if (provider === 'anthropic') {
+    try {
+      return await callAnthropic(role, system, user, maxTokens, temperature)
+    } catch (err) {
+      if (process.env.GEMINI_API_KEY) {
+        console.warn(`[llm] Anthropic failed (${(err as Error).message}), falling back to Gemini`)
+        return callGemini(role, system, user, maxTokens, temperature)
+      }
+      throw err
+    }
+  }
+
+  return callGemini(role, system, user, maxTokens, temperature)
 }
