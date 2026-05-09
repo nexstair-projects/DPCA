@@ -13,7 +13,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:300
 type Draft = { id: string; draft_text: string | null; tone_confidence: number | null; status: string | null }
 
 type Message = {
-  id: string
+  id: string 
   sender_name: string | null
   sender_email: string | null
   subject: string | null
