@@ -6,7 +6,7 @@ export const draftsRouter = Router()
 
 // POST /api/drafts/:id/approve — approve draft & mark message approved
 const approveSchema = z.object({
-  reviewed_by: z.string().uuid(),
+  reviewed_by: z.string().uuid().optional(),
   sender_email: z.string().email().optional(),
   draft_text: z.string().optional(),
   edited_text: z.string().optional(),
@@ -31,8 +31,8 @@ draftsRouter.post('/:id/approve', async (req: Request, res: Response) => {
 
   const updatePayload: Record<string, unknown> = {
     status,
-    reviewed_by,
     updated_at: new Date().toISOString(),
+    ...(reviewed_by ? { reviewed_by } : {}),
     ...(sender_email ? { sender_email } : {}),
   }
 
@@ -69,7 +69,7 @@ draftsRouter.post('/:id/approve', async (req: Request, res: Response) => {
   // Log to audit trail
   await supabase.from('audit_log').insert({
     action_type: edited_text ? 'edit_and_approve' : 'approve',
-    user_id: reviewed_by,
+    ...(reviewed_by ? { user_id: reviewed_by } : {}),
     draft_id: draftId,
     message_id: draft.message_id,
     metadata: edited_text ? { edited: true } : {},

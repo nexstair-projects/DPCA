@@ -232,7 +232,7 @@ function InboxContent() {
   }, [selected, filtered, handleSelect]);
 
   const handleApprove = async () => {
-    if (!selected || !userId) return;
+    if (!selected) return;
     const draftId = activeDraft?.id;
     setIsSending(true);
     setActionAlert(null);
@@ -756,7 +756,7 @@ function InboxContent() {
                     </Button>
                     <Button
                       onClick={handleApprove}
-                      disabled={isSending || !selected || !userId}
+                      disabled={isSending || !selected}
                       bgColor="bg-[#3d7a5a] hover:bg-[#2d6048]"
                       textColor="text-white"
                       border="border-[#2d6048] hover:border-[#3d7a5a]"
