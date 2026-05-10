@@ -81,7 +81,12 @@ webhooksRouter.post('/n8n/draft-generated', async (req: Request, res: Response) 
 
   const { data, error } = await supabase
     .from('drafts')
-    .insert({ ...fields, message_id, status })
+    .insert({
+      ...fields,
+      message_id,
+      status,
+      original_draft_text: fields.draft_text,
+    })
     .select('id')
     .single()
 
