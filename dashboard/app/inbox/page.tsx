@@ -215,9 +215,14 @@ function InboxContent() {
 
     const result = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new Error(
-        result?.error || result?.message || `Webhook call failed with status ${res.status}`,
-      );
+      const errMsg = typeof result?.error === 'string'
+        ? result.error
+        : typeof result?.message === 'string'
+          ? result.message
+          : result?.error
+            ? JSON.stringify(result.error)
+            : `Webhook call failed with status ${res.status}`;
+      throw new Error(errMsg);
     }
 
     return result;
@@ -253,7 +258,12 @@ function InboxContent() {
         });
         if (!response.ok) {
           const errorBody = await response.json().catch(() => ({}));
-          throw new Error(errorBody?.error || response.statusText || "Failed to approve draft");
+          const errMsg = typeof errorBody?.error === 'string'
+            ? errorBody.error
+            : errorBody?.error
+              ? JSON.stringify(errorBody.error)
+              : response.statusText || "Failed to approve draft";
+          throw new Error(errMsg);
         }
       } else {
         const supabase = createClient();
@@ -280,7 +290,11 @@ function InboxContent() {
       await mutate();
       advanceSelection();
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
+      const message = err instanceof Error
+        ? err.message
+        : typeof err === 'object'
+          ? JSON.stringify(err)
+          : String(err);
       const alertMessage = `Send failed: ${message}`;
       setActionAlert(alertMessage);
       window.alert(alertMessage);
