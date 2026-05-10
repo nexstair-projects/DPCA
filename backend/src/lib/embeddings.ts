@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { createOpenRouterClient } from './openrouter'
 
 // Both embedding providers are tried in order: Gemini first (free, 768-dim),
 // OpenRouter NVIDIA Llama Nemotron as fallback (free via OpenRouter).
@@ -26,12 +25,29 @@ async function embedWithGemini(text: string): Promise<number[]> {
 }
 
 async function embedWithOpenRouter(text: string): Promise<number[]> {
-  const client = createOpenRouterClient()
-  const res = await client.embeddings.create({
-    model: OPENROUTER_EMBEDDING_MODEL,
-    input: text,
+  const apiKey = process.env.OPENROUTER_API_KEY ?? ''
+  const res = await fetch('https://openrouter.ai/api/v1/embeddings', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({ model: OPENROUTER_EMBEDDING_MODEL, input: text }),
   })
-  return res.data[0].embedding
+
+  const json = (await res.json()) as Record<string, unknown>
+
+  if (!res.ok) {
+    throw new Error(`OpenRouter embedding HTTP ${res.status}: ${JSON.stringify(json)}`)
+  }
+
+  // Standard OpenAI-compatible format: { data: [{ embedding: number[] }] }
+  const data = json.data as Array<{ embedding: number[] }> | undefined
+  if (Array.isArray(data) && Array.isArray(data[0]?.embedding)) {
+    return data[0].embedding
+  }
+
+  throw new Error(`Unexpected OpenRouter embedding response: ${JSON.stringify(json).slice(0, 400)}`)
 }
 
 export async function createEmbedding(text: string): Promise<number[]> {
