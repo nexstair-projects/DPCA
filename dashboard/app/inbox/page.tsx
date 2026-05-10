@@ -113,6 +113,7 @@ function InboxContent() {
   );
   const [draftText, setDraftText] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [regenerateModalOpen, setRegenerateModalOpen] = useState(false);
@@ -124,23 +125,19 @@ function InboxContent() {
   // Get current user ID and session token for API calls
   useEffect(() => {
     const supabase = createClient();
-    console.log('🔐 Checking auth session...');
-    supabase.auth.getSession().then(({ data, error }) => {
-      console.log('🔐 getSession result:', { session: data.session ? 'EXISTS' : 'NONE', error });
-      if (error) {
-        console.error('🔐 Auth error:', error.message);
-        return;
-      }
-      if (!data.session) {
-        console.warn('🔐 No session found. User may not be logged in.');
-        return;
-      }
-      console.log('🔐 Session user:', data.session.user?.email);
-      console.log('🔐 Token (first 30 chars):', data.session.access_token.slice(0, 30) + '...');
-      setUserId(data.session.user?.id ?? null);
+    supabase.auth.getSession().then(async ({ data, error }) => {
+      if (error || !data.session) return;
       setAccessToken(data.session.access_token ?? null);
-    }).catch(err => {
-      console.error('🔐 Unexpected auth error:', err);
+
+      // reviewed_by FK references users.id (custom table), not auth.users.id
+      const { data: profile } = await supabase
+        .from('users')
+        .select('id, email')
+        .eq('auth_id', data.session.user.id)
+        .single();
+
+      setUserId(profile?.id ?? null);
+      setUserEmail(profile?.email ?? data.session.user.email ?? null);
     });
   }, []);
 
@@ -249,6 +246,7 @@ function InboxContent() {
           headers: { "Content-Type": "application/json", ...authHeaders },
           body: JSON.stringify({
             reviewed_by: userId,
+            sender_email: userEmail,
             draft_text: draftText,
             edited_text: editedText,
           }),

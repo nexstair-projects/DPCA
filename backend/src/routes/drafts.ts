@@ -7,6 +7,7 @@ export const draftsRouter = Router()
 // POST /api/drafts/:id/approve — approve draft & mark message approved
 const approveSchema = z.object({
   reviewed_by: z.string().uuid(),
+  sender_email: z.string().email().optional(),
   draft_text: z.string().optional(),
   edited_text: z.string().optional(),
 })
@@ -15,7 +16,7 @@ draftsRouter.post('/:id/approve', async (req: Request, res: Response) => {
   const parsed = approveSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
 
-  const { reviewed_by, draft_text, edited_text } = parsed.data
+  const { reviewed_by, sender_email, draft_text, edited_text } = parsed.data
   const draftId = req.params.id
   const status = edited_text ? 'edited_approved' : 'approved'
 
@@ -32,6 +33,7 @@ draftsRouter.post('/:id/approve', async (req: Request, res: Response) => {
     status,
     reviewed_by,
     updated_at: new Date().toISOString(),
+    ...(sender_email ? { sender_email } : {}),
   }
 
   if (edited_text !== undefined) {
