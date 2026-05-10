@@ -198,8 +198,8 @@ function InboxContent() {
     const payload = {
       message_id: selected.id,
       draft_id: activeDraft?.id,
-      inbox_id: (selected as any).inbox_id ?? null,
-      thread_id: (selected as any).thread_id ?? null,
+      inbox_id: selected.inbox_id ?? null,
+      thread_id: selected.thread_id ?? null,
       channel: selected.channel,
       sender_email: selected.sender_email,
       sender_name: selected.sender_name,
