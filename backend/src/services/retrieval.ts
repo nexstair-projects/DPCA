@@ -25,8 +25,8 @@ export async function retrieveContext(
   try {
     vector = await createEmbedding(query)
   } catch (err) {
-    // Embedding provider unavailable — degrade gracefully so draft generation
-    // can still proceed without retrieved KB context.
+    // All embedding providers exhausted — degrade gracefully so draft
+    // generation still proceeds without retrieved KB context.
     console.warn(`[retrieval] embedding failed (${(err as Error).message}); returning empty context`)
     return { context_text: '', source_ids: [] }
   }
