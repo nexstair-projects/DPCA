@@ -4,6 +4,8 @@ export type Message = {
     sender_email: string | null
     subject: string | null
     body_raw: string | null
+    inbox_id?: string | null
+    thread_id?: string | null
     category: string | null
     priority: string | null
     tier: number | null
@@ -20,6 +22,8 @@ export type Message = {
 export type Draft = {
     id: string
     draft_text: string | null
+    original_draft_text?: string | null
+    edited_text?: string | null
     tone_confidence: number | null
     status?: string | null
     version?: number | null

@@ -117,6 +117,9 @@ function InboxContent() {
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [regenerateModalOpen, setRegenerateModalOpen] = useState(false);
   const [viewingDraftId, setViewingDraftId] = useState<string | null>(null);
+  const [isSending, setIsSending] = useState(false);
+  const [actionAlert, setActionAlert] = useState<string | null>(null);
+  const N8N_APPROVE_SEND_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_APPROVE_SEND_WEBHOOK_URL ?? "";
 
   // Get current user ID and session token for API calls
   useEffect(() => {
@@ -192,6 +195,37 @@ function InboxContent() {
     setDraftText(msg.drafts?.[0]?.draft_text ?? "");
   }, []);
 
+  const sendApproveWebhook = async () => {
+    if (!selected || !N8N_APPROVE_SEND_WEBHOOK_URL) return null;
+
+    const payload = {
+      message_id: selected.id,
+      draft_id: activeDraft?.id,
+      inbox_id: (selected as any).inbox_id ?? null,
+      thread_id: (selected as any).thread_id ?? null,
+      channel: selected.channel,
+      sender_email: selected.sender_email,
+      sender_name: selected.sender_name,
+      subject: selected.subject,
+      draft_text: draftText,
+    };
+
+    const res = await fetch(N8N_APPROVE_SEND_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(
+        result?.error || result?.message || `Webhook call failed with status ${res.status}`,
+      );
+    }
+
+    return result;
+  };
+
   const advanceSelection = useCallback(() => {
     if (!selected) return;
     const idx = filtered.findIndex((m) => m.id === selected.id);
@@ -203,23 +237,59 @@ function InboxContent() {
   const handleApprove = async () => {
     if (!selected || !userId) return;
     const draftId = activeDraft?.id;
-    if (draftId) {
-      const editedText =
-        draftText !== activeDraft?.draft_text ? draftText : undefined;
-      await fetch(`${BACKEND_URL}/api/drafts/${draftId}/approve`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders },
-        body: JSON.stringify({ reviewed_by: userId, edited_text: editedText }),
-      });
-    } else {
-      const supabase = createClient();
-      await supabase
-        .from("messages")
-        .update({ status: "approved" })
-        .eq("id", selected.id);
+    setIsSending(true);
+    setActionAlert(null);
+
+    try {
+      if (draftId) {
+        const editedText =
+          draftText !== activeDraft?.draft_text ? draftText : undefined;
+        const response = await fetch(`${BACKEND_URL}/api/drafts/${draftId}/approve`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...authHeaders },
+          body: JSON.stringify({
+            reviewed_by: userId,
+            draft_text: draftText,
+            edited_text: editedText,
+          }),
+        });
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          throw new Error(errorBody?.error || response.statusText || "Failed to approve draft");
+        }
+      } else {
+        const supabase = createClient();
+        await supabase
+          .from("messages")
+          .update({ status: "approved" })
+          .eq("id", selected.id);
+      }
+
+      const webhookResponse = await sendApproveWebhook();
+      const alertMessage =
+        webhookResponse?.message ??
+        webhookResponse?.status ??
+        webhookResponse?.result ??
+        (N8N_APPROVE_SEND_WEBHOOK_URL
+          ? "Approve & send webhook completed successfully."
+          : "Approve completed; no send webhook configured.");
+
+      setActionAlert(alertMessage);
+      if (N8N_APPROVE_SEND_WEBHOOK_URL) {
+        window.alert(`Send webhook response: ${alertMessage}`);
+      }
+
+      await mutate();
+      advanceSelection();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      const alertMessage = `Send failed: ${message}`;
+      setActionAlert(alertMessage);
+      window.alert(alertMessage);
+      console.error("Approve & Send error:", err);
+    } finally {
+      setIsSending(false);
     }
-    mutate();
-    advanceSelection();
   };
 
   const handleReject = async (rejectionReason: string) => {
@@ -688,6 +758,7 @@ function InboxContent() {
                     </Button>
                     <Button
                       onClick={handleApprove}
+                      disabled={isSending || !selected || !userId}
                       bgColor="bg-[#3d7a5a] hover:bg-[#2d6048]"
                       textColor="text-white"
                       border="border-[#2d6048] hover:border-[#3d7a5a]"
@@ -709,10 +780,25 @@ function InboxContent() {
                         </svg>
                       }
                     >
-                      Approve & Send
+                      {isSending ? "Sending..." : "Approve & Send"}
                     </Button>
                   </div>
                 </div>
+                {actionAlert ? (
+                  <div
+                    style={{
+                      marginTop: 14,
+                      padding: 12,
+                      borderRadius: 12,
+                      background: "#f6ffed",
+                      border: "1px solid #b7eb8f",
+                      color: "#175a24",
+                      fontSize: 13,
+                    }}
+                  >
+                    {actionAlert}
+                  </div>
+                ) : null}
 
                 {/* Review body — two columns */}
                 <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
