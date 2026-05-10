@@ -250,8 +250,8 @@ function InboxContent() {
           method: "POST",
           headers: { "Content-Type": "application/json", ...authHeaders },
           body: JSON.stringify({
-            reviewed_by: userId,
-            sender_email: userEmail,
+            reviewed_by: userId ?? undefined,
+            sender_email: userEmail ?? undefined,
             draft_text: draftText,
             edited_text: editedText,
           }),
