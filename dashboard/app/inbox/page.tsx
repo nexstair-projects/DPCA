@@ -67,8 +67,8 @@ const FILTERS = [
   { key: "all", label: "All" },
   { key: "new_inquiry", label: "Inquiry" },
   { key: "existing_client", label: "Client" },
-  { key: "vendor", label: "Vendor" },
-  { key: "collaboration", label: "Collab" },
+  // { key: "vendor", label: "Vendor" },
+  // { key: "collaboration", label: "Collab" },
 ];
 
 const BACKEND_URL =
