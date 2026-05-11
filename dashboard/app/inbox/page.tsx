@@ -67,6 +67,7 @@ const FILTERS = [
   { key: "all", label: "All" },
   { key: "new_inquiry", label: "Inquiry" },
   { key: "existing_client", label: "Client" },
+  { key: "general", label: "General" },
   // { key: "vendor", label: "Vendor" },
   // { key: "collaboration", label: "Collab" },
 ];
@@ -183,7 +184,14 @@ function InboxContent() {
     let result = messages;
     if (channelFilter !== "all")
       result = result.filter((m) => m.channel === channelFilter);
-    if (filter !== "all") result = result.filter((m) => m.category === filter);
+
+    // Show everything except `general` when the `all` tab is active.
+    if (filter === "all") {
+      result = result.filter((m) => (m.category ?? "") !== "general");
+    } else {
+      result = result.filter((m) => m.category === filter);
+    }
+
     return result;
   }, [messages, channelFilter, filter]);
 
