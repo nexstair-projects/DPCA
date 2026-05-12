@@ -121,7 +121,8 @@ function InboxContent() {
   const [viewingDraftId, setViewingDraftId] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [actionAlert, setActionAlert] = useState<string | null>(null);
-  const N8N_APPROVE_SEND_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_APPROVE_SEND_WEBHOOK_URL ?? "";
+  const N8N_APPROVE_SEND_WEBHOOK_URL =
+    process.env.NEXT_PUBLIC_N8N_APPROVE_SEND_WEBHOOK_URL ?? "";
 
   // Get current user ID and session token for API calls
   useEffect(() => {
@@ -132,9 +133,9 @@ function InboxContent() {
 
       // reviewed_by FK references users.id (custom table), not auth.users.id
       const { data: profile } = await supabase
-        .from('users')
-        .select('id, email')
-        .eq('auth_id', data.session.user.id)
+        .from("users")
+        .select("id, email")
+        .eq("auth_id", data.session.user.id)
         .single();
 
       setUserId(profile?.id ?? null);
@@ -151,12 +152,19 @@ function InboxContent() {
     isLoading,
     mutate,
   } = useSWR<Message[]>(accessToken ? "inbox-messages" : null, async () => {
-    console.log('📡 Fetching messages with token:', accessToken ? accessToken.slice(0, 20) + '…' : 'NULL');
-    const res = await fetch(`${BACKEND_URL}/api/messages`, { headers: authHeaders });
+    console.log(
+      "📡 Fetching messages with token:",
+      accessToken ? accessToken.slice(0, 20) + "…" : "NULL",
+    );
+    const res = await fetch(`${BACKEND_URL}/api/messages`, {
+      headers: authHeaders,
+    });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      console.error('📡 API error:', res.status, body);
-      throw new Error(`${res.status}: ${body.error ?? 'Unknown'} — ${body.detail ?? ''}`);
+      console.error("📡 API error:", res.status, body);
+      throw new Error(
+        `${res.status}: ${body.error ?? "Unknown"} — ${body.detail ?? ""}`,
+      );
     }
     return res.json();
   });
@@ -173,7 +181,9 @@ function InboxContent() {
 
   // Active draft = whichever version the user is viewing, or the latest
   const activeDraft =
-    sortedDrafts.find((d) => d.id === viewingDraftId) ?? sortedDrafts[0] ?? null;
+    sortedDrafts.find((d) => d.id === viewingDraftId) ??
+    sortedDrafts[0] ??
+    null;
 
   useEffect(() => {
     setViewingDraftId(null);
@@ -223,13 +233,14 @@ function InboxContent() {
 
     const result = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const errMsg = typeof result?.error === 'string'
-        ? result.error
-        : typeof result?.message === 'string'
-          ? result.message
-          : result?.error
-            ? JSON.stringify(result.error)
-            : `Webhook call failed with status ${res.status}`;
+      const errMsg =
+        typeof result?.error === "string"
+          ? result.error
+          : typeof result?.message === "string"
+            ? result.message
+            : result?.error
+              ? JSON.stringify(result.error)
+              : `Webhook call failed with status ${res.status}`;
       throw new Error(errMsg);
     }
 
@@ -254,23 +265,27 @@ function InboxContent() {
       if (draftId) {
         const editedText =
           draftText !== activeDraft?.draft_text ? draftText : undefined;
-        const response = await fetch(`${BACKEND_URL}/api/drafts/${draftId}/approve`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", ...authHeaders },
-          body: JSON.stringify({
-            reviewed_by: userId ?? undefined,
-            sender_email: userEmail ?? undefined,
-            draft_text: draftText,
-            edited_text: editedText,
-          }),
-        });
+        const response = await fetch(
+          `${BACKEND_URL}/api/drafts/${draftId}/approve`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json", ...authHeaders },
+            body: JSON.stringify({
+              reviewed_by: userId ?? undefined,
+              sender_email: userEmail ?? undefined,
+              draft_text: draftText,
+              edited_text: editedText,
+            }),
+          },
+        );
         if (!response.ok) {
           const errorBody = await response.json().catch(() => ({}));
-          const errMsg = typeof errorBody?.error === 'string'
-            ? errorBody.error
-            : errorBody?.error
-              ? JSON.stringify(errorBody.error)
-              : response.statusText || "Failed to approve draft";
+          const errMsg =
+            typeof errorBody?.error === "string"
+              ? errorBody.error
+              : errorBody?.error
+                ? JSON.stringify(errorBody.error)
+                : response.statusText || "Failed to approve draft";
           throw new Error(errMsg);
         }
       } else {
@@ -298,11 +313,12 @@ function InboxContent() {
       await mutate();
       advanceSelection();
     } catch (err) {
-      const message = err instanceof Error
-        ? err.message
-        : typeof err === 'object'
-          ? JSON.stringify(err)
-          : String(err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object"
+            ? JSON.stringify(err)
+            : String(err);
       const alertMessage = `Send failed: ${message}`;
       setActionAlert(alertMessage);
       window.alert(alertMessage);
@@ -319,7 +335,10 @@ function InboxContent() {
       await fetch(`${BACKEND_URL}/api/drafts/${draftId}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders },
-        body: JSON.stringify({ reviewed_by: userId, rejection_reason: rejectionReason }),
+        body: JSON.stringify({
+          reviewed_by: userId,
+          rejection_reason: rejectionReason,
+        }),
       });
     } else {
       const supabase = createClient();
@@ -644,15 +663,7 @@ function InboxContent() {
               >
                 {/* Review header */}
                 <div
-                  style={{
-                    padding: "12px 20px",
-                    borderBottom: `1px solid ${S.border}`,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexShrink: 0,
-                    background: S.white,
-                  }}
+                  className={`py-3 px-5 border-b flex flex-col gap-[10px] justify-between items-start flex-shrink-0 bg-[${S.white}] border-[${S.border}]`}
                 >
                   <div>
                     <div
@@ -693,14 +704,7 @@ function InboxContent() {
                       </span>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 8,
-                      flexShrink: 0,
-                      marginLeft: 16,
-                    }}
-                  >
+                  <div className="flex gap-2 flex-shrink-0">
                     <Button
                       onClick={() => setSelectedId(null)}
                       bgColor="bg-transaparent hover:bg-[#faf8f3]"
