@@ -23,7 +23,7 @@ export function VersionHistory({ drafts, activeDraftId, onSelectVersion }: Props
 
   if (sorted.length <= 1 && !expanded) {
     return (
-      <div>
+      <div className="component-VersionHistory">
         <div
           style={{
             fontSize: 9,
