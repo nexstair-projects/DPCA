@@ -32,7 +32,7 @@ export function ContextSources({ sourceIds }: Props) {
   }, [sourceIds]);
 
   return (
-    <div>
+    <div className="component-ContextSources">
       <div
         style={{
           fontSize: 9,
