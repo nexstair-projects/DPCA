@@ -29,6 +29,18 @@ const config: Config = {
       },
     },
   },
+  // tailwind.config.js
+extend: {
+  keyframes: {
+    pulse: {
+      "0%, 100%": { opacity: 1 },
+      "50%": { opacity: 0.4 },
+    },
+  },
+  animation: {
+    pulse: "pulse 2s infinite",
+  },
+},
   plugins: [],
 }
 export default config
