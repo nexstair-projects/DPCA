@@ -99,18 +99,18 @@ export default function Sidebar() {
   return (
     <aside className="w-[220px] flex-shrink-0 bg-dpw-dark flex flex-col font-sans">
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-dpw-border">
-        <div className="font-serif text-[15px] font-semibold text-white leading-[1.2] mb-1">
+      <div className="px-6 py-6 border-b border-[#2e2820]">
+        <div className="font-serif text-[17px] font-semibold text-dpw-gold-light leading-[1.2] mb-1">
           Dream Paris Wedding
         </div>
 
-        <div className="text-[10px] text-dpw-muted tracking-[0.08em] mb-[10px]">
+        <div className="text-[10px] text-[#8a7a5a] tracking-[1.5px] mb-[10px]">
           AI COMMAND CENTRE
         </div>
 
-        <div className="inline-flex items-center gap-[5px] bg-[rgba(45,122,78,0.18)] rounded-xl px-[10px] py-[3px] text-[10px] text-[#4dbb80]">
-          <span className="w-[5px] h-[5px] rounded-full bg-[#4dbb80]" />
-          AI Active
+        <div className="inline-flex items-center gap-[5px] bg-[#b8960c26] rounded-xl px-[10px] py-[3px] text-[10px] border border-[#b8960c4d] text-dpw-gold-light tracking-[1.5px]">
+          <div className="w-[6px] h-[6px] bg-dpw-gold-light rounded-full animate-pulse"></div>
+          AI Assistant Active
         </div>
       </div>
 
@@ -120,7 +120,7 @@ export default function Sidebar() {
       </Suspense>
 
       {/* Footer */}
-      <div className="px-[16px] py-[14px] border-t border-dpw-border flex items-center gap-[10px]">
+      <div className="px-[16px] py-[14px] border-t border-[#2e2820] flex items-center gap-[10px]">
         <div className="w-[30px] h-[30px] rounded-full bg-dpw-gold flex items-center justify-center text-[12px] font-bold text-white flex-shrink-0">
           {initial}
         </div>

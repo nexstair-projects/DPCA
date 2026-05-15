@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { S } from "@/lib/theme";
 import type { Draft } from "@/app/types/message";
 
 type Props = {
@@ -10,7 +9,11 @@ type Props = {
   onSelectVersion: (draft: Draft) => void;
 };
 
-export function VersionHistory({ drafts, activeDraftId, onSelectVersion }: Props) {
+export function VersionHistory({
+  drafts,
+  activeDraftId,
+  onSelectVersion,
+}: Props) {
   const [expanded, setExpanded] = useState(false);
 
   if (!drafts || drafts.length === 0) return null;
@@ -24,93 +27,87 @@ export function VersionHistory({ drafts, activeDraftId, onSelectVersion }: Props
   if (sorted.length <= 1 && !expanded) {
     return (
       <div className="component-VersionHistory">
-        <div
-          style={{
-            fontSize: 9,
-            letterSpacing: "2px",
-            textTransform: "uppercase",
-            color: S.muted,
-            marginBottom: 10,
-            paddingBottom: 6,
-            borderBottom: `1px solid ${S.border}`,
-          }}
-        >
+
+        <div className="text-[9px] tracking-[2px] uppercase text-dpw-muted mb-2.5 pb-1.5 border-b border-dpw-border">
           Versions
         </div>
-        <div style={{ fontSize: 11, color: S.muted }}>
+
+        <div className="text-[11px] text-dpw-muted">
           v{sorted[0].version ?? 1} only
         </div>
+
       </div>
     );
   }
 
   return (
     <div>
+
       <div
         onClick={() => setExpanded((e) => !e)}
-        style={{
-          fontSize: 9,
-          letterSpacing: "2px",
-          textTransform: "uppercase",
-          color: S.muted,
-          marginBottom: 10,
-          paddingBottom: 6,
-          borderBottom: `1px solid ${S.border}`,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          cursor: "pointer",
-          userSelect: "none",
-        }}
+        className="text-[9px] tracking-[2px] uppercase text-dpw-muted mb-2.5 pb-1.5 border-b border-dpw-border flex justify-between items-center cursor-pointer select-none"
       >
         <span>Versions ({sorted.length})</span>
-        <span style={{ fontSize: 11, lineHeight: 1 }}>{expanded ? "▾" : "▸"}</span>
+
+        <span className="text-[11px] leading-none">
+          {expanded ? "▾" : "▸"}
+        </span>
       </div>
+
       {expanded && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div className="flex flex-col gap-1.5">
+
           {sorted.map((d) => {
             const isActive = d.id === activeDraftId;
-            const ts = d.created_at ? new Date(d.created_at) : null;
+
+            const ts = d.created_at
+              ? new Date(d.created_at)
+              : null;
+
             const tsLabel = ts
-              ? `${ts.toLocaleDateString()} ${ts.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+              ? `${ts.toLocaleDateString()} ${ts.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}`
               : "—";
+
             return (
               <div
                 key={d.id}
                 onClick={() => onSelectVersion(d)}
-                style={{
-                  padding: "8px 10px",
-                  borderRadius: 8,
-                  border: `1px solid ${isActive ? S.gold : S.border}`,
-                  background: isActive ? S.pale : "transparent",
-                  cursor: "pointer",
-                  fontSize: 11,
-                  color: isActive ? S.gold : S.text,
-                }}
+                className={`px-[10px] py-2 rounded-md border cursor-pointer text-[11px] ${
+                  isActive
+                    ? "border-dpw-gold bg-dpw-gold-pale text-dpw-gold"
+                    : "border-dpw-border bg-transparent text-dpw-text"
+                }`}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 2,
-                  }}
-                >
-                  <span style={{ fontWeight: 600 }}>v{d.version ?? 1}</span>
+
+                <div className="flex justify-between items-center mb-[2px]">
+
+                  <span className="font-semibold">
+                    v{d.version ?? 1}
+                  </span>
+
                   <span
-                    style={{
-                      fontSize: 9,
-                      color: isActive ? S.gold : S.muted,
-                      textTransform: "capitalize",
-                    }}
+                    className={`text-[9px] capitalize ${
+                      isActive
+                        ? "text-dpw-gold"
+                        : "text-dpw-muted"
+                    }`}
                   >
                     {(d.status ?? "pending_review").replace(/_/g, " ")}
                   </span>
+
                 </div>
-                <div style={{ fontSize: 9.5, color: S.muted }}>{tsLabel}</div>
+
+                <div className="text-[9.5px] text-dpw-muted">
+                  {tsLabel}
+                </div>
+
               </div>
             );
           })}
+
         </div>
       )}
     </div>
