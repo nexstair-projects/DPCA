@@ -2,14 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase";
-import { S } from "@/lib/theme";
-
 type KbRow = { id: string; title: string; category: string | null };
-
 type Props = {
   sourceIds: string[] | null | undefined;
 };
-
 export function ContextSources({ sourceIds }: Props) {
   const [rows, setRows] = useState<KbRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -19,8 +15,11 @@ export function ContextSources({ sourceIds }: Props) {
       setRows([]);
       return;
     }
+
     setLoading(true);
+
     const supabase = createClient();
+
     supabase
       .from("knowledge_base")
       .select("id, title, category")
@@ -32,61 +31,52 @@ export function ContextSources({ sourceIds }: Props) {
   }, [sourceIds]);
 
   return (
-    <div>
-      <div
-        style={{
-          fontSize: 9,
-          letterSpacing: "2px",
-          textTransform: "uppercase",
-          color: S.muted,
-          marginBottom: 10,
-          paddingBottom: 6,
-          borderBottom: `1px solid ${S.border}`,
-        }}
-      >
+    <div className="component-ContextSources">
+
+      <div className="text-[9px] tracking-[2px] uppercase text-dpw-muted mb-2.5 pb-1.5 border-b border-dpw-border">
         Context Sources
       </div>
+
       {!sourceIds || sourceIds.length === 0 ? (
-        <div style={{ fontSize: 11, color: S.muted }}>None retrieved</div>
+
+        <div className="text-[11px] text-dpw-muted">
+          None retrieved
+        </div>
+
       ) : loading ? (
-        <div style={{ fontSize: 11, color: S.muted }}>Loading…</div>
+
+        <div className="text-[11px] text-dpw-muted">
+          Loading…
+        </div>
+
       ) : rows.length === 0 ? (
-        <div style={{ fontSize: 11, color: S.muted }}>
+
+        <div className="text-[11px] text-dpw-muted">
           {sourceIds.length} source{sourceIds.length === 1 ? "" : "s"} (titles unavailable)
         </div>
+
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+
+        <div className="flex flex-col gap-1.5">
           {rows.map((row) => (
             <a
               key={row.id}
               href={`/knowledge-base?id=${row.id}`}
-              style={{
-                padding: "7px 10px",
-                borderRadius: 8,
-                border: `1px solid ${S.border}`,
-                background: S.bg,
-                fontSize: 11,
-                color: S.text,
-                textDecoration: "none",
-                display: "block",
-              }}
+              className="px-[10px] py-[7px] rounded-md border border-dpw-border bg-dpw-bg text-[11px] text-dpw-text no-underline block"
             >
-              <div style={{ fontWeight: 500, lineHeight: 1.3 }}>{row.title}</div>
+              <div className="font-medium leading-[1.3]">
+                {row.title}
+              </div>
+
               {row.category && (
-                <div
-                  style={{
-                    fontSize: 9,
-                    color: S.muted,
-                    marginTop: 2,
-                    textTransform: "capitalize",
-                  }}
-                >
+                <div className="text-[9px] text-dpw-muted mt-[2px] capitalize">
                   {row.category.replace(/_/g, " ")}
                 </div>
               )}
             </a>
           ))}
         </div>
+
       )}
     </div>
   );

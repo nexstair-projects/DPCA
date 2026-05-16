@@ -205,6 +205,7 @@ export async function generateDraft(
     .insert({
       message_id: messageId,
       draft_text: draftText,
+      original_draft_text: draftText,
       model_used: modelUsed,
       prompt_tokens: inputTokens,
       completion_tokens: outputTokens,

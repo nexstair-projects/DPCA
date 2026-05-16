@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import useSWR from 'swr'
 import { createClient } from '@/lib/supabase'
-import Sidebar from '@/components/Sidebar'
+import Sidebar from '@/components/block/Sidebar'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 

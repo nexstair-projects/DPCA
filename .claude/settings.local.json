@@ -18,7 +18,13 @@
       "PowerShell(Get-ChildItem -Path \"d:\\\\workspace\\\\DPCA\\\\n8n-workflows\" -File | Select-Object Name, @{Name=\"Size\"; Expression={$_.Length}})",
       "Bash(npx ts-node *)",
       "Bash(Get-ChildItem -Path \"d:\\\\workspace\\\\DPCA\\\\n8n\" -Force)",
-      "Bash(Select-Object Name, FullName)"
+      "Bash(Select-Object Name, FullName)",
+      "WebSearch",
+      "PowerShell(cd D:\\\\workspace\\\\DPCA; $env:NODE_PATH = \"D:\\\\workspace\\\\DPCA\\\\backend\\\\node_modules\"; .\\\\backend\\\\node_modules\\\\.bin\\\\tsx.cmd scripts\\\\kb-import.ts)",
+      "PowerShell($env:NODE_PATH = \"D:\\\\workspace\\\\DPCA\\\\backend\\\\node_modules\"; $env:BACKEND_URL = \"https://dpca-production.up.railway.app\"; .\\\\backend\\\\node_modules\\\\.bin\\\\tsx.cmd scripts\\\\kb-import.ts)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

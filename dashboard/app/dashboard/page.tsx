@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import useSWR from 'swr'
-import Sidebar from '@/components/Sidebar'
+import Sidebar from '@/components/block/Sidebar'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 

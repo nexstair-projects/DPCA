@@ -6,7 +6,9 @@ export const draftsRouter = Router()
 
 // POST /api/drafts/:id/approve — approve draft & mark message approved
 const approveSchema = z.object({
-  reviewed_by: z.string().uuid(),
+  reviewed_by: z.string().uuid().optional(),
+  sender_email: z.string().email().optional(),
+  draft_text: z.string().optional(),
   edited_text: z.string().optional(),
 })
 
@@ -14,13 +16,45 @@ draftsRouter.post('/:id/approve', async (req: Request, res: Response) => {
   const parsed = approveSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
 
-  const { reviewed_by, edited_text } = parsed.data
+  const { reviewed_by, sender_email, draft_text, edited_text } = parsed.data
   const draftId = req.params.id
   const status = edited_text ? 'edited_approved' : 'approved'
 
+  // Preserve the original draft text if it was never recorded.
+  const { data: existingDraft, error: existingDraftErr } = await supabase
+    .from('drafts')
+    .select('original_draft_text, draft_text')
+    .eq('id', draftId)
+    .single()
+
+  if (existingDraftErr) return res.status(500).json({ error: existingDraftErr.message })
+
+  const updatePayload: Record<string, unknown> = {
+    status,
+    updated_at: new Date().toISOString(),
+    ...(reviewed_by ? { reviewed_by } : {}),
+    ...(sender_email ? { sender_email } : {}),
+  }
+
+  if (edited_text !== undefined) {
+    updatePayload.edited_text = edited_text
+    updatePayload.draft_text = edited_text
+  }
+
+  if (draft_text !== undefined && edited_text === undefined) {
+    updatePayload.draft_text = draft_text
+  }
+
+  if (
+    existingDraft?.original_draft_text == null &&
+    typeof existingDraft?.draft_text === 'string'
+  ) {
+    updatePayload.original_draft_text = existingDraft.draft_text
+  }
+
   const { data: draft, error: draftErr } = await supabase
     .from('drafts')
-    .update({ status, reviewed_by, edited_text, updated_at: new Date().toISOString() })
+    .update(updatePayload)
     .eq('id', draftId)
     .select('message_id')
     .single()
@@ -35,7 +69,7 @@ draftsRouter.post('/:id/approve', async (req: Request, res: Response) => {
   // Log to audit trail
   await supabase.from('audit_log').insert({
     action_type: edited_text ? 'edit_and_approve' : 'approve',
-    user_id: reviewed_by,
+    ...(reviewed_by ? { user_id: reviewed_by } : {}),
     draft_id: draftId,
     message_id: draft.message_id,
     metadata: edited_text ? { edited: true } : {},
