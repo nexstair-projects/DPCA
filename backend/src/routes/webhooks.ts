@@ -19,6 +19,40 @@ const ingestSchema = z.object({
   labels: z.array(z.string()).optional(),
 })
 
+const threadMessageSchema = z.object({
+  messageId: z.string().optional(),
+  message_external_id: z.string().optional(),
+  threadId: z.string().optional(),
+  thread_id: z.string().optional(),
+  subject: z.string().optional(),
+  from: z.string().optional(),
+  to: z.string().optional(),
+  date: z.string().optional(),
+  timestamp: z.number().optional(),
+  labels: z.array(z.string()).optional(),
+  isSent: z.boolean().optional(),
+  role: z.enum(['assistant', 'customer']).optional(),
+  snippet: z.string().optional(),
+  body_raw: z.string().optional(),
+  body_clean: z.string().optional(),
+})
+
+const threadIngestSchema = z.object({
+  inbox_id: z.string().uuid(),
+  channel: z.enum(['gmail', 'whatsapp', 'instagram']).default('gmail'),
+  messages: z.array(threadMessageSchema),
+})
+
+const parseEmailAddress = (value = '') => {
+  const match = value.match(/^(.*?)\s*<([^>]+)>$/)
+  if (!match) return { name: undefined, email: value.includes('@') ? value.trim() : undefined }
+
+  return {
+    name: match[1].replace(/^"|"$/g, '').trim() || undefined,
+    email: match[2].trim() || undefined,
+  }
+}
+
 webhooksRouter.post('/n8n/message-ingested', async (req: Request, res: Response) => {
   const parsed = ingestSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
@@ -37,6 +71,56 @@ webhooksRouter.post('/n8n/message-ingested', async (req: Request, res: Response)
 })
 
 // POST /api/webhooks/n8n/message-classified — called by WF2 after classification
+// POST /api/webhooks/n8n/thread-messages-ingested - upsert missing Gmail messages from a full thread
+webhooksRouter.post('/n8n/thread-messages-ingested', async (req: Request, res: Response) => {
+  const body = Array.isArray(req.body?.messages)
+    ? req.body
+    : { ...req.body, messages: Array.isArray(req.body) ? req.body : [req.body] }
+
+  const parsed = threadIngestSchema.safeParse(body)
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
+
+  const rows = parsed.data.messages
+    .map((message) => {
+      const message_external_id = message.message_external_id ?? message.messageId
+      if (!message_external_id) return null
+
+      const sender = parseEmailAddress(message.from)
+      const isSent =
+        message.isSent ??
+        (message.role === 'assistant' || (message.labels ?? []).includes('SENT'))
+      const received_at =
+        message.date ??
+        (message.timestamp != null ? new Date(message.timestamp).toISOString() : new Date().toISOString())
+
+      return {
+        inbox_id: parsed.data.inbox_id,
+        channel: parsed.data.channel,
+        message_external_id,
+        thread_id: message.thread_id ?? message.threadId,
+        sender_name: sender.name,
+        sender_email: sender.email,
+        subject: message.subject ?? '',
+        body_raw: message.body_raw ?? message.snippet ?? '',
+        body_clean: message.body_clean ?? message.snippet ?? '',
+        labels: message.labels,
+        status: isSent ? 'replied' : 'new',
+        received_at,
+      }
+    })
+    .filter((row): row is NonNullable<typeof row> => row != null)
+
+  if (rows.length === 0) return res.status(400).json({ error: 'No valid thread messages supplied' })
+
+  const { data, error } = await supabase
+    .from('messages')
+    .upsert(rows, { onConflict: 'message_external_id', ignoreDuplicates: false })
+    .select('id, message_external_id')
+
+  if (error) return res.status(500).json({ error: error.message })
+  res.json({ ok: true, upserted: data?.length ?? 0, messages: data ?? [] })
+})
+
 const classifySchema = z.object({
   message_id: z.string().uuid(),
   category: z.string(),

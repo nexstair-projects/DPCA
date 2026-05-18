@@ -3,15 +3,15 @@
 import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import useSWR from "swr";
 import { createClient } from "@/lib/supabase";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/block/Sidebar";
 import { useSearchParams } from "next/navigation";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { Button } from "@/components/ui/Button";
 import { ChannelActivity } from "@/components/ui/ChannelActivity";
-import { RegenerateModal } from "@/components/RegenerateModal";
-import { RejectModal } from "@/components/RejectModal";
-import { VersionHistory } from "@/components/VersionHistory";
-import { ContextSources } from "@/components/ContextSources";
+import { RegenerateModal } from "@/components/modals/RegenerateModal";
+import { RejectModal } from "@/components/modals/RejectModal";
+import { VersionHistory } from "@/components/ui/VersionHistory";
+import { ContextSources } from "@/components/ui/ContextSources";
 
 /*Importing Types*/
 import { Message } from "@/app/types/message";
@@ -96,6 +96,63 @@ const CHANNEL_TABS = [
 
 // ── Page ────────────────────────────────────────────────────────────────────────
 
+const messageDate = (message: Message) =>
+  message.received_at ?? message.created_at;
+
+const isOutgoingMessage = (message: Message) => {
+  const labels = message.labels ?? [];
+  return (
+    message.role === "assistant" ||
+    labels.includes("SENT") ||
+    ["sent", "replied", "auto_sent"].includes(message.status ?? "")
+  );
+};
+
+const messageTime = (message: Message) => {
+  const parsed = Date.parse(messageDate(message));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const threadKey = (message: Message) =>
+  message.thread_id ?? message.message_external_id ?? message.id;
+
+const buildThreadList = (messages: Message[]) => {
+  const grouped = new Map<string, Message[]>();
+
+  messages.forEach((message) => {
+    const existingConversation =
+      message.conversation && message.conversation.length > 0
+        ? message.conversation
+        : [message];
+
+    existingConversation.forEach((conversationMessage) => {
+      const key = threadKey(conversationMessage) || threadKey(message);
+      grouped.set(key, [...(grouped.get(key) ?? []), conversationMessage]);
+    });
+  });
+
+  return [...grouped.values()]
+    .map((conversation) => {
+      const sortedConversation = [...conversation].sort(
+        (a, b) => messageTime(a) - messageTime(b),
+      );
+      const latest = sortedConversation[sortedConversation.length - 1];
+      const latestCustomer =
+        [...sortedConversation].reverse().find((m) => !isOutgoingMessage(m)) ??
+        latest;
+
+      return {
+        ...latestCustomer,
+        subject: latest.subject ?? latestCustomer.subject,
+        body_raw: latest.body_raw ?? latestCustomer.body_raw,
+        latest_message_at: messageDate(latest),
+        conversation_count: sortedConversation.length,
+        conversation: sortedConversation,
+      };
+    })
+    .sort((a, b) => messageTime(b) - messageTime(a));
+};
+
 export default function InboxPage() {
   return (
     <Suspense>
@@ -160,7 +217,15 @@ function InboxContent() {
     return res.json();
   });
 
-  const selected = messages.find((m) => m.id === selectedId) ?? null;
+  const threadList = useMemo(() => buildThreadList(messages), [messages]);
+
+  const selected = threadList.find((m) => m.id === selectedId) ?? null;
+  const selectedConversation =
+    selected?.conversation && selected.conversation.length > 0
+      ? selected.conversation
+      : selected
+        ? [selected]
+        : [];
 
   // Drafts sorted latest-first by version (so [0] is always the most recent)
   const sortedDrafts = useMemo(() => {
@@ -180,12 +245,12 @@ function InboxContent() {
   }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
-    let result = messages;
+    let result = threadList;
     if (channelFilter !== "all")
       result = result.filter((m) => m.channel === channelFilter);
     if (filter !== "all") result = result.filter((m) => m.category === filter);
     return result;
-  }, [messages, channelFilter, filter]);
+  }, [threadList, channelFilter, filter]);
 
   const handleSelect = useCallback((msg: Message) => {
     setSelectedId(msg.id);
@@ -534,6 +599,7 @@ function InboxContent() {
                     msg={msg}
                     isActive={isActive}
                     onClick={handleSelect}
+                    messageCount={msg.conversation_count ?? msg.conversation?.length}
                   />
                 );
               })}
@@ -735,26 +801,64 @@ function InboxContent() {
                         marginBottom: 12,
                       }}
                     >
-                      Original Message
+                      Conversation Thread ({selectedConversation.length})
                     </div>
                     <div
                       style={{
-                        background: S.white,
-                        border: `1px solid ${S.border}`,
-                        borderRadius: 12,
-                        padding: 20,
-                        fontSize: 13,
-                        color: S.text,
-                        lineHeight: 1.75,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 12,
                       }}
                     >
-                      {(selected.body_raw ?? "(no content)")
-                        .split("\n")
-                        .map((line, i) => (
-                          <p key={i} style={{ margin: "0 0 10px" }}>
-                            {line || <br />}
-                          </p>
-                        ))}
+                      {selectedConversation.map((message) => {
+                        const outgoing = isOutgoingMessage(message);
+                        return (
+                          <div
+                            key={message.id}
+                            style={{
+                              alignSelf: outgoing ? "flex-end" : "flex-start",
+                              maxWidth: "88%",
+                              background: outgoing ? "#f7f1df" : S.white,
+                              border: `1px solid ${outgoing ? "#e8d5a3" : S.border}`,
+                              borderRadius: 10,
+                              padding: "12px 14px",
+                              fontSize: 13,
+                              color: S.text,
+                              lineHeight: 1.65,
+                              boxShadow: "0 1px 2px rgba(40, 32, 18, 0.04)",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                gap: 12,
+                                marginBottom: 8,
+                                fontSize: 10,
+                                color: S.muted,
+                              }}
+                            >
+                              <strong style={{ color: outgoing ? S.gold : S.dark }}>
+                                {outgoing ? "Dream Paris Wedding" : message.sender_name ?? "Customer"}
+                              </strong>
+                              <span>
+                                {new Date(messageDate(message)).toLocaleDateString()}{" "}
+                                {new Date(messageDate(message)).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                            {(message.body_raw ?? "(no content)")
+                              .split("\n")
+                              .map((line, i) => (
+                                <p key={i} style={{ margin: "0 0 8px" }}>
+                                  {line || <br />}
+                                </p>
+                              ))}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 

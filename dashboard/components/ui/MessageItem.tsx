@@ -20,6 +20,9 @@ const relativeTime = (iso: string) => {
 
 /* Message Item Component */
 export function MessageItem({ msg, isActive, onClick, messageCount }: MessageItemProps) {
+  const count = messageCount ?? msg.conversation_count ?? msg.conversation?.length ?? 1;
+  const activityAt = msg.latest_message_at ?? msg.received_at ?? msg.created_at;
+
   return (
     <div
       className={`message-item px-4 py-[14px] border-b border-[#f0e8d4] cursor-pointer transition-all duration-100 ${
@@ -37,7 +40,7 @@ export function MessageItem({ msg, isActive, onClick, messageCount }: MessageIte
           </h6>
         </div>
         <span className="font-sans text-[10px] text-dpw-muted">
-          {relativeTime(msg.created_at)}
+          {relativeTime(activityAt)}
         </span>
       </div>
 
@@ -60,7 +63,7 @@ export function MessageItem({ msg, isActive, onClick, messageCount }: MessageIte
             <CategoryBadge category="high_value" className="ml-2" />
           )}
         </div>
-        {messageCount != null && messageCount > 1 && (
+        {count > 1 && (
           <div
             style={{
               background: S.bg,
@@ -71,7 +74,7 @@ export function MessageItem({ msg, isActive, onClick, messageCount }: MessageIte
               border: `1px solid ${S.border}`,
             }}
           >
-            {messageCount} messages
+            {count} messages
           </div>
         )}
       </div>

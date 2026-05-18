@@ -8,6 +8,12 @@ export type Message = {
     body_raw: string | null
     inbox_id?: string | null
     timestamp?: number | null
+    received_at?: string | null
+    latest_message_at?: string | null
+    conversation_count?: number | null
+    conversation?: Message[]
+    labels?: string[] | null
+    role?: "assistant" | "customer" | null
     category: string | null
     priority: string | null
     tier: number | null
