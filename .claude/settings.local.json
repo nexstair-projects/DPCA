@@ -24,7 +24,8 @@
       "PowerShell($env:NODE_PATH = \"D:\\\\workspace\\\\DPCA\\\\backend\\\\node_modules\"; $env:BACKEND_URL = \"https://dpca-production.up.railway.app\"; .\\\\backend\\\\node_modules\\\\.bin\\\\tsx.cmd scripts\\\\kb-import.ts)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(git remote *)"
     ]
   }
 }
