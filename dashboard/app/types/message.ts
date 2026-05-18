@@ -2,10 +2,18 @@ export type Message = {
     id: string
     sender_name: string | null
     sender_email: string | null
+    thread_id?: string | null
+    message_external_id?: string | null
     subject: string | null
     body_raw: string | null
     inbox_id?: string | null
-    thread_id?: string | null
+    timestamp?: number | null
+    received_at?: string | null
+    latest_message_at?: string | null
+    conversation_count?: number | null
+    conversation?: Message[]
+    labels?: string[] | null
+    role?: "assistant" | "customer" | null
     category: string | null
     priority: string | null
     tier: number | null

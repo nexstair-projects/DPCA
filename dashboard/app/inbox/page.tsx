@@ -1,18 +1,157 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import useSWR from "swr";
+import { createClient } from "@/lib/supabase";
 import Sidebar from "@/components/block/Sidebar";
-import { S } from "@/lib/theme";
-
-import { useInboxState } from "@/hooks/useInboxState";
-import { TopBar } from "@/components/block/TopBar";
-import { InboxListPanel } from "@/components/block/InboxList";
-import { ReviewPanel } from "@/components/block/ReviewPanel";
-import { MetaPanel } from "@/components/block/MetaPanel";
-import { RejectModal } from "@/components/modals/RejectModal";
+import { useSearchParams } from "next/navigation";
+import { formatDistanceToNow, parseISO } from "date-fns";
+import { Button } from "@/components/ui/Button";
+import { ChannelActivity } from "@/components/ui/ChannelActivity";
 import { RegenerateModal } from "@/components/modals/RegenerateModal";
-import { StatsBar } from "@/components/block/StatsBar";
+import { RejectModal } from "@/components/modals/RejectModal";
+import { VersionHistory } from "@/components/ui/VersionHistory";
+import { ContextSources } from "@/components/ui/ContextSources";
+
+/*Importing Types*/
+import { Message } from "@/app/types/message";
+
+/*End*/
+
+import { S } from "@/lib/theme";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { MessageItem } from "@/components/ui/MessageItem";
+import { MetaRow } from "@/components/ui/MetaRow";
+
+// ── Category look-up ────────────────────────────────────────────────────────────
+
+const CAT: Record<
+  string,
+  { label: string; bg: string; color: string; border: string }
+> = {
+  new_inquiry: {
+    label: "New Inquiry",
+    bg: "#fffbe6",
+    color: "#7a5c00",
+    border: "#f5d87a",
+  },
+  vendor: {
+    label: "Vendor",
+    bg: "#edfaf2",
+    color: "#1a5c35",
+    border: "#7bd4a5",
+  },
+  existing_client: {
+    label: "Client",
+    bg: "#eff5ff",
+    color: "#1a3a6e",
+    border: "#90b8f0",
+  },
+  collaboration: {
+    label: "Collab",
+    bg: "#f3eeff",
+    color: "#5a2a8a",
+    border: "#c0a0e0",
+  },
+  general: {
+    label: "General",
+    bg: "#f5f5f5",
+    color: "#5a5a5a",
+    border: "#d0d0d0",
+  },
+};
+
+const catMeta = (key: string | null) => CAT[key ?? "general"] ?? CAT.general;
+
+const FILTERS = [
+  { key: "all", label: "All" },
+  { key: "new_inquiry", label: "Inquiry" },
+  { key: "existing_client", label: "Client" },
+  // { key: "vendor", label: "Vendor" },
+  // { key: "collaboration", label: "Collab" },
+];
+
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
+
+// Status groupings
+const PENDING_STATUSES = [
+  "received",
+  "new",
+  "processing",
+  "classified",
+  "draft_ready",
+  "pending_review",
+  "needs_human_reply",
+];
+const APPROVED_STATUSES = ["approved", "edited_approved"];
+const SENT_STATUSES = ["auto_sent", "auto_approved", "sent", "replied"];
+
+const CHANNEL_TABS = [
+  { key: "all", label: "All", icon: "" },
+  { key: "gmail", label: "Gmail", icon: "✉️" },
+  { key: "whatsapp", label: "WhatsApp", icon: "💬" },
+  { key: "instagram", label: "Instagram", icon: "📸" },
+];
+
+// ── Page ────────────────────────────────────────────────────────────────────────
+
+const messageDate = (message: Message) =>
+  message.received_at ?? message.created_at;
+
+const isOutgoingMessage = (message: Message) => {
+  const labels = message.labels ?? [];
+  return (
+    message.role === "assistant" ||
+    labels.includes("SENT") ||
+    ["sent", "replied", "auto_sent"].includes(message.status ?? "")
+  );
+};
+
+const messageTime = (message: Message) => {
+  const parsed = Date.parse(messageDate(message));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const threadKey = (message: Message) =>
+  message.thread_id ?? message.message_external_id ?? message.id;
+
+const buildThreadList = (messages: Message[]) => {
+  const grouped = new Map<string, Message[]>();
+
+  messages.forEach((message) => {
+    const existingConversation =
+      message.conversation && message.conversation.length > 0
+        ? message.conversation
+        : [message];
+
+    existingConversation.forEach((conversationMessage) => {
+      const key = threadKey(conversationMessage) || threadKey(message);
+      grouped.set(key, [...(grouped.get(key) ?? []), conversationMessage]);
+    });
+  });
+
+  return [...grouped.values()]
+    .map((conversation) => {
+      const sortedConversation = [...conversation].sort(
+        (a, b) => messageTime(a) - messageTime(b),
+      );
+      const latest = sortedConversation[sortedConversation.length - 1];
+      const latestCustomer =
+        [...sortedConversation].reverse().find((m) => !isOutgoingMessage(m)) ??
+        latest;
+
+      return {
+        ...latestCustomer,
+        subject: latest.subject ?? latestCustomer.subject,
+        body_raw: latest.body_raw ?? latestCustomer.body_raw,
+        latest_message_at: messageDate(latest),
+        conversation_count: sortedConversation.length,
+        conversation: sortedConversation,
+      };
+    })
+    .sort((a, b) => messageTime(b) - messageTime(a));
+};
 
 export default function InboxPage() {
   return (
@@ -24,77 +163,233 @@ export default function InboxPage() {
 
 function InboxContent() {
   const searchParams = useSearchParams();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState("all");
+  const [channelFilter, setChannelFilter] = useState(
+    searchParams.get("channel") ?? "all",
+  );
+  const [draftText, setDraftText] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [regenerateModalOpen, setRegenerateModalOpen] = useState(false);
+  const [viewingDraftId, setViewingDraftId] = useState<string | null>(null);
+
+  // Get current user ID and session token for API calls
+  useEffect(() => {
+    const supabase = createClient();
+    console.log('🔐 Checking auth session...');
+    supabase.auth.getSession().then(({ data, error }) => {
+      console.log('🔐 getSession result:', { session: data.session ? 'EXISTS' : 'NONE', error });
+      if (error) {
+        console.error('🔐 Auth error:', error.message);
+        return;
+      }
+      if (!data.session) {
+        console.warn('🔐 No session found. User may not be logged in.');
+        return;
+      }
+      console.log('🔐 Session user:', data.session.user?.email);
+      console.log('🔐 Token (first 30 chars):', data.session.access_token.slice(0, 30) + '...');
+      setUserId(data.session.user?.id ?? null);
+      setAccessToken(data.session.access_token ?? null);
+    }).catch(err => {
+      console.error('🔐 Unexpected auth error:', err);
+    });
+  }, []);
+
+  const authHeaders: Record<string, string> = accessToken
+    ? { Authorization: `Bearer ${accessToken}` }
+    : {};
 
   const {
-    // Selection & filters
-    selectedId,
-    setSelectedId,
-    filter,
-    setFilter,
-    channelFilter,
-    setChannelFilter,
-    // Draft
-    draftText,
-    setDraftText,
-    viewingDraftId,
-    setViewingDraftId,
-    sortedDrafts,
-    activeDraft,
-    // Sending mode
-    sendingMode,
-    setSendingMode,
-    // UI state
-    isSending,
-    rejectModalOpen,
-    setRejectModalOpen,
-    regenerateModalOpen,
-    setRegenerateModalOpen,
-    // Data
-    filtered,
-    selected,
+    data: messages = [],
     isLoading,
     mutate,
-    // Handlers
-    handleSelect,
-    handleApprove,
-    handleReject,
-    handleRegenerate,
-    // Derived
-    pendingCount,
-    approvedCount,
-    autoSentCount,
-    channelCounts,
-    avgToneScore,
-  } = useInboxState(searchParams.get("channel") ?? "all");
+  } = useSWR<Message[]>(accessToken ? "inbox-messages" : null, async () => {
+    console.log('📡 Fetching messages with token:', accessToken ? accessToken.slice(0, 20) + '…' : 'NULL');
+    const res = await fetch(`${BACKEND_URL}/api/messages`, { headers: authHeaders });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      console.error('📡 API error:', res.status, body);
+      throw new Error(`${res.status}: ${body.error ?? 'Unknown'} — ${body.detail ?? ''}`);
+    }
+    return res.json();
+  });
+
+  const threadList = useMemo(() => buildThreadList(messages), [messages]);
+
+  const selected = threadList.find((m) => m.id === selectedId) ?? null;
+  const selectedConversation =
+    selected?.conversation && selected.conversation.length > 0
+      ? selected.conversation
+      : selected
+        ? [selected]
+        : [];
+
+  // Drafts sorted latest-first by version (so [0] is always the most recent)
+  const sortedDrafts = useMemo(() => {
+    if (!selected?.drafts) return [];
+    return [...selected.drafts].sort(
+      (a, b) => (b.version ?? 0) - (a.version ?? 0),
+    );
+  }, [selected]);
+
+  // Active draft = whichever version the user is viewing, or the latest
+  const activeDraft =
+    sortedDrafts.find((d) => d.id === viewingDraftId) ?? sortedDrafts[0] ?? null;
+
+  useEffect(() => {
+    setViewingDraftId(null);
+    if (selected) setDraftText(sortedDrafts[0]?.draft_text ?? "");
+  }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const filtered = useMemo(() => {
+    let result = threadList;
+    if (channelFilter !== "all")
+      result = result.filter((m) => m.channel === channelFilter);
+    if (filter !== "all") result = result.filter((m) => m.category === filter);
+    return result;
+  }, [threadList, channelFilter, filter]);
+
+  const handleSelect = useCallback((msg: Message) => {
+    setSelectedId(msg.id);
+    setDraftText(msg.drafts?.[0]?.draft_text ?? "");
+  }, []);
+
+  const advanceSelection = useCallback(() => {
+    if (!selected) return;
+    const idx = filtered.findIndex((m) => m.id === selected.id);
+    const next = filtered[idx + 1] ?? filtered[idx - 1] ?? null;
+    if (next) handleSelect(next);
+    else setSelectedId(null);
+  }, [selected, filtered, handleSelect]);
+
+  const handleApprove = async () => {
+    if (!selected || !userId) return;
+    const draftId = activeDraft?.id;
+    if (draftId) {
+      const editedText =
+        draftText !== activeDraft?.draft_text ? draftText : undefined;
+      await fetch(`${BACKEND_URL}/api/drafts/${draftId}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders },
+        body: JSON.stringify({ reviewed_by: userId, edited_text: editedText }),
+      });
+    } else {
+      const supabase = createClient();
+      await supabase
+        .from("messages")
+        .update({ status: "approved" })
+        .eq("id", selected.id);
+    }
+    mutate();
+    advanceSelection();
+  };
+
+  const handleReject = async (rejectionReason: string) => {
+    if (!selected || !userId) return;
+    const draftId = activeDraft?.id;
+    if (draftId) {
+      await fetch(`${BACKEND_URL}/api/drafts/${draftId}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders },
+        body: JSON.stringify({ reviewed_by: userId, rejection_reason: rejectionReason }),
+      });
+    } else {
+      const supabase = createClient();
+      await supabase
+        .from("messages")
+        .update({ status: "discarded" })
+        .eq("id", selected.id);
+    }
+    setRejectModalOpen(false);
+    mutate();
+    advanceSelection();
+  };
+
+  const handleRegenerate = async (instructions: string) => {
+    if (!selected || !userId) return;
+    const draftId = activeDraft?.id;
+    if (!draftId) return;
+    await fetch(`${BACKEND_URL}/api/drafts/${draftId}/regenerate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeaders },
+      body: JSON.stringify({ reviewed_by: userId, instructions }),
+    });
+    setRegenerateModalOpen(false);
+    mutate();
+  };
+
+  const pendingCount = messages.filter((m) =>
+    PENDING_STATUSES.includes(m.status ?? ""),
+  ).length;
+  const approvedCount = messages.filter((m) =>
+    APPROVED_STATUSES.includes(m.status ?? ""),
+  ).length;
+  const autoSentCount = messages.filter((m) =>
+    SENT_STATUSES.includes(m.status ?? ""),
+  ).length;
+  const [sendingMode, setSendingMode] = useState<"auto" | "approve" | "draft">(
+    "approve",
+  );
+
+  // Channel activity counts
+  const channelCounts = useMemo(() => {
+    const counts = { gmail: 0, whatsapp: 0, instagram: 0 };
+    messages.forEach((m) => {
+      const ch = (m.channel ?? "gmail").toLowerCase();
+      if (ch in counts) counts[ch as keyof typeof counts]++;
+    });
+    const total = Math.max(
+      counts.gmail + counts.whatsapp + counts.instagram,
+      1,
+    );
+    return { ...counts, total };
+  }, [messages]);
+
+  // Average tone score
+  const avgToneScore = useMemo(() => {
+    const scores = messages
+      .flatMap((m) => m.drafts)
+      .map((d) => d?.tone_confidence)
+      .filter((s): s is number => s != null);
+    return scores.length > 0
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+      : null;
+  }, [messages]);
 
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
-
-      switch (e.key.toLowerCase()) {
-        case "a":
-          e.preventDefault();
-          handleApprove();
-          break;
-        case "d":
-          e.preventDefault();
-          if (selected) setRejectModalOpen(true);
-          break;
-        case "j": {
-          e.preventDefault();
-          const idx = selected ? filtered.findIndex((m) => m.id === selected.id) : -1;
-          const next = filtered[idx + 1];
-          if (next) handleSelect(next);
-          break;
-        }
-        case "k": {
-          e.preventDefault();
-          const idx = selected ? filtered.findIndex((m) => m.id === selected.id) : filtered.length;
-          const prev = filtered[idx - 1];
-          if (prev) handleSelect(prev);
-          break;
-        }
+      if (
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLInputElement
+      )
+        return;
+      if (e.key === "a" || e.key === "A") {
+        e.preventDefault();
+        handleApprove();
+      }
+      if (e.key === "d" || e.key === "D") {
+        e.preventDefault();
+        if (selected) setRejectModalOpen(true);
+      }
+      if (e.key === "j" || e.key === "J") {
+        e.preventDefault();
+        const idx = selected
+          ? filtered.findIndex((m) => m.id === selected.id)
+          : -1;
+        const next = filtered[idx + 1];
+        if (next) handleSelect(next);
+      }
+      if (e.key === "k" || e.key === "K") {
+        e.preventDefault();
+        const idx = selected
+          ? filtered.findIndex((m) => m.id === selected.id)
+          : filtered.length;
+        const prev = filtered[idx - 1];
+        if (prev) handleSelect(prev);
       }
     };
     window.addEventListener("keydown", handler);
@@ -102,61 +397,804 @@ function InboxContent() {
   }); // intentionally no deps — always uses latest state
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: S.bg, fontFamily: S.sans }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        background: S.bg,
+        fontFamily: S.sans,
+      }}
+    >
       <Sidebar />
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
-        <TopBar pendingCount={pendingCount} onRefresh={() => mutate()} />
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
+          overflow: "hidden",
+        }}
+      >
+        {/* ── TOPBAR ──────────────────────────────────────────────────────── */}
+        <div
+          style={{
+            background: S.white,
+            borderBottom: `1px solid ${S.border}`,
+            padding: "0 24px",
+            height: 56,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <h1
+              style={{
+                fontFamily: S.serif,
+                fontSize: 18,
+                fontWeight: 600,
+                color: S.dark,
+                margin: 0,
+              }}
+            >
+              Approval Queue
+            </h1>
+            {pendingCount > 0 && (
+              <span
+                style={{
+                  background: S.pale,
+                  color: S.gold,
+                  border: `1px solid ${S.border}`,
+                  borderRadius: 20,
+                  padding: "2px 10px",
+                  fontSize: 11,
+                  fontWeight: 500,
+                }}
+              >
+                {pendingCount} Pending Review
+              </span>
+            )}
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button
+              onClick={() => mutate()}
+              bgColor="bg-transaparent hover:bg-[#faf8f3]"
+              textColor="text-[#8a7a5a]"
+              border="border-[#e8dfc8]"
+              className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+              icon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+              }
+            >
+              Refresh
+            </Button>
+            <Button
+              bgColor="bg-[#B8960C] hover:bg-[#D4AF37]"
+              textColor="text-white"
+              border="border-[#B8960C] hover:border-[#D4AF37]"
+              className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+              icon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m4.5 12.75 6 6 9-13.5"
+                  />
+                </svg>
+              }
+            >
+              Approve All Safe
+            </Button>
+          </div>
+        </div>
 
-        {/* 3-panel content */}
+        {/* ── 3-PANEL CONTENT ─────────────────────────────────────────────── */}
         <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
-          <InboxListPanel
-            filtered={filtered}
-            selectedId={selectedId}
-            isLoading={isLoading}
-            channelFilter={channelFilter}
-            filter={filter}
-            onChannelFilterChange={setChannelFilter}
-            onFilterChange={setFilter}
-            onSelect={handleSelect}
-          />
+          {/* ── INBOX LIST PANEL ──────────────────────────────────────────── */}
+          <div
+            style={{
+              width: 310,
+              flexShrink: 0,
+              borderRight: `1px solid ${S.border}`,
+              display: "flex",
+              flexDirection: "column",
+              background: S.white,
+            }}
+          >
+            {/* Channel tabs */}
+            <div
+              style={{
+                padding: "8px 12px 0",
+                borderBottom: `1px solid ${S.border}`,
+              }}
+            >
+              <div style={{ display: "flex", gap: 2, marginBottom: 4 }}>
+                {CHANNEL_TABS.map((ch) => (
+                  <button
+                    key={ch.key}
+                    onClick={() => setChannelFilter(ch.key)}
+                    style={{
+                      padding: "4px 9px",
+                      borderRadius: 6,
+                      border: "none",
+                      background:
+                        channelFilter === ch.key ? S.dark : "transparent",
+                      color: channelFilter === ch.key ? "#fff" : S.muted,
+                      fontSize: 10,
+                      fontWeight: channelFilter === ch.key ? 600 : 400,
+                      cursor: "pointer",
+                      fontFamily: S.sans,
+                      transition: "all 0.12s",
+                    }}
+                  >
+                    {ch.icon} {ch.label}
+                  </button>
+                ))}
+              </div>
+              {/* Category filter tabs */}
+              <div style={{ display: "flex", gap: 2 }}>
+                {FILTERS.map((f) => (
+                  <button
+                    key={f.key}
+                    onClick={() => setFilter(f.key)}
+                    style={{
+                      padding: "5px 9px",
+                      borderRadius: "6px 6px 0 0",
+                      border: "none",
+                      background: filter === f.key ? S.gold : "transparent",
+                      color: filter === f.key ? "#fff" : S.muted,
+                      fontSize: 10.5,
+                      fontWeight: filter === f.key ? 600 : 400,
+                      cursor: "pointer",
+                      fontFamily: S.sans,
+                      transition: "all 0.12s",
+                    }}
+                  >
+                    {f.label}
+                    {f.key === "all" ? ` (${filtered.length})` : ""}
+                  </button>
+                ))}
+              </div>
+            </div>
 
+            {/* Message list */}
+            <div style={{ flex: 1, overflowY: "auto" }}>
+              {isLoading && (
+                <div style={{ padding: 24, color: S.muted, fontSize: 13 }}>
+                  Loading messages…
+                </div>
+              )}
+              {!isLoading && filtered.length === 0 && (
+                <div style={{ padding: 24, color: S.muted, fontSize: 13 }}>
+                  No messages
+                </div>
+              )}
+              {filtered.map((msg) => {
+                const isActive = msg.id === selectedId;
+                return (
+                  <MessageItem
+                    key={msg.id}
+                    msg={msg}
+                    isActive={isActive}
+                    onClick={handleSelect}
+                    messageCount={msg.conversation_count ?? msg.conversation?.length}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── REVIEW + META ──────────────────────────────────────────────── */}
           {selected ? (
             <>
-              <ReviewPanel
-                selected={selected}
-                draftText={draftText}
-                activeDraft={activeDraft}
-                isSending={isSending}
-                onDraftChange={setDraftText}
-                onSkip={() => setSelectedId(null)}
-                onReject={() => setRejectModalOpen(true)}
-                onRegenerate={() => setRegenerateModalOpen(true)}
-                onApprove={handleApprove}
-              />
-              <MetaPanel
-                selected={selected}
-                sortedDrafts={sortedDrafts}
-                activeDraft={activeDraft}
-                onSelectVersion={(d) => {
-                  setViewingDraftId(d.id);
-                  setDraftText(d.draft_text ?? "");
+              {/* Review panel */}
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
                 }}
-                sendingMode={sendingMode}
-                onSendingModeChange={setSendingMode}
-                pendingCount={pendingCount}
-                approvedCount={approvedCount}
-                autoSentCount={autoSentCount}
-                avgToneScore={avgToneScore}
-                channelCounts={channelCounts}
-              />
+              >
+                {/* Review header */}
+                <div
+                  style={{
+                    padding: "12px 20px",
+                    borderBottom: `1px solid ${S.border}`,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexShrink: 0,
+                    background: S.white,
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontFamily: S.serif,
+                        fontSize: 18,
+                        fontWeight: 600,
+                        color: S.dark,
+                      }}
+                    >
+                      {selected.sender_name}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: S.muted,
+                        marginTop: 3,
+                        display: "flex",
+                        gap: 14,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {selected.sender_email && (
+                        <span>✉️ {selected.sender_email}</span>
+                      )}
+                      <span>
+                        🕐 {new Date(selected.created_at).toLocaleDateString()}{" "}
+                        {new Date(selected.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      <span>
+                        📍 Via{" "}
+                        {(selected.channel ?? "Gmail").replace(/^\w/, (c) =>
+                          c.toUpperCase(),
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      flexShrink: 0,
+                      marginLeft: 16,
+                    }}
+                  >
+                    <Button
+                      onClick={() => setSelectedId(null)}
+                      bgColor="bg-transaparent hover:bg-[#faf8f3]"
+                      textColor="text-[#8a7a5a]"
+                      border="border-[#e8dfc8]"
+                      className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+                      icon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m7.49 12-3.75 3.75m0 0 3.75 3.75m-3.75-3.75h16.5V4.499"
+                          />
+                        </svg>
+                      }
+                    >
+                      Skip
+                    </Button>
+                    <Button
+                      onClick={() => setRegenerateModalOpen(true)}
+                      bgColor="bg-transparent hover:bg-[#faf8f3]"
+                      textColor="text-[#6b5d3f]"
+                      border="border-[#e8dfc8]"
+                      className="font-sans text-[13px]"
+                      icon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                          />
+                        </svg>
+                      }
+                    >
+                      Regenerate
+                    </Button>
+                    <Button
+                      onClick={() => setRejectModalOpen(true)}
+                      bgColor="bg-[#fdf0f0] hover:bg-[#fde8e8]"
+                      textColor="text-[#8b3a3a]"
+                      border="border-[#e8c0c0]"
+                      className="font-sans text-[13px]"
+                      icon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18 18 6M6 6l12 12"
+                          />
+                        </svg>
+                      }
+                    >
+                      Reject
+                    </Button>
+                    <Button
+                      onClick={handleApprove}
+                      bgColor="bg-[#3d7a5a] hover:bg-[#2d6048]"
+                      textColor="text-white"
+                      border="border-[#2d6048] hover:border-[#3d7a5a]"
+                      className="font-sans text-[13px] disabled:bg-dpw-gold disabled:text-white disabled:border-dpw-gold disabled:opacity-100 disabled:cursor-not-allowed"
+                      icon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m4.5 12.75 6 6 9-13.5"
+                          />
+                        </svg>
+                      }
+                    >
+                      Approve & Send
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Review body — two columns */}
+                <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+                  {/* Original message */}
+                  <div
+                    style={{
+                      flex: 1,
+                      padding: 20,
+                      overflowY: "auto",
+                      borderRight: `1px solid ${S.border}`,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        color: S.muted,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        marginBottom: 12,
+                      }}
+                    >
+                      Conversation Thread ({selectedConversation.length})
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 12,
+                      }}
+                    >
+                      {selectedConversation.map((message) => {
+                        const outgoing = isOutgoingMessage(message);
+                        return (
+                          <div
+                            key={message.id}
+                            style={{
+                              alignSelf: outgoing ? "flex-end" : "flex-start",
+                              maxWidth: "88%",
+                              background: outgoing ? "#f7f1df" : S.white,
+                              border: `1px solid ${outgoing ? "#e8d5a3" : S.border}`,
+                              borderRadius: 10,
+                              padding: "12px 14px",
+                              fontSize: 13,
+                              color: S.text,
+                              lineHeight: 1.65,
+                              boxShadow: "0 1px 2px rgba(40, 32, 18, 0.04)",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                gap: 12,
+                                marginBottom: 8,
+                                fontSize: 10,
+                                color: S.muted,
+                              }}
+                            >
+                              <strong style={{ color: outgoing ? S.gold : S.dark }}>
+                                {outgoing ? "Dream Paris Wedding" : message.sender_name ?? "Customer"}
+                              </strong>
+                              <span>
+                                {new Date(messageDate(message)).toLocaleDateString()}{" "}
+                                {new Date(messageDate(message)).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                            {(message.body_raw ?? "(no content)")
+                              .split("\n")
+                              .map((line, i) => (
+                                <p key={i} style={{ margin: "0 0 8px" }}>
+                                  {line || <br />}
+                                </p>
+                              ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* AI Draft */}
+                  <div
+                    style={{
+                      flex: 1,
+                      padding: 20,
+                      overflowY: "auto",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        marginBottom: 10,
+                      }}
+                    >
+                      <span
+                        style={{
+                          background: S.dark,
+                          color: "#D4AF37",
+                          padding: "2px 9px",
+                          borderRadius: 12,
+                          fontSize: 9,
+                          fontWeight: 700,
+                          letterSpacing: "0.06em",
+                        }}
+                      >
+                        ✦ AI DRAFT
+                      </span>
+                      {activeDraft?.tone_confidence != null && (
+                        <span style={{ fontSize: 10, color: S.green }}>
+                          {activeDraft.tone_confidence}% tone match
+                        </span>
+                      )}
+                    </div>
+                    <textarea
+                      value={draftText}
+                      onChange={(e) => setDraftText(e.target.value)}
+                      style={{
+                        flex: 1,
+                        minHeight: 260,
+                        padding: 16,
+                        border: `1px solid ${S.border}`,
+                        borderRadius: 12,
+                        fontSize: 13,
+                        color: S.text,
+                        lineHeight: 1.75,
+                        fontFamily: S.sans,
+                        resize: "none",
+                        background: "#fffdf8",
+                        outline: "none",
+                      }}
+                    />
+                    <div
+                      style={{
+                        marginTop: 8,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontSize: 10,
+                        color: S.muted,
+                      }}
+                    >
+                      <span>✎ Click to edit before sending</span>
+                      <span>{draftText.length} characters</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── META PANEL ──────────────────────────────────────────── */}
+              <div
+                style={{
+                  width: 220,
+                  flexShrink: 0,
+                  borderLeft: `1px solid ${S.border}`,
+                  padding: "18px 16px",
+                  overflowY: "auto",
+                  background: S.white,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 18,
+                }}
+              >
+                {/* Classification */}
+                <div>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      color: S.muted,
+                      marginBottom: 10,
+                      paddingBottom: 6,
+                      borderBottom: `1px solid ${S.border}`,
+                    }}
+                  >
+                    Classification
+                  </div>
+                  <MetaRow label="Category">
+                    <CategoryBadge category={selected.category} />
+                  </MetaRow>
+                  <MetaRow label="Priority">
+                    {(() => {
+                      const p = selected.priority ?? "medium";
+                      const cfg: Record<string, { bg: string; color: string }> =
+                        {
+                          high: { bg: S.redBg, color: S.red },
+                          medium: { bg: S.pale, color: S.gold },
+                          low: { bg: "#f5f5f5", color: "#666" },
+                        };
+                      const c = cfg[p] ?? cfg.medium;
+                      return (
+                        <span
+                          style={{
+                            background: c.bg,
+                            color: c.color,
+                            padding: "2px 8px",
+                            borderRadius: 8,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {p}
+                        </span>
+                      );
+                    })()}
+                  </MetaRow>
+                  <MetaRow label="Source">
+                    {(selected.channel ?? "Gmail").replace(/^\w/, (c) =>
+                      c.toUpperCase(),
+                    )}
+                  </MetaRow>
+                  {selected.estimated_value != null && (
+                    <MetaRow label="Est. Value">
+                      <span style={{ color: S.green }}>
+                        &euro;{selected.estimated_value.toLocaleString()}+
+                      </span>
+                    </MetaRow>
+                  )}
+                  {selected.guest_count != null && (
+                    <MetaRow label="Guests">~{selected.guest_count}</MetaRow>
+                  )}
+                </div>
+
+                {/* Sending Mode */}
+                <div>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      color: S.muted,
+                      marginBottom: 10,
+                      paddingBottom: 6,
+                      borderBottom: `1px solid ${S.border}`,
+                    }}
+                  >
+                    Sending Mode
+                  </div>
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
+                  >
+                    {(
+                      [
+                        ["auto", "Auto-Send"],
+                        ["approve", "Approve First"],
+                        ["draft", "Draft Only"],
+                      ] as const
+                    ).map(([key, label]) => {
+                      const active = sendingMode === key;
+                      return (
+                        <div
+                          key={key}
+                          onClick={() => setSendingMode(key)}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: "7px 10px",
+                            borderRadius: 8,
+                            border: `1px solid ${active ? "#e8d5a3" : S.border}`,
+                            background: active ? S.pale : "transparent",
+                            color: active ? S.gold : S.muted,
+                            fontWeight: active ? 500 : 400,
+                            fontSize: 11,
+                            cursor: "pointer",
+                            transition: "all 0.12s",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              border: `1.5px solid currentColor`,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {active && (
+                              <div
+                                style={{
+                                  width: 6,
+                                  height: 6,
+                                  background: S.gold,
+                                  borderRadius: "50%",
+                                }}
+                              />
+                            )}
+                          </div>
+                          {label}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Versions (D3) */}
+                <VersionHistory
+                  drafts={sortedDrafts}
+                  activeDraftId={activeDraft?.id ?? null}
+                  onSelectVersion={(d) => {
+                    setViewingDraftId(d.id);
+                    setDraftText(d.draft_text ?? "");
+                  }}
+                />
+
+                {/* Context Sources (D4) */}
+                <ContextSources sourceIds={activeDraft?.context_sources} />
+
+                {/* Stats */}
+                <div>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      color: S.muted,
+                      marginBottom: 10,
+                      paddingBottom: 6,
+                      borderBottom: `1px solid ${S.border}`,
+                    }}
+                  >
+                    Today&apos;s Stats
+                  </div>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 8,
+                    }}
+                  >
+                    {(
+                      [
+                        [pendingCount, "Pending", S.gold],
+                        [autoSentCount, "Auto-sent", S.green],
+                        [approvedCount, "Approved", S.dark],
+                        [
+                          avgToneScore != null ? `${avgToneScore}%` : "—",
+                          "Tone Score",
+                          S.mid,
+                        ],
+                      ] as [string | number, string, string][]
+                    ).map(([val, lbl, col]) => (
+                      <div
+                        key={lbl}
+                        style={{
+                          background: S.bg,
+                          border: `1px solid ${S.border}`,
+                          borderRadius: 8,
+                          padding: "10px 10px 8px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontFamily: S.serif,
+                            fontSize: 22,
+                            fontWeight: 600,
+                            color: col,
+                            lineHeight: 1,
+                            marginBottom: 3,
+                          }}
+                        >
+                          {val}
+                        </div>
+                        <div style={{ fontSize: 9.5, color: S.muted }}>
+                          {lbl}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Channel Activity */}
+                <div>
+                  <ChannelActivity channelCounts={channelCounts} />
+                </div>
+              </div>
             </>
           ) : (
-            <EmptyState isLoading={isLoading} pendingCount={pendingCount} />
+            /* ── EMPTY STATE ─────────────────────────────────────────────── */
+            <div
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                color: S.muted,
+                gap: 10,
+              }}
+            >
+              <div style={{ fontSize: 28, color: S.gold }}>✦</div>
+              <div style={{ fontFamily: S.serif, fontSize: 20, color: S.mid }}>
+                {isLoading ? "Loading…" : "Select a message to review"}
+              </div>
+              {!isLoading && (
+                <div style={{ fontSize: 12 }}>
+                  {pendingCount > 0
+                    ? `${pendingCount} message${pendingCount === 1 ? "" : "s"} awaiting review`
+                    : "All caught up!"}
+                </div>
+              )}
+            </div>
           )}
         </div>
 
-        {/* Modals */}
+        {/* ── MODALS ──────────────────────────────────────────────────────── */}
         <RejectModal
           open={rejectModalOpen}
           onClose={() => setRejectModalOpen(false)}
@@ -168,44 +1206,85 @@ function InboxContent() {
           onSubmit={handleRegenerate}
         />
 
-        {/* Stats bar */}
-        <StatsBar
-          pendingCount={pendingCount}
-          autoSentCount={autoSentCount}
-          approvedCount={approvedCount}
-          avgToneScore={avgToneScore}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ── Local helpers (page-specific, too small for their own files) ───────────────
-
-function EmptyState({ isLoading, pendingCount }: { isLoading: boolean; pendingCount: number }) {
-  return (
-    <div
-      style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        color: S.muted,
-        gap: 10,
-      }}
-    >
-      <div style={{ fontSize: 28, color: S.gold }}>✦</div>
-      <div style={{ fontFamily: S.serif, fontSize: 20, color: S.mid }}>
-        {isLoading ? "Loading…" : "Select a message to review"}
-      </div>
-      {!isLoading && (
-        <div style={{ fontSize: 12 }}>
-          {pendingCount > 0
-            ? `${pendingCount} message${pendingCount === 1 ? "" : "s"} awaiting review`
-            : "All caught up!"}
+        {/* ── STATS BAR ───────────────────────────────────────────────────── */}
+        <div
+          style={{
+            background: S.white,
+            borderTop: `1px solid ${S.border}`,
+            padding: "8px 24px",
+            display: "flex",
+            alignItems: "center",
+            gap: 24,
+            flexShrink: 0,
+            fontSize: 11,
+            color: S.muted,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: S.gold,
+              }}
+            />
+            <strong style={{ color: S.text }}>{pendingCount}</strong>
+            &nbsp;awaiting approval
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: S.green,
+              }}
+            />
+            <strong style={{ color: S.text }}>{autoSentCount}</strong>
+            &nbsp;auto-sent today
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: S.blue,
+              }}
+            />
+            <strong style={{ color: S.text }}>{approvedCount}</strong>
+            &nbsp;manually approved
+          </div>
+          <div
+            style={{
+              marginLeft: "auto",
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+            }}
+          >
+            {avgToneScore != null && (
+              <span>
+                AI tone accuracy:{" "}
+                <strong style={{ color: S.green }}>{avgToneScore}%</strong>
+              </span>
+            )}
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: S.green,
+                  animation: "pulse 2s infinite",
+                }}
+              />
+              System online
+            </div>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
