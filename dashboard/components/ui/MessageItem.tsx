@@ -1,11 +1,13 @@
 import { CategoryBadge } from "./CategoryBadge";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { Message } from "@/app/types/message";
+import { S } from "@/lib/theme";
 
 type MessageItemProps = {
   msg: Message;
   isActive: boolean;
   onClick: (msg: Message) => void;
+  messageCount?: number;
 };
 
 const relativeTime = (iso: string) => {
@@ -17,7 +19,7 @@ const relativeTime = (iso: string) => {
 };
 
 /* Message Item Component */
-export function MessageItem({ msg, isActive, onClick }: MessageItemProps) {
+export function MessageItem({ msg, isActive, onClick, messageCount }: MessageItemProps) {
   return (
     <div
       className={`message-item px-4 py-[14px] border-b border-[#f0e8d4] cursor-pointer transition-all duration-100 ${
@@ -34,14 +36,13 @@ export function MessageItem({ msg, isActive, onClick }: MessageItemProps) {
             {msg.sender_name ?? "Unknown"}
           </h6>
         </div>
-
         <span className="font-sans text-[10px] text-dpw-muted">
           {relativeTime(msg.created_at)}
         </span>
       </div>
 
       <div>
-        <h4 className="font-sans font-normal text-[12px] mb-0.5">
+        <h4 className="font-sans font-regular text-[12px] mb-0.5">
           {msg.subject ?? "(no subject)"}
         </h4>
       </div>
@@ -52,13 +53,26 @@ export function MessageItem({ msg, isActive, onClick }: MessageItemProps) {
         </p>
       </div>
 
-      <div className="mt-1">
-        <CategoryBadge category={msg.category} />
-
-        {(msg.tier === 3 ||
-          (msg.estimated_value != null &&
-            msg.estimated_value >= 5000)) && (
-          <CategoryBadge category="high_value" className="ml-2" />
+      <div className="mt-1 flex items-center justify-between">
+        <div>
+          <CategoryBadge category={msg.category} />
+          {(msg.tier === 3 || (msg.estimated_value != null && msg.estimated_value >= 5000)) && (
+            <CategoryBadge category="high_value" className="ml-2" />
+          )}
+        </div>
+        {messageCount != null && messageCount > 1 && (
+          <div
+            style={{
+              background: S.bg,
+              color: S.muted,
+              fontSize: 11,
+              padding: '2px 8px',
+              borderRadius: 999,
+              border: `1px solid ${S.border}`,
+            }}
+          >
+            {messageCount} messages
+          </div>
         )}
       </div>
     </div>

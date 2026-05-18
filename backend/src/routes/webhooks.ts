@@ -23,9 +23,12 @@ webhooksRouter.post('/n8n/message-ingested', async (req: Request, res: Response)
   const parsed = ingestSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() })
 
+  // Upsert by external message id to avoid duplicate inserts when the same
+  // thread is processed multiple times by n8n. Use `message_external_id` as
+  // the conflict key in the DB (see Supabase table constraint).
   const { data, error } = await supabase
     .from('messages')
-    .insert({ ...parsed.data, status: 'new' })
+    .upsert({ ...parsed.data, status: 'new' }, { onConflict: 'message_external_id' })
     .select('id')
     .single()
 
